@@ -1,0 +1,27 @@
+
+@charset "UTF-8";
+.uni-rate {
+	line-height: 0;
+	font-size: 0;
+	display: -webkit-box;
+	display: -webkit-flex;
+	display: flex;
+	-webkit-box-orient: horizontal;
+	-webkit-box-direction: normal;
+	-webkit-flex-direction: row;
+	        flex-direction: row
+}
+.uni-rate-icon {
+	position: relative;
+	line-height: 0;
+	font-size: 0;
+	display: inline-block
+}
+.uni-rate-icon-on {
+	line-height: 1;
+	position: absolute;
+	top: 0;
+	left: 0;
+	overflow: hidden
+}
+

@@ -1,0 +1,10 @@
+{
+  "navigationBarTitleText": "商品分类",
+  "navigationBarBackgroundColor": "#FCFCFC",
+  "navigationBarTextStyle": "black",
+  "backgroundColorTop": "#fcfcfc",
+  "backgroundColorBottom": "#fcfcfc",
+  "disableScroll": true,
+  "enablePullDownRefresh": true,
+  "usingComponents": {}
+}

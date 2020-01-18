@@ -1,0 +1,7 @@
+{
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "jingswiper": "/components/jing-swiper/jing-swiper",
+    "uni-icon": "/components/uni/uni-icon/uni-icon"
+  }
+}

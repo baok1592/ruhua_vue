@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "评分",
+  "usingComponents": {
+    "uni-rate": "/components/uni/uni-rate/uni-rate"
+  }
+}

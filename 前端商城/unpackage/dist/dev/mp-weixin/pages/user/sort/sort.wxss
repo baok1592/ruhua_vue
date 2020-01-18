@@ -1,0 +1,69 @@
+.sort .head {
+  background-color: #E0451D;
+  color: #fff;
+  padding: 40px 10px 30px;
+  line-height: 20px;
+}
+.sort .head .head_tit {
+  font-size: 24px;
+  padding-bottom: 20px;
+}
+.sort .head ._span {
+  font-size: 30px;
+  padding: 0 5px;
+}
+.sort .t_tou {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  padding: 10px;
+  height: 30px;
+  line-height: 30px;
+  margin-bottom: 10px;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+          justify-content: space-between;
+}
+.sort .tou_1 {
+  width: 20%;
+  text-align: center;
+}
+.sort .tou_2 {
+  width: 45%;
+  text-align: left;
+}
+.sort .t_01 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  height: 50px;
+  line-height: 50px;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+          justify-content: space-between;
+}
+.sort .t_01_1 {
+  width: 20%;
+  text-align: center;
+}
+.sort .t_01_1 ._img {
+  width: 30px;
+  height: 30px;
+}
+.sort .t_01_2 {
+  width: 45%;
+  text-align: left;
+}
+.sort .t_01_2 ._img {
+  width: 30px;
+  height: 30px;
+  border-radius: 30px;
+  margin-right: 10px;
+}
+.sort .t ._li:nth-of-type(odd) {
+  background-color: #EEEEEE;
+}
+.sort .t ._li:nth-of-type(even) {
+  background-color: #fff;
+}
+

@@ -1,0 +1,6 @@
+{
+  "navigationBarTitleText": "设置",
+  "usingComponents": {
+    "uni-icon": "/components/uni/uni-icon/uni-icon"
+  }
+}

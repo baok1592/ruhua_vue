@@ -1,0 +1,47 @@
+.agent .head {
+  background-color: #E0451D;
+  color: #fff;
+  text-align: center;
+  padding: 40px 10px 30px;
+}
+.agent .head ._span {
+  font-size: 30px;
+  padding: 0 5px;
+}
+.agent .t_tou {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  padding: 10px;
+  height: 30px;
+  line-height: 30px;
+  margin-bottom: 5px;
+}
+.agent .tou_1 {
+  width: 34%;
+  text-align: center;
+}
+.agent .t_01 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  height: 45px;
+  line-height: 45px;
+}
+.agent .t_01_1 {
+  width: 34%;
+  text-align: center;
+}
+.agent .t_01_1 ._img {
+  width: 30px;
+  height: 30px;
+  border-radius: 30px;
+  margin-top: 7px;
+}
+.agent .t ._li:nth-of-type(odd) {
+  background-color: #EEEEEE;
+}
+.agent .t ._li:nth-of-type(even) {
+  background-color: #fff;
+}
+

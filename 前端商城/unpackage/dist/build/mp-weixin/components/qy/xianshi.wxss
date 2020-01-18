@@ -1,0 +1,1 @@
+.xianshi{display:-webkit-box;display:-webkit-flex;display:flex;font-size:12px;border:1px solid #fe201f;border-radius:3px;margin-left:5px;-webkit-flex-shrink:0;flex-shrink:0}.xianshi .xs_l{background-color:#fe201f;color:#fff;padding:0 3px}.xianshi .xs_r{color:#fe201f;padding:0 3px}

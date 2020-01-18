@@ -1,0 +1,8 @@
+{
+  "navigationBarBackgroundColor": "#fff",
+  "navigationBarTitleText": "购物车",
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "tui-numberbox": "/components/numberbox/numberbox"
+  }
+}

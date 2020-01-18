@@ -1,0 +1,21 @@
+.xianshi {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  font-size: 12px;
+  border: 1px solid #FE201F;
+  border-radius: 3px;
+  margin-left: 5px;
+  -webkit-flex-shrink: 0;
+          flex-shrink: 0;
+}
+.xianshi .xs_l {
+  background-color: #FE201F;
+  color: #fff;
+  padding: 0 3px;
+}
+.xianshi .xs_r {
+  color: #FE201F;
+  padding: 0 3px;
+}
+

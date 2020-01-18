@@ -1,0 +1,7 @@
+{
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "uni-load-more": "/components/uni/uni-load-more/uni-load-more",
+    "empty": "/components/empty"
+  }
+}

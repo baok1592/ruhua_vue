@@ -1,0 +1,9 @@
+{
+  "navigationBarTitleText": "评价",
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "tui-tabs": "/components/tui-tabs/tui-tabs",
+    "tui-rate": "/components/rate/rate",
+    "none": "/components/qy/none"
+  }
+}

@@ -1,0 +1,85 @@
+.mingxi .head {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  margin: 10px 0;
+}
+.mingxi .head_l {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  width: 85%;
+  -webkit-justify-content: space-around;
+          justify-content: space-around;
+}
+.mingxi .head_r {
+  width: 15%;
+  text-align: center;
+}
+.mingxi .head_l_1 {
+  border: 1px solid #F2F2F2;
+  padding: 0px 15px;
+  line-height: 25px;
+}
+.mingxi .head_btn {
+  margin: 10px 20px 0;
+  border: 1px solid #F2F2F2;
+  padding: 0px 15px;
+  line-height: 25px;
+}
+.mingxi .ling {
+  color: #E1461D;
+  border: 1px solid #E1461D;
+  padding: 0px 15px;
+  line-height: 25px;
+}
+.mingxi .shouyi {
+  border-top: 1px solid #EBEBEB;
+  border-bottom: 1px solid #EBEBEB;
+  background-color: #FAFAFA;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  height: 30px;
+  line-height: 30px;
+  padding: 3px 10px;
+  margin-top: 15px;
+}
+.mingxi .sy_l {
+  width: 50%;
+}
+.mingxi .sy_l ._span {
+  font-weight: bold;
+}
+.mingxi .ticheng ._li:nth-of-type(odd) {
+  background-color: #EEEEEE;
+}
+.mingxi .ticheng ._li:nth-of-type(even) {
+  background-color: #fff;
+}
+.mingxi .tc {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+          justify-content: space-between;
+  padding: 10px;
+  line-height: 25px;
+  font-size: 14px;
+}
+.mingxi .tc_l {
+  color: #9A9A9A;
+}
+.mingxi .tc_l ._span {
+  font-size: 14px;
+  font-weight: bold;
+  color: #000;
+}
+.mingxi .tc_2 {
+  color: #E1461D;
+}
+.mingxi .tc_2 ._span {
+  color: #9A9A9A;
+}
+

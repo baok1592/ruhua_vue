@@ -1,0 +1,1 @@
+<view class="title-c _div" id="title-c"><view class="_div"><view class="cx _div"><view class="cx_l _div"></view><view class="cx_m _div">{{title}}</view><view class="cx_l _div"></view></view></view></view>

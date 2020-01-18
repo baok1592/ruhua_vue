@@ -1,0 +1,40 @@
+.auth .login-box {
+  position: absolute;
+  left: 15%;
+  top: 25%;
+  z-index: 99999;
+  border-radius: 20rpx;
+  box-shadow: 1px 5px 3px #ccc;
+  width: 70%;
+  height: 439rpx;
+  background: #FAF9FD;
+  text-align: center;
+}
+.auth .login-box .t1 {
+  font-size: 32rpx;
+  border-bottom: 1px solid #DEDEDE;
+  padding: 7px 0;
+}
+.auth .login-box .t2 {
+  padding: 10rpx 0 10rpx;
+  font-size: 30rpx;
+}
+.auth .login-box .t2 image {
+  width: 120rpx;
+  height: 120rpx;
+}
+.auth .login-box .t3 {
+  font-size: 28rpx;
+  color: #A8A7AB;
+  padding-bottom: 20rpx;
+}
+.auth .login-box .t4 {
+  border-top: 1px solid #DEDEDE;
+  padding: 10px 0 0;
+}
+.auth .login-box .t4 button {
+  font-size: 32rpx;
+  color: #51C332;
+  font-weight: 500;
+}
+

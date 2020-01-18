@@ -1,0 +1,86 @@
+.tongji {
+  padding: 10px;
+  font-size: 14px;
+}
+.tongji .t_tit {
+  font-size: 22px;
+  padding: 20px 0px 0;
+  font-weight: 900;
+}
+.tongji .t_time {
+  padding: 10px 0px 15px;
+  color: #B8B8B8;
+  font-size: 10px;
+}
+.tongji .card {
+  margin: 10px 0;
+  background: -webkit-linear-gradient(top, #FA7458, #EB511B);
+  background: linear-gradient(to bottom, #FA7458, #EB511B);
+  border-radius: 5px;
+  padding: 10px;
+  color: #FCE8E3;
+  box-shadow: 2px 2px 5px 3px #FCEAE8;
+}
+.tongji .card_01 {
+  padding: 5px 0 10px;
+  color: #FCE8E3;
+}
+.tongji .card_02 {
+  font-size: 20px;
+  border-bottom: 1px solid #FFE4DC;
+  padding-bottom: 15px;
+}
+.tongji .card_03 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  line-height: 20px;
+  padding: 10px 0 5px;
+}
+.tongji .card_03_1 {
+  width: 35%;
+}
+.tongji .name {
+  margin: 25px 0 15px;
+  font-size: 15px;
+  font-weight: bold;
+}
+.tongji .uhsj {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-justify-content: space-around;
+          justify-content: space-around;
+}
+.tongji .uhsj_l {
+  width: 40%;
+  text-align: center;
+  box-shadow: 0px 0px 5px #E5E5E5;
+  border-radius: 5px;
+  line-height: 25px;
+  padding: 15px 10px;
+}
+.tongji .uhsj_l ._span {
+  font-size: 18px;
+  font-weight: bold;
+}
+.tongji .shuju {
+  background-color: #F8F8F8;
+  border-radius: 5px;
+}
+.tongji .sj_01 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+}
+.tongji .sj_01_1 {
+  width: 50%;
+  text-align: center;
+  line-height: 25px;
+  padding: 10px;
+}
+.tongji .sj_02 {
+  height: 1px;
+  background-color: #fff;
+}
+

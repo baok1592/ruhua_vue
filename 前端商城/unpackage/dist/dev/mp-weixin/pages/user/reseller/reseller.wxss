@@ -1,0 +1,117 @@
+page {
+  background-color: #F5F5F5;
+}
+.reseller {
+  background-color: #F5F5F5;
+  min-height: 100vh;
+  font-size: 14px;
+}
+.reseller .top {
+  color: #FFFFFF;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+          justify-content: space-between;
+  position: relative;
+  width: 100%;
+  height: 250px;
+  background-color: #DD524D;
+  background: -webkit-linear-gradient(top, #4EC28E, #1C9C63);
+  background: linear-gradient(top, #4EC28E, #1C9C63);
+}
+.reseller .top .title {
+  background-color: #FFFFFF;
+}
+.reseller .top .num {
+  font-size: 15px;
+  line-height: 25px;
+  text-align: center;
+  margin-top: 33%;
+  width: 33%;
+}
+.reseller .top .num1 {
+  margin-top: 10%;
+  text-align: center;
+  width: 33%;
+}
+.reseller .jilu {
+  font-size: 15px;
+  position: absolute;
+  left: 78%;
+  top: 20%;
+}
+.reseller .tixian {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+          justify-content: center;
+  background-color: #F5F5F5;
+  width: 55%;
+  height: 60px;
+  border-radius: 60px;
+  position: absolute;
+  bottom: -30px;
+  left: 23%;
+}
+.reseller .tixian .btn {
+  margin-top: 7%;
+  text-align: center;
+  width: 85%;
+  background-color: #1C9C63;
+  height: 40px;
+  border: none;
+  border-radius: 50px;
+  line-height: 40px;
+  color: #FFFFFF;
+}
+.reseller .icon {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+          justify-content: space-between;
+  -webkit-flex-wrap: wrap;
+          flex-wrap: wrap;
+  margin-left: 3%;
+  margin-right: 3%;
+  margin-top: 10%;
+}
+.reseller .icon .ico {
+  border-radius: 10px;
+  border: 1px solid #C0C0C0;
+  width: 49%;
+  height: 100px;
+  margin-top: 10px;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  border: none;
+  font-size: 15px;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: column;
+          flex-direction: column;
+  background-color: #FFFFFF;
+}
+.reseller .icon .ico .img {
+  width: 32px;
+  height: 32px;
+}
+.reseller .icon .ico .tubiao {
+  margin-top: 20px;
+  text-align: center;
+}
+.reseller .icon .ico .text {
+  color: #8F8F94;
+  padding-top: 5px;
+  text-align: center;
+}
+.reseller .kong {
+  height: 100px;
+}
+

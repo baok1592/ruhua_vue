@@ -1,0 +1,8 @@
+{
+  "enablePullDownRefresh": true,
+  "navigationBarBackgroundColor": "#F2F2F2",
+  "usingComponents": {
+    "black": "/components/qy/Black",
+    "uni-icon": "/components/uni/uni-icon/uni-icon"
+  }
+}

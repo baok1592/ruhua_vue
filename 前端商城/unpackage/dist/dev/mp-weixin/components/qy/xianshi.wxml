@@ -1,0 +1,1 @@
+<view class="xianshi"><view class="xs_l">{{title}}</view><view class="xs_r">{{"￥"+price}}</view></view>

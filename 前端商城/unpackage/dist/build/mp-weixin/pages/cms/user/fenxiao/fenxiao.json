@@ -1,0 +1,8 @@
+{
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "uni-icon": "/components/uni/uni-icon/uni-icon",
+    "uni-list": "/components/uni/uni-list/uni-list",
+    "uni-list-item": "/components/uni/uni-list-item/uni-list-item"
+  }
+}

@@ -1,0 +1,91 @@
+.mingxi .none {
+  padding: 150px 0;
+  text-align: center;
+  color: #00A9F4;
+  line-height: 50px;
+}
+.mingxi .none ._img {
+  width: 60px;
+  height: 60px;
+}
+.mingxi .head {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  margin: 10px 0;
+}
+.mingxi .head_l {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  width: 85%;
+  -webkit-justify-content: space-around;
+          justify-content: space-around;
+}
+.mingxi .head_r {
+  width: 15%;
+  text-align: center;
+}
+.mingxi .head_l_1 {
+  border: 1px solid #F2F2F2;
+  padding: 0px 15px;
+  line-height: 25px;
+  font-size: 15px;
+  border-radius: 5px;
+}
+.mingxi .ling {
+  color: #E1461D;
+  border: 1px solid #E1461D;
+  padding: 0px 15px;
+  line-height: 25px;
+  font-size: 15px;
+  border-radius: 5px;
+}
+.mingxi .shouyi {
+  border-top: 1px solid #EBEBEB;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  height: 30px;
+  line-height: 30px;
+  padding: 3px 10px;
+  margin-top: 15px;
+  margin-bottom: 15px;
+}
+.mingxi .sy_l {
+  width: 50%;
+  font-size: 17px;
+}
+.mingxi .sy_l ._span {
+  font-weight: bold;
+  font-size: 17px;
+}
+.mingxi .ticheng ._li:nth-of-type(odd) {
+  background-color: #EEEEEE;
+}
+.mingxi .ticheng ._li:nth-of-type(even) {
+  background-color: #fff;
+}
+.mingxi .tc {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+          justify-content: space-between;
+  padding: 10px;
+  line-height: 25px;
+  font-size: 14px;
+}
+.mingxi .tc_l {
+  color: #9A9A9A;
+}
+.mingxi .tc_l ._span {
+  font-size: 14px;
+  font-weight: bold;
+  color: #000;
+}
+.mingxi .tc_2 {
+  color: #E1461D;
+}
+

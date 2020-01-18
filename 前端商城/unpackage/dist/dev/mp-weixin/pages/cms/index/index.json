@@ -1,0 +1,11 @@
+{
+  "navigationBarTextStyle": "white",
+  "navigationBarTitleText": "手机端商城管理",
+  "enablePullDownRefresh": true,
+  "navigationBarBackgroundColor": "#51C592",
+  "usingComponents": {
+    "uni-icon": "/components/uni/uni-icon/uni-icon",
+    "uni-badge": "/components/uni/uni-badge/uni-badge",
+    "tan": "/components/qy/Tan"
+  }
+}

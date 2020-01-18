@@ -1,0 +1,14 @@
+.article {
+  padding: 20px 10px;
+  font-size: 14px;
+}
+.article .tit {
+  text-align: center;
+  font-size: 16px;
+}
+.article .time {
+  padding: 5px 0 15px;
+  text-align: center;
+  color: #D1D1D1;
+}
+

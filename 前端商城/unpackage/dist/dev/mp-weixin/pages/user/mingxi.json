@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "收入明细",
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "uni-icon": "/components/uni/uni-icon/uni-icon",
+    "none": "/components/qy/none"
+  }
+}

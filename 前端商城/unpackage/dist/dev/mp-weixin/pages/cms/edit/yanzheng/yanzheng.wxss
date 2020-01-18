@@ -1,0 +1,98 @@
+.yzm {
+  background-color: #f5f5f5;
+  min-height: 100vh;
+  padding: 0 0 1px 0;
+}
+.yzm .del {
+  padding: 10px 10px 0;
+}
+.yzm .del ._img {
+  width: 32px;
+  height: 32px;
+}
+.yzm .head {
+  background: -webkit-linear-gradient(top, #52c693, #27a26c);
+  background: linear-gradient(to bottom, #52c693, #27a26c);
+  padding: 30px 25px 30px;
+  color: #fff;
+}
+.yzm .yz_tit {
+  font-size: 16px;
+  text-align: center;
+}
+.yzm .yzms {
+  background-color: #1c9b62;
+  border-radius: 5px;
+  padding: 0px 15px;
+  height: 60px;
+  line-height: 60px;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+          justify-content: space-between;
+}
+.yzm .yzms input {
+  width: 95%;
+  background-color: #1c9b62;
+  color: #fff;
+  height: 60px;
+  font-size: 26px;
+}
+.yzm .shuzi {
+  padding: 20px;
+}
+.yzm .sz_01 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-justify-content: space-around;
+          justify-content: space-around;
+  -webkit-flex-wrap: wrap;
+          flex-wrap: wrap;
+}
+.yzm .sz_01_1 {
+  background-color: #ffffff;
+  height: 80px;
+  width: 80px;
+  border-radius: 50px;
+  text-align: center;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+          justify-content: center;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: column;
+          flex-direction: column;
+  font-size: 30px;
+  border: 1px solid #ececec;
+  margin: 15px 10px;
+}
+.yzm .sz_01_2 {
+  background-color: #36b77e;
+  border-radius: 65px;
+  width: 60%;
+  color: #fff;
+  text-align: center;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-pack: center;
+  -webkit-justify-content: center;
+          justify-content: center;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+  -webkit-flex-direction: column;
+          flex-direction: column;
+  font-size: 30px;
+  margin: 15px 0;
+}
+.yzm input::-webkit-input-placeholder {
+  color: #fff;
+  font-size: 24px;
+}
+

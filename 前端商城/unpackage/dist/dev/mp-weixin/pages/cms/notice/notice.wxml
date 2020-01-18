@@ -1,0 +1,1 @@
+<view class="notice"><view class="head"><view class="head_l">通知公告</view></view><block wx:for="{{list}}" wx:for-item="item" wx:for-index="index" wx:key="index"><block><view class="list"><view class="list_02"><view class="list_l">标题标题标题</view></view><view class="list_03"><view class="list_l">2019-07-28</view></view></view></block></block></view>

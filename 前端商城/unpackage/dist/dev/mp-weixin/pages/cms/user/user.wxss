@@ -1,0 +1,59 @@
+.user {
+  padding: 20px;
+  background-color: #fff;
+  min-height: 100vh;
+}
+.user .uni-list {
+  width: 260px;
+  font-size: 16px;
+}
+.user .uni-list .build_01 {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  border-bottom: 1px solid #F8F8F8;
+  line-height: 35px;
+  padding: 5px 0;
+}
+.user .uni-list .build_01_l {
+  width: 80px;
+  text-align: right;
+}
+.user .uni-list .build_01_r {
+  color: #959595;
+  padding-left: 20px;
+}
+.user .uni-list .foot {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  border-top: 1px #F9F9F9 solid;
+  line-height: 40px;
+  height: 40px;
+  margin-top: 30px;
+}
+.user .uni-list .foot_l {
+  width: 50%;
+  text-align: center;
+}
+.user .uni-list .foot_r {
+  width: 50%;
+  text-align: center;
+  border-left: 1px #F9F9F9 solid;
+  color: #5095D3;
+}
+.user .list {
+  line-height: 35px;
+}
+.user .list_01 {
+  padding: 15px 10px 8px;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+          justify-content: space-between;
+  border-bottom: 1px solid #F4F4F4;
+  font-size: 14px;
+}
+

@@ -1,0 +1,8 @@
+{
+  "navigationBarTitleText": "收藏",
+  "enablePullDownRefresh": true,
+  "usingComponents": {
+    "none": "/components/qy/none",
+    "uni-segmented-control": "/components/uni/uni-segmented-control/uni-segmented-control"
+  }
+}

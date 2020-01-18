@@ -1,0 +1,116 @@
+.tixian .BH {
+  height: 10px;
+  background-color: #F8F8F8;
+  margin: 0px 0 10px;
+}
+.tixian .je {
+  padding: 10px;
+  font-size: 16px;
+  font-weight: bold;
+}
+.tixian .hsuru {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  border-bottom: 1px solid #F0F0F0;
+  margin: 10px 10px 12px;
+  padding: 10px 10px 10px 0;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+          justify-content: space-between;
+}
+.tixian .hu_l input {
+  font-size: 24px;
+  font-weight: bold;
+}
+.tixian .yue {
+  margin: 0px 10px 20px;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+          justify-content: space-between;
+}
+.tixian .yue ._span {
+  color: #F86744;
+}
+.tixian .qdtx {
+  margin: 0 20% 20px;
+  border-radius: 20px;
+  color: #fff;
+  height: 36px;
+  line-height: 36px;
+  text-align: center;
+  font-size: 16px;
+  background: -webkit-linear-gradient(bottom, #FA7458, #EB511B);
+  background: linear-gradient(to top, #FA7458, #EB511B);
+  box-shadow: 2px 2px 4px #ED5624;
+  border: 1px solid #F76644;
+}
+.tixian .card {
+  background-color: #45AAF0;
+  margin: 0px 20px 10px;
+  border-radius: 10px;
+  padding: 20px 10px;
+  color: #fff;
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  box-shadow: 0px 5px 10px #A5CBEA;
+}
+.tixian .card_l {
+  width: 20%;
+  text-align: center;
+}
+.tixian .card_l ._img {
+  width: 45px;
+  height: 45px;
+}
+.tixian .card_r {
+  width: 80%;
+}
+.tixian .card_r .card_r_1 {
+  font-size: 16px;
+  padding-bottom: 10px;
+}
+.tixian .card_r .card_r_2 {
+  font-size: 14px;
+  padding-bottom: 20px;
+}
+.tixian .card_r .card_r_3 {
+  font-size: 14px;
+}
+.tixian .one {
+  display: -webkit-box;
+  display: -webkit-flex;
+  display: flex;
+  -webkit-box-pack: justify;
+  -webkit-justify-content: space-between;
+          justify-content: space-between;
+}
+.tixian .one .t_tit {
+  font-size: 20px;
+  padding: 20px;
+  font-weight: bold;
+}
+.tixian .one .head_btn {
+  margin: 15px 20px 0px;
+  border: 1px solid #F2F2F2;
+  padding: 0px 15px;
+  line-height: 25px;
+  height: 25px;
+}
+.tixian .gongshang {
+  background-color: #C42B25;
+}
+.tixian .nongye {
+  background-color: #008566;
+}
+.tixian .renmin {
+  background-color: #E50012;
+}
+.tixian .jianshe {
+  background-color: #003B8F;
+}
+

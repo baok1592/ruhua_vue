@@ -1,0 +1,8 @@
+{
+  "usingComponents": {
+    "uni-icon": "/components/uni/uni-icon/uni-icon",
+    "titlec": "/components/qy/Title-c",
+    "listd": "/components/qy/List-d",
+    "uni-popup": "/components/uni/uni-popup/uni-popup"
+  }
+}
