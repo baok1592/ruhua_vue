@@ -41,7 +41,7 @@
 			},
 			post_config() {
 				var that = this;
-				this.http.post("cms/get_config", {
+				this.http.post_show("cms/get_config", {
 						type: 2
 					})
 					.then((res) => {

@@ -1,6 +1,7 @@
 <template>
 	<view>
-		<view v-for="item of list">
+		<None v-if="list_empty"></None>
+		<view v-for="item of list" v-else>
 			<view class="list" @click="jump(item.id)">
 				{{item.title}}
 			</view>
@@ -10,11 +11,16 @@
 </template>
 
 <script>
+	import None from "@/components/qy/none.vue"
 	export default {
 		data() {
 			return {
+				list_empty: false,
 				list:''
 			};
+		},
+		components:{
+			None
 		},
 		onLoad() {
 			this._load()
@@ -22,7 +28,11 @@
 		methods: {
 			_load() {
 				this.$api.http.get('article/type_article?type=5').then(res=>{
-					this.list = res.data
+					if (res.data=='') {
+						this.list_empty = true
+					} else {
+						this.list = res.data
+					}
 				})
 			},
 			jump(id) {

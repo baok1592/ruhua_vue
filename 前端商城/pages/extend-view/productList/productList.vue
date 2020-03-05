@@ -20,6 +20,7 @@
 			</view>
 		</view>
 		<!--header-->
+		
 		<!--screen-->
 		<view class="tui-header-screen" :style="{top:height+'px'}">
 			<view class="tui-screen-top">
@@ -31,7 +32,7 @@
 				<view class="tui-top-item" @tap="screen" data-index="2">
 					<tui-icon :name="isList?'manage':'listview'" :size="isList?22:18" :bold="isList?false:true" color="#333"></tui-icon>
 				</view>
-				<view class="tui-top-item tui-icon-ml" @tap="screen" data-index="3">
+				<view v-if="!is_fx" class="tui-top-item tui-icon-ml" @tap="screen" data-index="3">
 					<text>筛选</text>
 					<tui-icon name="screen" :size="12" color="#333" tui-icon-class="tui-ml" :bold="true"></tui-icon>
 				</view>
@@ -61,32 +62,30 @@
 			</view> -->
 		</view>
 		<!--screen-->
+		 
 		<!--list-->
 		<view class="tui-product-list" style="margin-top: 125px;">
 			<view class="tui-product-container">
-				<block v-for="(item,index) in productList" :key="index">
-					<!-- <template is="productItem" data="{{item,index:index,isList:isList}}" /> -->
-					<!--商品列表-->
-					<view class="tui-pro-item" :class="isList?'tui-flex-list':''" hover-class="hover" :hover-start-time="150" @tap="detail(item.goods_id)">
-						<image :src="getimg+item.imgs" class="tui-pro-img" :class="isList?'tui-proimg-list':''" />
+			<!--商品列表-->	 
+				<block v-for="(item,index) in productList" :key="index"> 
+					<view class="tui-pro-item" :class="isList?'tui-flex-list':''" 
+					@click="detail(item.goods_id)">
+						<image v-if="item.imgs" :src="getimg+item.imgs" class="tui-pro-img" :class="isList?'tui-proimg-list':''" />
+						<image v-else :src="default_img" class="tui-pro-img" :class="isList?'tui-proimg-list':''" />
 						<view class="tui-pro-content">
 							<view class="tui-pro-tit">{{item.goods_name}}</view>
 							<view>
 								<view class="tui-pro-price">
-									<text class="tui-sale-price">￥{{item.price}}</text>
-									<text class="tui-factory-price">￥{{item.market_price}}</text>
-								</view>
-								<block v-if="item.sales == 0">
-									<view class="tui-pro-pay">0人付款</view>
-								</block>
-								<block v-else>
-									<view class="tui-pro-pay">{{item.sales}}人付款</view>
-								</block>
+								   <text class="tui-sale-price"><text>￥</text>{{Math.floor(item.price)}} </text>
+								</view> 
+								<view class="tui-pro-pay">
+									{{item.sales?item.sales:0}}人付款
+								</view> 
 							</view>
 						</view>
 					</view>
-					<!--商品列表-->
 				</block>
+			
 			</view>
 		</view>
 
@@ -173,11 +172,13 @@
 			tuiDrawer,
 			tuiLoadmore,
 			tuiNomore,
-			tuiTopDropdown
+			tuiTopDropdown,
 		},
 		data() {
 			return {
+				is_fx:false,
 				getimg: this.$getimg,
+				default_img:require('@/imgs/default.jpg'),
 				currentId: 0,
 				current_children_id: 0,
 				currentName: '',
@@ -227,7 +228,11 @@
 
 			}
 		},
+		
 		onLoad: function(options) {
+			if(options.type=='fx'){
+				this.is_fx=true
+			}
 			if (options.cid) {
 				this.cid = options.cid
 				this.currentId=options.cid
@@ -292,27 +297,28 @@
 						}
 					})
 				})
+				
 			},
-			get_pro() { 
+			get_pro() {  
 				this.$api.http.get('product/get_recent').then(res => { //所有商品
 					this.productList = res.data
 					this.all = res.data
-					console.log(this.productList)
+					console.log('获取所有商品：',res.data)
 				})
 			},
 			get_pro_cate(id) {
 				this.$api.http.get('product/get_cate_pros?id=' + id).then(res => {
 					this.productList = res.data
-					this.all = res.data
-					console.log(this.productList)
+					this.all = res.data					
+					console.log("分类商品:",this.productList)
 				})
 			},
 			get_pro_search(key){
 				this.$api.http.get('product/search?name='+key).then(res => {
 					this.productList = res.data
-					this.all = res.data
-					console.log(this.productList)
-					this.is_search = 0
+					this.all = res.data 
+					this.is_search = 0 
+					console.log("搜索商品:",this.productList)
 				})
 			},
 			//一级分类点击
@@ -329,7 +335,7 @@
 					this.current_children_id = id
 				}
 			},
-			//点击一级分类-全部
+			//点击一级分类中的全部
 			set_all() {
 				this.currentId = 0
 				this.current_children_id = 0
@@ -427,33 +433,33 @@
 				this.current_children_id = 0
 			},
 			closeDrawer() {
-				let sid = 0
-				if(this.sid){
-					sid = this.sid
-				}
+				let sid = this.sid?this.sid:0
+				
 				if (this.currentId > 0) {
+					sid = this.currentId
 					if (this.current_children_id > 0) {
 						sid = this.current_children_id
-					} else {
-						sid = this.currentId
-					}
-				}
-				console.log('sid:', sid)
-				if (sid && sid != 0) {
-						console.log('pp7')
-						this.get_pro_cate(sid)
-					//请求-指定分类的商品
-				} else {					
-					if(this.cid){	
-						console.log('cid:',this.cid)
-						this.get_pro_cate(this.cid)
+					}  
+					console.log('获取分类商品')
+					this.get_pro_cate(sid)
+				}else{
+					if(this.is_fx){
+						this.$api.http.get('/fx/get_goods').then(res => { //分销商品
+							this.productList = res.data
+							this.all = res.data
+							console.log('获取所有分销商品：',res.data)
+						})
 					}else{
 						this.get_pro()
 					}
-				}
-				//还有搜索部分
+				}	
 				this.drawer = false
 				this.sid = ''
+				// if(this.cid){	
+				// 	console.log('cid:',this.cid)
+				// 	this.get_pro_cate(this.cid)
+				// }  
+				
 			},
 			back: function() {
 				if (this.drawer) {
@@ -474,16 +480,16 @@
 			}
 		},
 		onPullDownRefresh: function() {
-			let loadData = JSON.parse(JSON.stringify(this.productList));
-			loadData = loadData.splice(0, 10);
-			this.productList = loadData;
+			// let loadData = JSON.parse(JSON.stringify(this.productList));
+			// loadData = loadData.splice(0, 10);
+			// this.productList = loadData;
 			this.pageIndex = 1;
 			this.pullUpOn = true;
 			this.loadding = false;
 			uni.stopPullDownRefresh()
 		},
 		onReachBottom: function() {
-			if (!this.pullUpOn) return;
+			/* if (!this.pullUpOn) return;
 			this.loadding = true;
 			if (this.pageIndex == 4) {
 				this.loadding = false;
@@ -497,7 +503,7 @@
 				this.productList = this.productList.concat(loadData);
 				this.pageIndex = this.pageIndex + 1;
 				this.loadding = false
-			}
+			} */
 		}
 	}
 </script>
@@ -1080,16 +1086,16 @@
 		-webkit-line-clamp: 2;
 	}
 
-	.tui-pro-price {
+	.tui-pro-price {display: flex;
 		padding-top: 18rpx;
 	}
 
 	.tui-sale-price {
-		font-size: 34rpx;
+		font-size: 16px;
 		font-weight: 500;
 		color: #e41f19;
 	}
-
+	.tui-sale-price text{font-size: 12px;}
 	.tui-factory-price {
 		font-size: 24rpx;
 		color: #a0a0a0;

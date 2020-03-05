@@ -34,6 +34,7 @@
 					<el-menu-item index="4-2" @click="jump_evaluate">
 						<span slot="title" style="margin-left: 40px;">评价</span>
 					</el-menu-item>
+					
 				</el-menu-item-group>
 			</el-submenu>
 			<!-- <el-menu-item index="9" @click="jump_touser">
@@ -78,8 +79,6 @@
 					<el-menu-item index="7-1" @click="jump_data">
 						<span slot="title" style="margin-left: 40px;">数据</span>
 					</el-menu-item>
-					
-					
 				</el-menu-item-group>
 			</el-submenu>
 			
@@ -115,12 +114,9 @@
 					<el-menu-item index="8-1" @click="jump_tocoupon">
 						<span slot="title" style="margin-left: 40px;">优惠券</span>
 					</el-menu-item>
-					
-					
-					<el-menu-item index="8-2" @click="jump_template">
+					<el-menu-item index="8-4" @click="jump_template">
 						<span slot="title" style="margin-left: 40px;">运费模板</span>
 					</el-menu-item>
-					
 				</el-menu-item-group>
 			</el-submenu>
 			<el-submenu index="10">
@@ -134,42 +130,36 @@
 					<el-menu-item index="10-2" @click="jump_backup">
 						<span slot="title" style="margin-left: 40px;">备份</span>
 					</el-menu-item>
-					<el-menu-item index="10-3" @click="jump_toadmin">
-						<span slot="title" style="margin-left: 40px;">管理员</span>
-					</el-menu-item>
-					<!-- <el-menu-item index="10-3" @click="jump_upgrade">
-						<span slot="title" style="margin-left: 40px;">在线升级</span>
-					</el-menu-item> -->
 				</el-menu-item-group>
 			</el-submenu>
 			<!-- <el-menu-item index="6" @click="logout">
 				<span slot="title">退出</span>
 			</el-menu-item> -->
-			<el-menu-item index="11" disabled style="cursor:default">
+			<el-menu-item index="11">
 				<span slot="title"></span>
 			</el-menu-item>
-			<el-menu-item index="111" disabled style="cursor:default">
+			<el-menu-item index="111">
 				<span slot="title"></span>
 			</el-menu-item>
-			<el-menu-item index="411" disabled style="cursor:default">
+			<el-menu-item index="411">
 				<span slot="title"></span>
 			</el-menu-item>
-			<el-menu-item index="4111" disabled style="cursor:default">
+			<el-menu-item index="4111">
 				<span slot="title"></span>
 			</el-menu-item>
-			<el-menu-item index="42" disabled style="cursor:default">
+			<el-menu-item index="42">
 				<span slot="title"></span>
 			</el-menu-item>
-			<el-menu-item index="43" disabled style="cursor:default">
+			<el-menu-item index="43">
 				<span slot="title"></span>
 			</el-menu-item>
-			<el-menu-item index="44" disabled style="cursor:default">
+			<el-menu-item index="44">
 				<span slot="title"></span>
 			</el-menu-item>
-			<el-menu-item index="45" disabled style="cursor:default">
+			<el-menu-item index="45">
 				<span slot="title"></span>
 			</el-menu-item>
-			<el-menu-item index="46" disabled style="cursor:default">
+			<el-menu-item index="46">
 				<span slot="title"></span>
 			</el-menu-item>
 
@@ -230,11 +220,6 @@
 					path: '/product/new_product'
 				})
 			},
-			jump_toadmin(){
-				this.$router.push({
-					path:'/user/admin'
-				})
-			},
 			jump_template(){
 				this.$router.push({
 					path: '/product/template'
@@ -260,30 +245,21 @@
 					path: '/backup/backup'
 				})
 			},
-			jump_upgrade(){
-				this.$router.push({
-					path: '/set/upgrade'
-				})
-			},
 			jump_data(){
 				this.$router.push({
 					path: '/data/data'
 				})
 			},
-			
 			jump_good(){
 				this.$router.push({
 					path: '/good'
 				})
 			},
-			
-			
 			jump_topoint(){
 				this.$router.push({
 					path: '/user/point'
 				})
 			},
-			
 			jump_cate(){
 				this.$router.push({
 					path: '/product/category'

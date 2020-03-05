@@ -69,10 +69,12 @@
 				this.form = cache
 				this.type = 'edit'
 				this.del_id = cache.id
+				this.resultInfo.result = cache.province + cache.city +cache.county
 			}
 			else if (option.type == 'add') {
 				this.type = 'add'
 			}
+			console.log(this.form);
 		},
 		components: {
 			wPicker

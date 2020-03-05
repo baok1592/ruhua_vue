@@ -10,7 +10,6 @@
 				</el-header>
 				<transition appear appear-active-class="animated fadeInLeft">
 					<el-main style="background-color: #F3F3F3;">
-
 						<div class="category">
 							<!-- 弹窗--新增分类 -->
 							<AddCategory @up_parent="up_list" :list="category_top"></AddCategory>
@@ -97,8 +96,7 @@
 				</transition>
 			</el-container>
 		</el-container>
-		<!-- <Pic :drawer="drawer" @drawer="is_show" @get_img="get_img" :length="length"></Pic> -->
-		<Pic ref="child" :drawer="drawer" :father_fun="get_img" :length="length" :iscg="is_cg"></Pic>
+		<Pic :drawer="drawer" @drawer="is_show" @get_img="get_img" :length="length"></Pic>
 	</div>
 </template>
 
@@ -123,7 +121,6 @@
 		},
 		data() {
 			return {
-				is_cg: 0,
 				length: 1,
 				drawer: false,
 				getimg: this.$getimg,
@@ -137,8 +134,8 @@
 					category_name: '',
 					short_name: '',
 					pid: '',
-					category_pic: [],
-					imgs: []
+					category_pic: '',
+					imgs: ''
 				},
 				formLabelWidth: '120px',
 				editindex: 0,
@@ -187,27 +184,12 @@
 				this.drawer = !this.drawer
 			},
 			get_img(e) {
-				// this.img_list = e
-				// for (let v in e) {
-				// 	this.editform.category_pic = e[v].id
-				// 	this.editform.imgs = e[v].url
-				// }
-				// console.log(this.form.img_id)
-
-
-
-				this.drawer = false
-				for (let k in e) {
-					const v = e[k]
-					this.img_list.push(v)
-					this.editform.category_pic = v.id
-					this.editform.imgs = v.url
+				this.img_list = e
+				for (let v in e) {
+					this.editform.category_pic = e[v].id
+					this.editform.imgs = e[v].url
 				}
-				this.length = 6 - this.img_list.length
-				console.log('get_img_end:', e, this.img_list)
-
-
-
+				console.log(this.form.img_id)
 			},
 			delimg(index) {
 				// this.img_list.splice(index, 1)
@@ -226,20 +208,11 @@
 					this.http.put_show('category/admin/del_category', {
 						id: id
 					}).then((res) => {
-						if (res.data == 1) {
-							that.$message({
-								showClose: true,
-								message: res.msg,
-								type: 'success'
-							});
-						}else{
-							that.$message({
-								showClose: true,
-								message: res.msg,
-								type: 'warning'
-							});
-						}
-
+						that.$message({
+							showClose: true,
+							message: '删除成功',
+							type: 'success'
+						});
 						this.getCategory()
 					})
 				})
@@ -247,7 +220,6 @@
 			//修改分类
 			onedit(id) {
 				console.log(id)
-
 				// this.editform = this.category[index];
 				const that = this
 				for (let k in that.category) {
@@ -256,7 +228,6 @@
 						that.editform = v
 					}
 				}
-				console.log(this.editform)
 				// this.editindex = index;
 				this.editbox = true;
 			},
@@ -285,10 +256,6 @@
 				this.http.post_show('category/admin/edit_category', {
 					form: that.editform
 				}).then((res) => {
-					this.$message({
-						message: '修改成功',
-						type: 'success'
-					})
 					// console.log(res.data);
 					that.editbox = false;
 					// this.category.splice(index, 1, res.data);

@@ -30,8 +30,9 @@
 		<view class="cover-container" :style="[{
 				transform: coverTransform,
 				transition: coverTransition
-			}]"
-		 @touchstart="coverTouchstart" @touchmove="coverTouchmove" @touchend="coverTouchend">
+			}]">
+			<!-- 下拉方法 -->
+			<!-- @touchstart="coverTouchstart" @touchmove="coverTouchmove" @touchend="coverTouchend" -->
 			<image class="arc" src="/static/arc.png"></image>
 
 			<!-- <view class="tj-sction">
@@ -72,7 +73,13 @@
 					<text class="yticon icon-shouhoutuikuan"></text>
 					<text>退款/售后</text>
 				</view>
+				<view class="bangding" v-if="bang">
+					<view class="bd-l">找不到订单和优惠券？绑定手机试试</view>
+					<!-- <view class="bd-r" @click="bind">立即绑定</view> -->
+					<button class="bd-r" size="mini" open-type="getPhoneNumber" @getphonenumber="bind">授权电话</button>
+				</view>
 			</view>
+
 			<!-- 浏览历史 -->
 			<view class="history-section icon">
 				<view @click="jump_toaddress">
@@ -82,10 +89,10 @@
 					<list-cell icon="icon-shoucang" iconColor="#DF2073" title="我的收藏"></list-cell>
 				</view>
 				<view @click="jump_tocms">
-					<list-cell icon="icon-shoucang_xuanzhongzhuangtai" iconColor="#54b4ef" title="后台(演示版-无需权限)"></list-cell>
+					<list-cell icon="icon-shoucang_xuanzhongzhuangtai" iconColor="#54b4ef" title="后台(演示-无需权限)"></list-cell>
 				</view>
 				<view @click="jump_toreseller">
-					<list-cell icon="icon-iconfontweixin" iconColor="#54b4ef" title="分销商"></list-cell>
+					<list-cell icon="icon-iconfontweixin" iconColor="#54b4ef" title="分销商(演示-无需权限)"></list-cell>
 				</view>
 				<view @click="jump_tomycoupon">
 					<list-cell icon="icon-tuijian" iconColor="#54b4ef" title="我的优惠券"></list-cell>
@@ -94,6 +101,9 @@
 				<view @click="jump_toset">
 					<list-cell icon="icon-shezhi1" iconColor="#e07472" title="设置" border=""></list-cell>
 				</view>
+				<view @click="clear_cache">
+					<list-cell icon="icon-shezhi1" iconColor="#e07472" title="清空缓存" border=""></list-cell>
+				</view>
 				<!-- #endif -->
 				<view @click="jump_tohelp">
 					<list-cell icon="icon-bangzhu" iconColor="#FF0000" title="关于如花"></list-cell>
@@ -101,7 +111,8 @@
 			</view>
 			<view class="cpy">
 				<view>如花商城系统</view>
-				<view>www.ruhuashop.com</view>
+				<view>Copyringht@2019</view>
+				<!-- <view>www.ruhuashop.com</view> -->
 			</view>
 		</view>
 
@@ -112,13 +123,11 @@
 	import uniBadge from "@/components/uni/uni-badge/uni-badge.vue"
 	import XcxAuth from "@/components/wx_auth/xcx_auth.vue"
 	import listCell from '@/components/mix-list-cell';
-	import {
-		WxToken
-	} from '@/common/wx_token.js'
+	import {WxToken} from '@/common/wx_token.js'
 	var wxtoken = new WxToken();
-	import {
-		mapState
-	} from 'vuex';
+	import {CUser} from '@/common/cache/user.js'
+	var cache_user = new CUser();
+
 	let startY = 0,
 		moveY = 0,
 		pageAtTop = true;
@@ -130,7 +139,8 @@
 		},
 		data() {
 			return {
-				list: '', 
+				bang: true,
+				list: '',
 				auth: {
 					is_name: false,
 					is_address: false,
@@ -147,18 +157,18 @@
 			this.auth.is_name = !this.auth.is_name
 			// #endif
 
-			// #ifdef H5
+			// #ifdef H5 || APP-PLUS
 			//wxtoken.verify('userinfo'); //手动授权获取openid和头像昵称	
-			this.$api.http.get('/user/info').then(res => {
-				this.userinfo={
-					avatarUrl:res.data.headpic,
-					nickName:res.data.nickname
-				} 
-			})
 			
+			const my=cache_user.info()
+			this.userinfo = {
+				avatarUrl: my.headpic,
+				nickName: my.nickname
+			}
 			// #endif
 		},
-		onShow(){			
+		onShow() {
+			cache_user.info()
 			this.get_number()
 		},
 		// #ifndef MP
@@ -181,18 +191,34 @@
 			}
 		},
 		// #endif
-		computed: {
-			...mapState(['hasLogin', 'userInfo'])
-		},
+
 		methods: {
+			bind(e) {
+				// #ifdef MP-WEIXIN
+				let obj = {}
+				obj.iv = e.detail.iv
+				obj.encryptedData = e.detail.encryptedData
+				//然后在第三方服务端结合 session_key 以及 app_id 进行解密获取手机号
+
+				// this.$api.http.post('xxxx/xxxx',obj).then(res=>{
+				// 	console.log(res)
+				// })
+				// #endif
+
+
+			},
 			get_number() {
-				this.$api.http.post('order/user/order_date').then(res => {
+				this.$api.http.post('order/user/order_date', {}, false).then(res => {
 					this.list = res.data
 				})
 			},
 			get_userinfo(e) {
 				this.userinfo = e
-			},			
+			},
+			clear_cache() {
+				uni.clearStorageSync()
+				this.$api.msg('已清空')
+			},
 			jump_tohelp() {
 				uni.navigateTo({
 					url: '/pages/list/list'
@@ -289,6 +315,7 @@
 			}
 		},
 		onPullDownRefresh() {
+			this.get_number()
 			setTimeout(function() {
 				uni.stopPullDownRefresh();
 			}, 2000);
@@ -300,12 +327,14 @@
 		background-color: #F5F5F5;
 		min-height: 100vh;
 	}
-	.cpy{
-		padding:20px 0;
+
+	.cpy {
+		padding: 20px 0;
 		text-align: center;
-		font-size:12px;
-		color:#666;
+		font-size: 12px;
+		color: #666;
 	}
+
 	%flex-center {
 		display: flex;
 		flex-direction: column;
@@ -412,7 +441,7 @@
 
 	.cover-container {
 		background: $page-color-base;
-		margin-top: -150upx;
+		margin-top: -160upx;
 		padding: 0 30upx;
 		position: relative;
 		background: #f5f5f5;
@@ -449,6 +478,32 @@
 		@extend %section;
 		padding: 28upx 0;
 		margin-top: 20upx;
+		flex-wrap: wrap;
+
+		.bangding {
+			width: 100%;
+			display: flex;
+			justify-content: space-between;
+			font-size: 12px;
+			border-top: 1px solid #F1F3F6;
+			padding: 10px 10px 0;
+			margin-top: 15px;
+
+			.bd-l {
+				height: 27px;
+				line-height: 27px;
+			}
+
+			.bd-r {
+				color: #FB526A;
+				border: 1px solid #FB526A;
+				border-radius: 3px;
+				height: 24px;
+				line-height: 24px;
+				text-align: center;
+				padding: 0 10px;
+			}
+		}
 
 		.order-item {
 			@extend %flex-center;

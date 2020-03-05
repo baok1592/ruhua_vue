@@ -199,7 +199,7 @@
 				})
 				let _this = this;
 				let phoneData = wx.getSystemInfoSync();
-				this.phoneH = phoneData.windowHeight-150;
+				this.phoneH = phoneData.windowHeight-100;
 				this.phoneW = phoneData.windowWidth;
 				let scaleW = this.phoneW / 375; //按照苹果留 375*667比例 其他型号手机等比例缩放 显示
 				let scaleH = this.phoneH / 667; //按照苹果留 375*667比例 其他型号手机等比例缩放 显示
@@ -273,7 +273,7 @@
 					let leftSpace = 65; // 这段文字起始的X位置
 					let textLineHeight = 18; // 一行文字加一行行间距
 					for (let b = 0; b < row.length; b++) { //一行一行绘制文本
-						ctx.fillText(row[b], leftSpace, (contentTextY + textLineHeight * b - 15) * scaleH+60, (this.phoneW - 130));
+						ctx.fillText(row[b], leftSpace, (contentTextY + textLineHeight * b - 15) * scaleH+40, (this.phoneW - 130));
 						ctx.draw(true)
 					}
 				}, 500)
@@ -323,7 +323,7 @@
 				wx.getImageInfo({
 					src: code,
 					success(res) {
-						ctx.drawImage(res.path, (_this.phoneW - 70) / 2, 490 * scaleH, 70, 70)
+						ctx.drawImage(res.path, (_this.phoneW - 70) / 2, 500 * scaleH, 70, 70)
 						ctx.draw(true)
 					},
 					fail() {
@@ -343,7 +343,7 @@
 				ctx.setFontSize(14)
 				ctx.setFillStyle('#2f1709') //文字颜色：默认黑色
 				ctx.font = 'normal bold 14px sans-serif';
-				ctx.fillText('小程序的名称', (_this.phoneW - 90) / 2, 590 * scaleH, 90);
+				ctx.fillText('小程序的名称', (_this.phoneW - 90) / 2, 610 * scaleH, 90);
 				// 小程序的名称end
 				// 长按/扫描识别查看商品
 				// ctx.setFontSize(14)

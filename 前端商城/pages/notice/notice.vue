@@ -1,11 +1,13 @@
 <template>
 	<view>
-		<view class="notice-item" v-for="item of event_list">
+		<None v-if="list_empty"></None>
+		<view class="notice-item" v-for="item of event_list" v-else>
 			<text class="time">{{item.create_time}}</text>
 			<view class="content" @click="jump_article(item.id)">
 				<text class="title">{{item.title}}</text>
 				<view class="img-wrapper">
-					<image class="pic" :src="getimg+item.img.url"></image>
+					
+					<image class="pic" :src="get_img+item.img.url"></image>
 				</view>
 				<text class="introduce">
 					<rich-text :nodes="item.content"></rich-text>
@@ -20,12 +22,17 @@
 </template>
 
 <script>
+	import None from "@/components/qy/none.vue"
 	export default {
 		data() {
 			return {
 				event_list:'',
-				get_img:this.$get_img
+				list_empty: false,
+				get_img:this.$getimg
 			}
+		},
+		components:{
+			None
 		},
 		onLoad() {
 			this.get_event()
@@ -33,7 +40,12 @@
 		methods: {
 			get_event(){
 				this.$api.http.get('article/type_article?type=4').then(res=>{
-					this.event_list = res.data
+					
+					if (res.data=='') {
+						this.list_empty = true
+					} else {
+						this.event_list = res.data
+					}
 				})
 			},
 			jump_article(id){
@@ -43,7 +55,7 @@
 			}
 		},
 		onPullDownRefresh() {
-			//this._load()
+			this.get_event()
 			setTimeout(function() {
 				uni.stopPullDownRefresh();
 			}, 2000);

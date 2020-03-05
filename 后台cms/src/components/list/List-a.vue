@@ -1,7 +1,6 @@
 <template>
 	<div class="list-a">
 
-		
 		<div class="tab-btn" v-if="!addShow">
 			<el-button size="medium" @click="all">在售商品</el-button>
 			<el-button size="medium" @click="getDownPro">下架商品</el-button>
@@ -111,7 +110,6 @@
 		props: ['down'],
 		data() {
 			return {
-				getimg: this.$getimg,
 				allB:'',
 				value: '',
 				inpue: '',
@@ -132,14 +130,14 @@
 		//vue生命函数
 		mounted() {
 			this.getProductList(); //获取商品 
-			this.all()
+			// this.get_pro()
 		},
 		methods: {
 			serach(key) {
 				console.log(key)
 				// this.getProductList(1, this.value);
 				let arr = []
-				for (let s of this.allB) {
+				for (let s of this.product) {
 					let a = s.goods_name.indexOf(key)
 					if (a >= 0) {
 						arr.push(s)
@@ -161,13 +159,12 @@
 							message: '操作成功',
 							type: 'success'
 						})
-						this.all()
 					})
 			},
 			//获取在售商品
 			all() {
 				this.value = '';
-				this.http.post('product/admin/get_product').then(res=>{
+				this.http.post_show('product/admin/get_product').then(res=>{
 					this.total = res.data.length
 					this.allB = res.data
 					this.product = res.data.slice(0,this.size)
@@ -199,7 +196,7 @@
 			//获取所有商品
 			getProductList() {
 				const that = this;
-				this.http.post('product/admin/all_goods_info').then((res) => {
+				this.http.post_show('product/admin/all_goods_info').then((res) => {
 					that.allB = res.data
 					// that.product = res.data
 					that.product = res.data.slice(0, that.size);
@@ -209,7 +206,7 @@
 			//获取下架商品
 			getDownPro() {
 				var that = this;
-				this.http.post('product/admin/get_products_down').then((res) => {
+				this.http.post_show('product/admin/get_products_down').then((res) => {
 					that.allB = res.data
 					that.product = res.data
 					that.total = res.data.length

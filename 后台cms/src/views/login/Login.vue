@@ -2,7 +2,7 @@
 	<div id="login" v-if="show">
 		<div class="login_wrap">
 
-			<div class="wenzi">如花商城管理后台--免费版</div>
+			<div class="wenzi">如花商城管理后台</div>
 			<div id="darkbannerwrap"></div>
 			<form method="post">
 				<div class="put"><i class="el-icon-news"></i><input v-model="user" placeholder="用户名"></div>

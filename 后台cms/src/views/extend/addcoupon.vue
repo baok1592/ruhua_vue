@@ -71,8 +71,8 @@
 									<el-radio-group v-model="menkan" @change="is_menkan">
 										<el-radio :label="0">无门槛</el-radio>
 										<el-radio :label="2">订单满&emsp;
-										<el-input v-if="show_ininput == 1" v-model="form.full" style="width:100px"></el-input>
-										&emsp;元
+											<el-input v-if="show_ininput == 1" v-model="form.full" style="width:100px"></el-input>
+											&emsp;元
 										</el-radio>
 									</el-radio-group>
 								</el-form-item>
@@ -168,8 +168,8 @@
 	export default {
 		data() {
 			return {
-				show_ininput:0,
-				menkan:'',
+				show_ininput: 0,
+				menkan: '',
 				canjia_list: [],
 				is_all: '',
 				top: "0",
@@ -197,11 +197,11 @@
 			NavTo
 		},
 		methods: {
-			is_menkan(e){
+			is_menkan(e) {
 				console.log(e)
-				if(e == 2){
+				if (e == 2) {
 					this.show_ininput = 1
-				}else{
+				} else {
 					this.form.full = 0
 					this.show_ininput = 0
 				}
@@ -269,6 +269,25 @@
 					this.form.goods_ids.push(this.tableData[v].goods_id)
 				}
 				console.log(this.form)
+
+				if (this.form.time) {
+					if (this.form.day == '') {
+						this.$message({
+							type: 'warning',
+							message: '未填写天数!'
+						});
+						return
+					}
+				}
+				if (!this.form.time) {
+					if (this.form.start_time == '' || this.form.end_time == '') {
+						this.$message({
+							type: 'warning',
+							message: '未填写起止日期'
+						});
+						return
+					}
+				}
 				this.http.post_show('coupon/admin/add_coupon', this.form).then(() => {
 					this.$message({
 						type: 'success',

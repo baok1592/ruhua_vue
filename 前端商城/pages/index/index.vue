@@ -51,7 +51,7 @@
 			<view class="tui-category-item" v-for="(item,index) in category" :key="index" :data-key="item.name"> 
 				<navigator :url="item.url">
 					<image :src="getimg+item.img_id" class="tui-category-img" mode="scaleToFill"></image>
-					<view class="tui-category-name">{{item.url_name}}</view>
+					<view class="tui-category-name">{{item.nav_name}}</view>
 				</navigator>
 			</view>
 		</view>
@@ -114,7 +114,7 @@
 										<text class="tui-sale-price" v-if="is_vip">vip{{item.price}}</text>
 										<text class="tui-sale-price" v-else>￥{{item.price}}</text>
 										<text class="tui-factory-price" v-if="is_vip">￥{{item.market_price}}</text>
-										<xianshi v-if="item.discount.reduce_price"  title="限时" :price="item.price-item.discount.reduce_price*1"></xianshi>
+										
 									</view>
 									<!-- <view class="tui-pro-pay">{{item.sales}}人付款</view> -->
 								</view>
@@ -145,7 +145,7 @@
 										<text class="tui-sale-price" v-if="is_vip">vip {{item.price}}</text>
 										<text class="tui-sale-price" v-else>￥{{item.price}}</text>
 										<text class="tui-factory-price" v-if="is_vip">￥{{item.market_price}}</text>
-										<xianshi v-if="item.discount.reduce_price"  title="限时" :price="item.price-item.discount.reduce_price*1"></xianshi>
+										
 									</view>
 									<!-- <view class="tui-pro-pay">{{item.sales}}人付款</view> -->
 								</view>
@@ -164,16 +164,20 @@
 		<!--加载loadding-->
 		<view class="tui-safearea-bottom"></view>
 		<!-- <Coupon :coupon="coupon" :coulist="coulist" @close_add="close_add"></Coupon> -->
+		<!-- 弹出 -->
+		<!-- #ifdef APP-PLUS -->
+			<Xieyi></Xieyi>		
+		<!-- #endif -->
 	</view>
 </template>
 <script>
+	import Xieyi from "@/components/qy/xieyi"
 	import tuiIcon from "@/components/icon/icon"
-	import Coupon from "@/components/qy/Coupon"
+	import Coupon from "@/components/qy/Coupon" 
 	import tuiTag from "@/components/tag/tag"
 	import tuiLoadmore from "@/components/loadmore/loadmore"
 	import tuiNomore from "@/components/nomore/nomore"
 	import Cache from "@/common/cache.js"
-	import xianshi from "@/components/qy/xianshi"
 	export default {
 		components: {
 			tuiIcon,
@@ -181,10 +185,11 @@
 			tuiLoadmore,
 			tuiNomore,
 			Coupon,
-			xianshi
+			Xieyi
 		},
 		data() {
 			return {
+				xy:true,
 				resou: '',
 				coulist: [1, 2, 3, 4],
 				coupon: true,
@@ -258,55 +263,26 @@
 				}
 			},
 			_load() {
-				let time = Date.parse(new Date()) / 1000 //当前时间
-				// this.$api.http.get('product/get_recent',{type:''}).then(res=>{
-				// 	this.newProduct = res.data
-				// })
-				this.$api.http.get('product/get_recent', {
-					type: 'hot'
-				}).then(res => { //热门
-					this.productList = res.data
-					console.log(this.productList)
-				})
-				this.$api.http.get('product/get_recent', {
-					type: 'new'
-				}).then(res => { //新品
-					this.newProduct = res.data
-				})
-				this.$api.http.get('nav/get_nav').then(res => {
-					this.category = res.data
-				})
-				this.$api.http.get('banner/get_banner?id=1').then(res => { //首页banner
-					this.banner = res.data.items
-					console.log(this.banner)
-				})
-				this.$api.http.get('search/record').then(res => { //首页banner
+				this.$api.http.get('search/record').then(res => { //首页banner 
 					this.resou = res.data
+					if(res.data==1){
+						return;
+					}
 					this.hotSearch = res.data.slice(0, 3)
 					uni.setStorageSync('hotSearch', this.resou)
-					console.log('hot:', this.hotSearch)
 				})
-				//let a = this.$api.http.get('get_category')
-				//let b = this.$api.http.get('product/get_recent')
-				//let c = this.$api.http.get('get_productList')
-				//let d = this.$api.http.get('get_banner')
-				// Promise.all([a, b, c, d]).then(res => {
-				// 	this.category = res[0].data
-				// 	this.newProduct = res[1].data
-				// 	this.productList = res[2].data
-				// 	this.banner = res[3].data
-				// 	Cache._set_home_cache(res)
-
-				// })
-
+				let a = this.$api.http.get('product/get_recent', {type: 'hot'})//热门推荐
+				let b = this.$api.http.get('product/get_recent', {type: 'new'})//新品推荐
+				let c = this.$api.http.get('nav/get_nav')//导航
+				let d = this.$api.http.get('banner/get_banner?id=1')//轮播图
+				
+				Promise.all([a, b, c, d]).then(res => {
+					this.productList = res[0].data
+					this.newProduct = res[1].data
+					this.category = res[2].data
+					this.banner = res[3].data.items
+				})
 			},
-
-			// async laoddata(){
-			// 	this.productList = await this.$api.json('productList')
-			// 	console.log(this.productList)
-			// 	console.log(1)
-			// },
-			// 
 			_CheckCacheTime(times, xs = 5) {
 				const time = Date.parse(new Date()) / 1000 //当前时间
 				const end_time = times + 60 * xs
@@ -321,7 +297,6 @@
 				uni.switchTab({
 					url: '/pages/category/category'
 				})
-
 			},
 			more: function(e) {
 				let key = e.currentTarget.dataset.key || "";
@@ -370,7 +345,7 @@
 	page {
 		background: #f7f7f7;
 	}
-
+	
 	.container {
 		padding-bottom: 100rpx;
 		color: #333;
@@ -643,7 +618,7 @@
 		align-items: center;
 		justify-content: space-between;
 		flex-direction: column;
-		padding: 30rpx 0 10px;
+		padding: 30rpx 0 10px;margin-bottom: 5px;
 	}
 
 	.tui-category-img {

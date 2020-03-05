@@ -211,7 +211,7 @@
 			post_order(index = 1, keywords = "") {
 				var that = this;
 				this.http
-					.post("/admin/get_order_all", {
+					.post_show("/admin/get_order_all", {
 						page: index,
 						size: this.size,
 						keywords: keywords

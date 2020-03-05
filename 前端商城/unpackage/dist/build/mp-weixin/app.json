@@ -73,7 +73,14 @@
     "pages/zhibo/zhibo",
     "pages/article/article",
     "pages/cartnone/cartnone",
-    "pages/list/list"
+    "pages/list/list",
+    "pages/invite/invite",
+    "pages/pindetail/pindetail",
+    "pages/onebuy/onebuy",
+    "pages/pin/pin",
+    "pages/xieyi/xieyi",
+    "pages/login/login",
+    "pages/invoices/invoices"
   ],
   "subPackages": [],
   "window": {
@@ -83,7 +90,7 @@
   },
   "tabBar": {
     "color": "#666666",
-    "selectedColor": "#5677FC",
+    "selectedColor": "#FB586A",
     "backgroundColor": "#FFFFFF",
     "list": [
       {
@@ -112,5 +119,11 @@
       }
     ]
   },
-  "usingComponents": {}
+  "permission": {
+    "scope.address": {
+      "desc": "收货地址"
+    }
+  },
+  "usingComponents": {},
+  "sitemapLocation": "sitemap.json"
 }

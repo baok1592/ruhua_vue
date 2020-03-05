@@ -18,7 +18,7 @@
 				<view class="zhe">限时8折</view>
 			</view>
 		</view>
-		<view class="btn">立即购买一年卡 ¥ 279</view>
+		<view class="btn" @click="buy">立即购买</view>
 		<view class="quan">
 			<view class="q_tit">8大超值会员权益</view>
 			<view class="q_qy" v-for="(item,index) of list" :key="index">
@@ -42,6 +42,9 @@
 		methods:{
 			xuan(e){
 				this.xz=e
+			},
+			buy(){
+				this.$api.msg('开发中...')
 			}
 		},
 		onPullDownRefresh() {

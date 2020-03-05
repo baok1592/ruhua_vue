@@ -34,7 +34,7 @@
 				</el-dialog>
 			</el-row>
 		</div>
-	</div>
+		</div>
 </template>
 
 <script>
@@ -46,7 +46,6 @@
 		data() {
 			return {
 				sct: '',
-				dialogVisible: false,
 				dialogFormVisible: false,
 				formLabelWidth: '120px',
 				form: {
@@ -67,7 +66,7 @@
 		},
 		methods: {
 			_load() {
-				this.http.get('statistic/admin/remind').then(res => {
+				this.http.get_show('statistic/admin/remind').then(res => {
 					this.event = res.data
 					this.event_num = this.event.total
 				})
@@ -86,27 +85,16 @@
 					return
 				}
 				this.http.post_show('cms/admin/edit_psw', this.form).then(res => {
-					if (res.status == 400) {
-						this.$message.error(res.msg)
-						this.form = {
-							old_psw: '',
-							new_psw: '',
-							password2: '',
-						}
-					} else {
-						this.$message({
-							message: '修改密码成功',
-							type: 'success'
-						});
-						this.form = {
-							old_psw: '',
-							new_psw: '',
-							password2: '',
-						}
-						this.dialogFormVisible = false
+					this.$message({
+						message: '修改密码成功',
+						type: 'success'
+					});
+					this.form = {
+						old_psw: '',
+						new_psw: '',
+						password2: '',
 					}
-
-
+					this.dialogFormVisible = false
 				})
 			},
 			jump_money() {

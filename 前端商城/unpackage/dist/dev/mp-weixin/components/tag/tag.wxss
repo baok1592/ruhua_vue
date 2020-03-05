@@ -208,10 +208,8 @@
 }
 .tui-white-outline::after {
   border: 1px solid #fff !important;
-}
-
-/* color end*/
-
+} 
+/* color end*/ 
 /* tag start*/
 .tui-tag {
   padding: 16rpx 26rpx;
@@ -269,8 +267,7 @@
 }
 .tui-tag-fillet-right.tui-tag-outline::after {
   border-radius: 0 100rpx 100rpx 0;
-}
-
+} 
 /* tag end*/
 
 

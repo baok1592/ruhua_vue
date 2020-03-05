@@ -65,20 +65,8 @@
 							</template>
 							<template v-if="!tab_nav">
 								<el-table :data="list" border style="width: 100%">
-									<el-table-column type="index" label="序号" width="60">
-										
-									</el-table-column>
-									<el-table-column prop="title" label="文章标题" width="400">
-										
-									</el-table-column>
-									<el-table-column label="文章图片" width="400">
-										<!-- <template slot-scope="scope">
-											<template v-if="scope.row.img.url">
-												<img :src="$getimg + scope.row.img.url" />
-											</template>
-											
-										</template> -->
-									</el-table-column>
+									<el-table-column type="index" label="序号" width="60"></el-table-column>
+									<el-table-column prop="title" label="文章标题" width="400"></el-table-column>
 									<el-table-column label="类别" width="180">
 										<template slot-scope="scope">
 											<template v-for="item of options">
@@ -209,7 +197,6 @@
 				} else {
 					this.btn_title = "文章列表";
 					this.tab_nav = true;
-					this.clear_data();
 				}
 			},
 			sub(form) {
@@ -249,7 +236,6 @@
 						message: "修改成功",
 						type: "success"
 					});
-					this.img_list = []
 					this.btn_title = "添加文章"
 					this.tab_nav = false
 					that.clear_data();
@@ -317,7 +303,6 @@
 						that.form.appid = res.data.summary;
 						that.form.path = res.data.content;
 					}
-					this.img_list.push(res.data.img)
 					that.isedit = true;
 					that.oid = res.data.id;
 					that.tab_nav = true;
@@ -328,7 +313,6 @@
 				done(); //官方实例用法
 			},
 			clear_data() {
-				this.img_list = []
 				this.dialogFormVisible = false;
 				this.form.type = "";
 				this.form.title = "";

@@ -609,14 +609,15 @@ page {
 	-webkit-box-orient: vertical;
 	-webkit-line-clamp: 2;
 }
-.tui-pro-price {
+.tui-pro-price {display: -webkit-box;display: -webkit-flex;display: flex;
 	padding-top: 18rpx;
 }
 .tui-sale-price {
-	font-size: 34rpx;
+	font-size: 16px;
 	font-weight: 500;
 	color: #e41f19;
 }
+.tui-sale-price text{font-size: 12px;}
 .tui-factory-price {
 	font-size: 24rpx;
 	color: #a0a0a0;

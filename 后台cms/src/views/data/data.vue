@@ -102,24 +102,24 @@
 		},
 		methods: {
 			get_data_sale() {
-				this.http.post('statistic/admin/get_money').then(res => {
+				this.http.post_show('statistic/admin/get_money').then(res => {
 					this.chartData_sale.rows = res.data
 				})
 			},
 			get_data_order() {
-				this.http.post('statistic/admin/get_table').then(res => {
+				this.http.post_show('statistic/admin/get_table').then(res => {
 					this.chartData_order.rows = res.data
 				})
 			},
 			get_month_sale(month) {
-				this.http.post('statistic/admin/get_money', {
+				this.http.post_show('statistic/admin/get_money', {
 					month: month / 1000
 				}).then(res => {
 					this.chartData_sale.rows = res.data
 				})
 			},
 			get_month_order(month) {
-				this.http.post('statistic/admin/get_table', {
+				this.http.post_show('statistic/admin/get_table', {
 					month: month / 1000
 				}).then(res => {
 					this.chartData_order.rows = res.data

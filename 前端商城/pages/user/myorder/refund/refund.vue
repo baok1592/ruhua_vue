@@ -53,7 +53,7 @@
 						short: '其他'
 					}
 				],
-				current: 0
+				current: -1
 			};
 		},
 		components: {},
@@ -75,19 +75,20 @@
 				}
 
 				let data = {
-					id:this.id,
+					order_id:this.id,
 					radio:this.radio,
 					content:this.content,
+					goods_id:0
 				}
 				this.$api.http.post('order/user/tui_kuan', data).then(res => {
-					if(res.status == 400){
-						this.$api.msg(res.msg)
-					}
-					if(res.status == 200){
+					if(res.data == 1){ 
 						this.$api.msg('操作成功')
-						uni.navigateBack({
-							
-						})
+						setTimeout(()=>{
+							uni.navigateBack({
+							})
+						},1000)
+					}else{
+						this.$api.msg(res.msg)
 					}
 				});
 			}

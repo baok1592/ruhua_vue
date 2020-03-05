@@ -69,7 +69,7 @@
 						<!-- 订单列表 -->
 
 						<div v-if="!addShow" style="padding: 15px;background-color: #fff">
-							<el-table :data="list" border style="width: 100%" @filter-change="xxx">
+							<el-table :data="list" border style="width: 100%">
 								<el-table-column type="index" label="序号" width="50"></el-table-column>
 								<el-table-column prop="order_num" label="订单号" width="180"></el-table-column>
 								<el-table-column label="商品名称" width="280">
@@ -79,7 +79,7 @@
 								</el-table-column>
 								<el-table-column label="订单价格" width="100">
 									<template slot-scope="scope">
-										<el-button type="text" @click="open(scope.row.order_money,scope.row.order_id)">{{scope.row.order_money}}</el-button>
+										<el-button type="text" @click="open(scope.$index)">{{scope.row.order_money}}</el-button>
 									</template>
 								</el-table-column>
 								<el-table-column prop="message" label="客户备注" width="160">
@@ -87,7 +87,7 @@
 								<el-table-column prop="users.nickname" label="用户" width="160"></el-table-column>
 								<el-table-column prop="pay_time" label="支付日期" width="180"></el-table-column>
 								<el-table-column label="支付状态" width="100" :filters="[{ text: '已支付', value: 1 }, { text: '未支付', value: 0 }]"
-								 :filter-method="filter_pay" filter-placement="bottom-end" column-key="zf">
+								 :filter-method="filter_pay" filter-placement="bottom-end">
 									<template slot-scope="scope">
 										<p v-if="scope.row.payment_state == 1">已支付</p>
 										<p v-else style="color:Red;">未支付</p>
@@ -101,7 +101,7 @@
 									</template>
 								</el-table-column> -->
 								<el-table-column label="订单状态" width="100" :filters="[{ text: '已退款', value: -2 }, { text: '退款中', value: -1 },{ text: '未完成', value: 0 },{ text: '已完成', value: 1 },{ text: '已评价', value: 2 },]"
-								  filter-placement="bottom-end" :column-key="'dd'">
+								 :filter-method="filterTag" filter-placement="bottom-end">
 									<template slot-scope="scope">
 										<p v-if="scope.row.state == -2">已退款</p>
 										<p v-if="scope.row.state == -1">退款中</p>
@@ -132,7 +132,7 @@
 									</template>
 								</el-table-column>
 							</el-table>
-							<el-pagination v-if="fy_show == 1" style="margin-top: 50px;" background layout="prev, pager, next" :total="total" :page-size="size"
+							<el-pagination style="margin-top: 50px;" background layout="prev, pager, next" :total="total" :page-size="size"
 							 @current-change="jump_page">
 							</el-pagination>
 						</div>
@@ -147,16 +147,6 @@
 				</transition>
 			</el-container>
 		</el-container>
-		<el-dialog title="修改" :visible.sync="ed" width="35%" :before-close="handleClose">
-			<span style="display: flex;justify-content: flex-start;">原价{{yj}},增减金额：</span>
-				<el-input v-model="ed_money" placeholder="例:+100或者-100" style=""></el-input>
-			
-
-			<span slot="footer" class="dialog-footer">
-				<el-button @click="cancel">取 消</el-button>
-				<el-button type="primary" @click="sub_ed_order">确 定</el-button>
-			</span>
-		</el-dialog>
 	</div>
 </template>
 
@@ -184,11 +174,7 @@
 		},
 		data() {
 			return {
-				fy_show:1,
-				eid:'',
-				ed_money:'',
-				yj:'',
-				ed: false,
+
 				activeNames: '',
 				input: '',
 				type: [{
@@ -373,37 +359,6 @@
 			this.get_all_order()
 		},
 		methods: {
-			xxx(filters){
-				console.log(filters)
-			},
-			open(order_money,id) {
-				this.ed = true
-				this.yj = order_money
-				this.eid = id
-			},
-			handleClose() {
-				this.ed = false
-			},
-			sub_ed_order(){
-				const that = this
-				this.http.post('order/admin/edit_price',{
-					price:this.ed_money,
-					order_id:this.eid
-				}).then(res=>{
-					that.$message({
-						showClose: true,
-						message: '修改成功',
-						type: 'success'
-					});
-					this.ed = false
-					this.ed_money = ''
-					this.get_all_order()
-				})
-			},
-			cancel(){
-				this.ed = false
-				this.ed_money = ''
-			},
 			get_excel() {
 				const aLink = document.createElement('a');
 				let token = localStorage.getItem('token');
@@ -424,7 +379,7 @@
 			},
 			get_all_order() {
 				const that = this
-				this.http.post('order/admin/get_order').then(res => {
+				this.http.post_show('order/admin/get_order').then(res => {
 					that.all = res.data
 					that.list = res.data;
 					that.list = res.data.slice(0, that.size);
@@ -446,7 +401,6 @@
 				return Y + M + D + h + m + s;
 			},
 			filter_pay(value, row) {
-				console.log(value)
 				return row.payment_state === value;
 			},
 			filter_tui(value, row) {
@@ -561,9 +515,6 @@
 
 			reset() {
 				this.get_all_order()
-				this.fy_show = 1
-				this.list = this.all.slice(0,this.size)
-				
 			},
 			search(input) { //订单号  商品名称  用户名
 				console.log(input)
@@ -583,11 +534,8 @@
 					}
 				}
 				// this.all = arr
-				this.fy_show = 0
-				this.list = arr
-				
-				// this.list = arr.slice(0, this.size);
-				// this.total = arr.length
+				this.list = arr.slice(0, this.size);
+				this.total = arr.length
 				console.log(arr)
 				this.input = ''
 			},

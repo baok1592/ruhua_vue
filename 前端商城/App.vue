@@ -1,8 +1,10 @@
 <script>
 	import {XcxToken} from '@/common/xcx_token.js'
 	import {WxToken} from '@/common/wx_token.js'	
+	import {AppToken} from '@/common/app_token.js'	
 	var xcxtoken = new XcxToken();
-	var wxtoken = new WxToken();	
+	var wxtoken = new WxToken();
+	var apptoken = new AppToken(); 
  
 	export default { 
 		onLaunch: function() { 
@@ -12,9 +14,12 @@
 			
 			// #ifdef H5
 				//微信公众号获取token -必须是认证的服务号 
-				wxtoken.verify('userinfo'); //静默获取openid					
+				//wxtoken.verify('userinfo'); //静默获取openid					
 			// #endif
 			
+			// #ifdef APP-PLUS 
+				apptoken.verify(); 					
+			// #endif
 			console.log('App Launch')
 		},
 		onShow: function() {

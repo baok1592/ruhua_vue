@@ -166,7 +166,7 @@
 		},
 		methods: {
 			get_home_data(){
-				this.http.get('statistic/admin/get_index_data').then(res=>{
+				this.http.get_show('statistic/admin/get_index_data').then(res=>{
 					this.message[0].num = res.data.shipment
 					this.message[1].num = res.data.tui
 					this.message[4].num = res.data.yesterday_order + '/'+ res.data.yesterday_money
@@ -176,12 +176,12 @@
 				})
 			},
 			get_data() {
-				this.http.post('statistic/admin/get_table').then(res => {
+				this.http.post_show('statistic/admin/get_table').then(res => {
 					this.chartData.rows = res.data
 				})
 			},
 			get_month(month) {
-				this.http.post('statistic/admin/get_table', {
+				this.http.post_show('statistic/admin/get_table', {
 					month: month / 1000
 				}).then(res => {
 					this.chartData.rows = res.data
@@ -195,7 +195,7 @@
 				// })
 			},
 			check_login() {
-				this.http.get('index/admin/check_login').then(res => {
+				this.http.get_show('index/admin/check_login').then(res => {
 					if (!res.data) {
 						localStorage.clear()
 						this.$router.push('/login')

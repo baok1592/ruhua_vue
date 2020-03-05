@@ -1,15 +1,17 @@
 <template>
 	<view class="mingxi">
-		
+
 		<view class="head">
 			<view class="head_l">
-				<view :class="num==0?'ling':'head_l_1'"  @click="change(0)">全部</view>
-				<view :class="num==1?'ling':'head_l_1'"  @click="change(1)">代理提成</view>
-				<view :class="num==2?'ling':'head_l_1'"  @click="change(2)">用户提成</view>
-			</view> 
-			<view class="head_r"><uni-icon type="pengyouquan" size="25" color="#B2B2B2"></uni-icon></view>
+				<view :class="num==0?'ling':'head_l_1'" @click="change(0)">全部</view>
+				<view :class="num==1?'ling':'head_l_1'" @click="change(1)">代理提成</view>
+				<view :class="num==2?'ling':'head_l_1'" @click="change(2)">用户提成</view>
+			</view>
+			<view class="head_r">
+				<uni-icon type="pengyouquan" size="25" color="#B2B2B2"></uni-icon>
+			</view>
 		</view>
-		
+
 		<view class="shouyi">
 			<view class="sy_l">总收入：<span>¥ {{total}}</span></view>
 			<!-- <view class="sy_l">今日收入：<span>¥</span></view> -->
@@ -19,7 +21,7 @@
 			<view class="vip" v-for="(item,index) of vipList" :key="index" v-else>
 				<li class="tc">
 					<view class="tc_l">
-						<span>推荐{{item.from_mobile}}成为{{item.type==2?'商家':'VIP'}}</span>
+						<span>{{item.user.nickname}}</span>
 						<br />{{item.create_time}}
 					</view>
 					<view class="tc_2">+{{item.money}}</view>
@@ -60,35 +62,22 @@
 		},
 		methods: {
 			_load() {
-				// this.$api.loading()
-				// let a= this.$api.http.get('user/vip_money').then(res=>{
-				// 	if(res.length<1){
-				// 		this.list_empty=true
-				// 	}else{
-				// 		this.vipList = res
-				// 	}
-				// 	let total=0
-				// 	for (let k in res){
-				// 		let v=res[k]
-				// 		total=total*1 + v.money*1
-				// 	}
-				// 	this.total=total
-				// 	uni.hideLoading();
-				// 	uni.stopPullDownRefresh();
-			// })
-	},
-	change(e) {
-		this.num = e
-		console.log(e)
-	}
-	},
-	onPullDownRefresh() {
-		console.log('refresh');
-		this._load();
-		setTimeout(function() {
-			uni.stopPullDownRefresh();
-		}, 2000);
-	}
+				this.$api.http.get('fx/user/get_fx_record').then(res=>{
+					this.vipList = res.data
+				})
+			},
+			change(e) {
+				this.num = e
+				console.log(e)
+			}
+		},
+		onPullDownRefresh() {
+			console.log('refresh');
+			this._load();
+			setTimeout(function() {
+				uni.stopPullDownRefresh();
+			}, 2000);
+		}
 	}
 </script>
 

@@ -10,7 +10,7 @@
 			<view v-for="(item,index) of list" :key="index" v-else>
 				<!-- <view class='coupon'  > -->
 
-				<view class='coupon' v-if="item.status==state" >
+				<view class='coupon' v-if="item.status==state">
 					<view class='cou_t'>
 						<view class='cou_t_l'>
 							<view :class='class_name'><span>¥</span> {{item.reduce}}</view>
@@ -20,11 +20,17 @@
 							<view class='cou_t_r_01'>满{{item.full}}减{{item.reduce}}</view>
 							<view class='cou_t_r_02'>有效期：{{item.end_time}}</view>
 						</view>
-						<view :class='btn_name' v-if="state==0" >
-							<view  @click="jump_to">去使用</view>
+						<view :class='btn_name' v-if="state==0">
+							<view @click="jump_to(item.goods_ids)">去使用</view>
 						</view>
 					</view>
-					<view class='cou_d'>描述信息</view>
+					<block v-if="item.goods_ids == 0">
+						<view class='cou_d'>所有商品可用</view>
+					</block>
+					<block v-else>
+						<view class='cou_d'>指定商品可用</view>
+					</block>
+
 					<view class="ysy" v-if="state==1"><img src="@/imgs/yi.png"></img></view>
 					<view class="ysy" v-if="state==3"><img src="@/imgs/late.png"></img></view>
 				</view>
@@ -53,22 +59,28 @@
 			this._load()
 		},
 		methods: {
-			jump_to(){
+			jump_to(is_all) {
+				let type = ''
+				if (is_all == 0) {
+					type = 'all'
+				} else {
+					type = 'coupon'
+				}
 				uni.navigateTo({
-					url:'../../index/index'
+					url: '../../extend-view/productList/productList?cid=5&sid=0&type=' + type
 				})
 			},
 			_load() {
-				
-				this.$api.http.get('coupon/user/get_coupon').then(res=>{ 
-					
-					if(!res.data){
-						this.list_empty=true
-					}else{
-						this.list=res.data
+
+				this.$api.http.get('coupon/user/get_coupon').then(res => {
+
+					if (res.data=='') {
+						this.list_empty = true
+					} else {
+						this.list = res.data
 					}
 					uni.stopPullDownRefresh();
-				})		
+				})
 			},
 			num(index) {
 				if (index == 0) {
@@ -92,7 +104,7 @@
 			},
 
 		},
-		
+
 		onPullDownRefresh() {
 			console.log('refresh');
 			this._load();
@@ -106,7 +118,8 @@
 <style lang="scss">
 	.coupon {
 		background-color: #F8F8F8;
-		min-height: 100vh;padding-bottom: 1px;
+		min-height: 100vh;
+		padding-bottom: 1px;
 
 		.po {
 			z-index: 99;

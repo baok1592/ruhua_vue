@@ -53,56 +53,15 @@
 		props: [],
 		data() {
 			return {
-				list:[{
-						id: 1,
-						name: '签到',
-						url: '/pages/qiandao/qiandao'
-					},
-					{
-						id: 2,
-						name: '积分',
-						url: '/pages/point/point'
-					},
-					{
-						id: 3,
-						name: '秒杀',
-						url: '/pages/miaosha/miaosha'
-					},
-					{
-						id: 4,
-						name: '限时折扣',
-						url: '/pages/discount/discount'
-					},
-					{
-						id: 5,
-						name: '新人团购',
-						url: '/pages/one/one'
-					},
-					{
-						id: 6,
-						name: '直播',
-						url: '/pages/zhibo/zhibo'
-					},
-					{
-						id: 7,
-						name: '活动',
-						url: '/pages/notice/notice'
-					},
-					{
-						id: 8,
-						name: '优惠券',
-						url: '/pages/coupon/coupon'
-					},
-					{
-						id: 9,
-						name: '分销商品',
-						url: '/pages/extend-view/productList/productList?type=fx'
-					},
-					{
-						id: 10,
-						name: '视频购',
-						url: '/pages/zhibo/zhibo' 
-					},
+				list:[
+					{name:'签到',url:'/pages/qiandao/qiandao'},
+					{name:'积分',url:'/pages/qiandao/qiandao'},
+					{name:'秒杀',url:'/pages/qiandao/qiandao'},
+					{name:'限时折扣',url:'/pages/discount/discount'},
+					{name:'1元购',url:'/pages/one/one'},
+					{name:'直播',url:'/pages/zhibo/zhibo'},
+					{name:'活动',url:'/pages/notice/notice'},
+					{name:'优惠券',url:'/pages/qiandao/qiandao'},
 				],
 				length:1,
 				drawer: false,

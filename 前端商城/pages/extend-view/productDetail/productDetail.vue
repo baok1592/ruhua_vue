@@ -1,4 +1,4 @@
-<template> 
+<template>
 	<view class="container">
 		<!--header-->
 		<view class="tui-header-box" :style="{height:height+'px',background:'rgba(255,255,255,'+opcity+')'}">
@@ -15,7 +15,13 @@
 
 		<!--banner-->
 		<view class="tui-banner-swiper">
-			<swiper :autoplay="true" :interval="5000" :duration="150" :circular="true" :style="{height:scrollH + 'px'}" @change="bannerChange">
+			<swiper :autoplay="is_auto" :interval="5000" :duration="150" :circular="true" :style="{height:scrollH + 'px'}"
+			 @change="bannerChange">
+				<swiper-item v-if="list.video">
+					<video :style="{height:scrollH+'px'}" style="width: 100%;" id="myVideo" :src="getimg+list.video.url" @error="videoErrorCallback"
+					 show-fullscreen-btn controls objectFit="fill" :poster="getimg+list.banner_imgs_url[0]"></video>
+
+				</swiper-item>
 				<block v-for="(item,index) in list.banner_imgs_url" :key="index">
 					<swiper-item :data-index="index" @click="bigimage(index)">
 						<img :src="getimg+item" class="tui-slide-image" :style="{height:scrollH+'px'}" />
@@ -23,97 +29,52 @@
 				</block>
 			</swiper>
 			<tui-tag type="translucent" shape="circleLeft" size="small">{{bannerIndex+1}}
-			/{{list.banner_imgs_url.length}}</tui-tag>
-			<block v-if="discount_start == 1">
-				<view class="xszk" v-if="!detail">限时折扣</view>
-			</block>
-			
+				/{{banner_length}}</tui-tag>
+
+			<view class="xszk" v-if="label_name && zk_status=='start'">{{label_name}}</view>
 		</view>
 		<!--banner-->
 
 
+		<!--商品简介-->
 		<view class="tui-pro-detail">
 			<view class="tui-product-title tui-border-radius">
-				<view v-if="!detail">
-					<block v-if="discount_start == 1">
-						<view class="detail">
-							<view>
-								<view class="tui-pro-pricebox tui-padding red">
-									<view class="tui-pro-price">
-										<view>￥<text class="tui-price">{{price}}</text></view>
-										<!-- <view class="tag">新品</view> -->
-									</view>
-								</view>
-								<view class="tui-original-price tui-gray">
-									价格
-									<text class="tui-line-through">￥{{list.market_price}}</text>
-								</view>
-							</view>
-							<view class="time">
-								<view class="juli">距离活动结束还剩</view>
-								<uni-countdown :day="discount_time.days" border-color="#FF4342" color="#FF4342" splitor-color="#fff" :hour="discount_time.hours"
-								 :minute="discount_time.minutes" :second="discount_time.seconds">
-								</uni-countdown>
 
-							</view>
-						</view>
-					</block>
-					<block v-else>
-						<view class="tui-pro-pricebox tui-padding">
-							<view class="tui-pro-price">
-								<view>{{is_vip?'VIP':'¥'}}
-									<text class="tui-price">{{price}}</text>
-								</view>
-								<!-- <tui-tag :plain="true" type="high-green" shape="circle">新品</tui-tag> -->
-							</view>
-						
-							<view class="tui-original-price tui-gray" style="font-weight: 100;flex-grow: 1;" v-if="is_vip">
-								价格
-								<text class="tui-line-through">￥{{list.market_price}}</text>
-							</view>
-						</view>
-					</block>
-
-
-				</view>
-
-				<view v-else>
+				<!-- 普通商品 -->
+				<block v-if="pro_type == 'pro' ">
 					<view class="tui-pro-pricebox tui-padding">
 						<view class="tui-pro-price">
-							<view>{{is_vip?'VIP':'¥'}}
+							<view>{{my.vip.status == 1?'VIP':'¥'}}
 								<text class="tui-price">{{price}}</text>
 							</view>
-							<!-- <tui-tag :plain="true" type="high-green" shape="circle">新品</tui-tag> -->
 						</view>
-
 						<view class="tui-original-price tui-gray" style="font-weight: 100;flex-grow: 1;" v-if="is_vip">
 							价格
 							<text class="tui-line-through">￥{{list.market_price}}</text>
 						</view>
 					</view>
-					<!-- <view class="tui-original-price tui-gray" v-if="is_vip">
-						价格
-						<text class="tui-line-through">￥{{list.market_price}}</text>
-					</view> -->
-				</view>
+
+				</block>
+
+
 				<view class="tui-pro-titbox">
 					<view class="tui-pro-title">
 						{{list.goods_name}}
 					</view>
 
+					<!-- #ifdef MP-WEIXIN -->
 					<button @click="is_share=true" class="tui-share-btn tui-share-position share" style="margin-top: -7px;">
 						<tui-tag type="gray" tui-tag-class="tui-tag-share tui-size" shape="circleLeft" size="small">
 							<view class="tui-icon tui-icon-partake" style="color:#999;font-size:15px"></view>
 							<text class="tui-share-text tui-gray">分享</text>
-							
+
 						</tui-tag>
 					</button>
+					<!-- #endif -->
+
 
 				</view>
-				<view class="tui-padding" v-if="list.discount.discount">
-					<block v-if="list.discount.discount.start_time">
-						<view class="tui-sub-title tui-size font-red">此商品将于{{list.discount.discount.start_time}}开启限时折扣</view>
-					</block>
+				<view class="tui-padding" v-if="zk_status=='wait'"> 
 					<view class="tui-sale-info tui-size tui-gray">
 						<view>快递：{{list.delivery.name}}</view>
 						<view>月销：{{list.sales}}</view>
@@ -121,18 +82,7 @@
 					</view>
 				</view>
 			</view>
-
-			<view class="tui-discount-box tui-radius-all tui-mtop" v-if="couponList.length > 0">
-				<view class="tui-list-cell" @click="toggleMask('show')">
-					<view class="tui-bold tui-cell-title">领券</view>
-					<view class="tui-tag-coupon-box">
-						<template v-for="(item,index) of couponList" v-if="index <= 2">
-							<tui-tag size="small" type="red" shape="circle" tui-tag-class="tui-tag-coupon">满{{item.full}}减{{item.reduce}}</tui-tag>
-						</template>
-					</view>
-					<tui-icon name="more-fill" :size="20" class="tui-right tui-top40" color="#666"></tui-icon>
-				</view>
-			</view>
+ 
 
 			<view class="tui-basic-info tui-mtop tui-radius-all" v-if="list.sku.length>0">
 				<view class="tui-list-cell" @tap="showPopup">
@@ -141,6 +91,8 @@
 					<tui-icon name="more-fill" :size="20" class="tui-right" color="#666"></tui-icon>
 				</view>
 			</view>
+
+
 
 			<view class="tui-cmt-box tui-mtop tui-radius-all">
 				<view class="tui-list-cell tui-last tui-between">
@@ -156,21 +108,23 @@
 						<image :src="applist.user.headpic" class="tui-acatar"></image>
 						<view>{{applist.user.nickname}}</view>
 					</view>
-					<view class="tui-cmt">{{applist.content}}</view> 
+					<view class="tui-cmt">{{applist.content}}</view>
 				</view>
 
-				<view class="tui-cmt-btn">
+				<!-- <view class="tui-cmt-btn">
 					<tui-tag type="black" :plain="true" tui-tag-class="tui-tag-cmt" @tap="jump_toevaluate(list.goods_id)">查看全部评价</tui-tag>
+				</view> -->
+			</view>
+
+			<view class="pro-content">
+				<view class="tui-nomore-box">
+					<tui-nomore text="详情介绍" :visible="true" bgcolor="#f7f7f7"></tui-nomore>
+				</view>
+				<view class="tui-product-img tui-radius-all">
+					<rich-text :nodes="content"></rich-text>
 				</view>
 			</view>
 
-
-			<view class="tui-nomore-box">
-				<tui-nomore text="详情介绍" :visible="true" bgcolor="#f7f7f7"></tui-nomore>
-			</view>
-			<view class="tui-product-img tui-radius-all">
-				<rich-text :nodes="content" ></rich-text>
-			</view>
 			<tui-nomore text="已经到最底了" :visible="true" bgcolor="#f7f7f7"></tui-nomore>
 			<view class="tui-safearea-bottom"></view>
 
@@ -178,28 +132,31 @@
 
 		<!--底部操作栏-->
 		<view class="tui-operation">
-			<view class="tui-operation-left tui-col-5">
-				<view class="tui-operation-item" hover-class="opcity" :hover-stay-time="150" @click="jump_tohome">
+			<view class="tui-operation-left tui-col-5 ">
+				<view class="tui-operation-item pad" hover-class="opcity" :hover-stay-time="150" @click="jump_tohome">
 					<tui-icon name="shop" :size="22" color='#333'></tui-icon>
 					<view class="tui-operation-text tui-scale-small">首页</view>
 				</view>
-				<view class="tui-operation-item" hover-class="opcity" :hover-stay-time="150" @click="jump_tocart">
+				<view class="tui-operation-item " hover-class="opcity" :hover-stay-time="150" @click="jump_tocart">
 					<tui-icon name="cart" :size="22" color='#333'></tui-icon>
 					<view class="tui-operation-text tui-scale-small">购物车</view>
 					<tui-badge type="danger" size="small" v-if="shop_car_num>0">{{shop_car_num}}</tui-badge>
 				</view>
-				<view class="tui-operation-item" hover-class="opcity" :hover-stay-time="150" @click="collecting">
+				<view class="tui-operation-item pad" hover-class="opcity" :hover-stay-time="150" @click="collecting">
 					<tui-icon :name="collected?'like-fill':'like'" :size="22" :color=" collected?'#ff201f':'#333' "></tui-icon>
 					<view class="tui-operation-text tui-scale-small" :style="collected?'color: #ff201f;':''">收藏</view>
 				</view>
-				<view class="tui-operation-item" hover-class="opcity" :hover-stay-time="150"></view>
+				<view style="width: 20px;"></view>
 			</view>
 			<view class="tui-operation-right tui-right-flex tui-col-7 tui-btnbox-4">
-				<view class="tui-flex-1">
-					<tui-button type="danger" shape="circle" size="mini" @click="showPopup">加入购物车</tui-button>
+				<view class="tui-flex-1" v-if="!list.pt.price">
+					<tui-button type="danger" shape="circle" size="mini" @click="showPopup('car')">加入购物车</tui-button>
 				</view>
-				<view class="tui-flex-1">
-					<tui-button type="warning" shape="circle" size="mini" @click="showPopup">立即购买</tui-button>
+				<view class="tui-flex-1" v-if="list.pt.price">
+					<tui-button type="warning" shape="circle" size="mini" @click="showPopupxx">我要开团</tui-button>
+				</view>
+				<view class="tui-flex-1" v-else>
+					<tui-button type="warning" shape="circle" size="mini" @click="showPopup('shopping')">立即购买</tui-button>
 				</view>
 			</view>
 		</view>
@@ -211,7 +168,13 @@
 				<view class="tui-product-box tui-padding">
 					<img :src="getimg+list.imgs" class="tui-popup-img" />
 					<view class="tui-popup-price">
-						<view class="tui-amount tui-bold">￥{{list.price}}</view>
+						<template v-if="list.discount != '[]'">
+							<view class="tui-amount tui-bold">￥{{price}}</view>
+						</template>
+						<template v-else>
+							<view class="tui-amount tui-bold">￥{{price}}</view>
+						</template>
+
 						<view class="tui-number"><text v-if="list.sku_name">{{list.sku_name}}</text> <text>库存：{{list.stock}}</text>
 						</view>
 					</view>
@@ -240,8 +203,9 @@
 					</view>
 				</scroll-view>
 				<view class="tui-operation tui-operation-right tui-right-flex tui-popup-btn">
-					<tui-button type="red" tui-button-class="tui-btn-equals" shape="circle" size="mini" class="tui-flex-1" @click="add_cart">加入购物车</tui-button>
-					<tui-button type="warning" tui-button-class="tui-btn-equals" shape="circle" size="mini" class="tui-flex-1" @click="add_shopping">立即购买</tui-button>
+					<!-- <tui-button v-if="!list.pt.price" type="red" tui-button-class="tui-btn-equals" shape="circle" size="mini" class="tui-flex-1"
+					 @click="sure">确定</tui-button> -->
+					<tui-button type="warning" tui-button-class="tui-btn-equals" shape="circle" size="mini" class="tui-flex-1" @click="sure">确定</tui-button>
 				</view>
 				<view class="tui-icon tui-icon-close-fill tui-icon-close" style="color: #999;font-size:20px" @tap="hidePopup"></view>
 				<!-- <tui-icon name="close-fill" color="#999" class="tui-icon-close" size="20" @tap="hidePopup"></tui-icon> -->
@@ -249,34 +213,6 @@
 		</tui-bottom-popup>
 		<!--规格选择-->
 
-		<!-- 优惠券面板 -->
-		<view class="mask" :class="maskState===0 ? 'none' : maskState===1 ? 'show' : ''" @click="toggleMask">
-
-			<view class="mask-content" >
-				<!-- 优惠券页面，仿mt -->
-				<view class="coupon-item" v-for="(item,index) in couponList" :key="index">
-					<view class="con">
-						<view class="left">
-							<text class="title">{{item.name}}</text>
-							<text class="time">有效期至{{item.end_time}}</text>
-						</view>
-						<view class="right">
-							<text class="price">{{item.reduce}}</text>
-							<text>满{{item.full}}可用</text>
-						</view>
-
-						<view class="circle l"></view>
-						<view class="circle r"></view>
-					</view>
-					<view class="dott">
-						<text class="tips">限新用户使用</text>
-						<div class="an" @click="lq_coupon(item.id)">立即领取</div>
-					</view>
-
-				</view>
-			</view>
-
-		</view>
 
 		<!-- 分享 -->
 		<view class="sha_tan" v-if="is_share">
@@ -310,14 +246,6 @@
 			<canvas class="canvas" canvas-id="myCanvas"></canvas><!-- 海报 -->
 		</view>
 
-		<!-- <view class="r_b">
-			<view class="back">
-				<view class="tui-icon tui-icon-top" style="color:#999;font-size:18px"></view>
-			</view>
-			<view class="back">
-				<view class="tui-icon tui-icon-mobile" style="color:#999;font-size:18px"></view>
-			</view>
-		</view> -->
 	</view>
 </template>
 
@@ -330,8 +258,15 @@
 	import tuiButton from "@/components/button/button"
 	import tuiTopDropdown from "@/components/top-dropdown/top-dropdown"
 	import tuiBottomPopup from "@/components/bottom-popup/bottom-popup"
-	import tuiNumberbox from "@/components/numberbox/numberbox" 
+	import tuiNumberbox from "@/components/numberbox/numberbox"
 	import hchPoster from '@/components/hch-poster/hch-poster.vue'
+	import {
+		Api_url
+	} from '@/common/config.js'
+	import {
+		CUser
+	} from '@/common/cache/user.js'
+	var cache_user = new CUser();
 
 	export default {
 		components: {
@@ -342,12 +277,23 @@
 			tuiButton,
 			tuiTopDropdown,
 			tuiBottomPopup,
-			tuiNumberbox, 
+			tuiNumberbox,
 			uniCountdown,
 			hchPoster
 		},
 		data() {
 			return {
+				// zk_status:"",
+				is_new_pt: false,
+				is_auto: '',
+				my: '',
+				pro_type: 'pro',
+				is_timeup: 1,
+				remain: [],
+				time_list: [],
+				pindan: [],
+				is_pt: false, //是否拼团商品
+				is_pindan: false, //是否弹出拼团列表
 				discount_start: 0,
 				discount_time: {
 					days: '',
@@ -360,7 +306,6 @@
 				posterData: {},
 				content: "",
 				xz_sku_name: '',
-				price: '', //原始价格
 				x: 0, //简便的数据更新方法
 				sku_index: '', //规格下标
 				num: 1, //购买数量
@@ -389,19 +334,34 @@
 				popupShow: false,
 				goods_num: 1,
 				id: '',
-				zk_price:'',
+				zk_price: '',
 				list: {},
 				applist: [],
 				collected: '',
 				detailData: '',
-				shareList: ''
+				shareList: '',
+				shopping_type: '',
+				code: '',
 			}
 		},
 		onLoad: function(options) {
 			this.id = options.id
+
+			// #ifdef H5
+			let token = uni.getStorageSync('token')
+			if (token) {
+				this.load_data()
+				this.is_like(options.id)
+			}
+			// #endif
+
+			// #ifdef MP-WEIXIN
 			this.is_like(options.id)
-					
+
+			// #endif
+
 			this._load()
+
 			let cache = uni.getStorageSync('cart')
 			if (!cache) {
 				this.shop_car_num = 0
@@ -428,8 +388,60 @@
 					this.scrollH = res.windowWidth //APP不支持css的vw，所以用这种
 				}
 			})
+			this.get_code()
+		},
+		computed: {
+			//最终售价
+			price() {
+				const old = this.list.price * 1
+				let result = old
+				return result.toFixed(2)
+			},
+			//轮播与视频个数
+			banner_length() {
+				//const num = this.list.banner_imgs_url.length 
+				return 1;
+			}
+			 
 		},
 		methods: {
+			get_code() { 
+			},
+			sure() {
+				console.log(this.shopping_type);
+				if (this.shopping_type == 'car') {
+					this.add_cart()
+				}
+				if (this.shopping_type == 'shopping') {
+					this.add_shopping()
+				}
+			},
+			videoErrorCallback: function(e) {
+				uni.showModal({
+					content: e.target.errMsg,
+					showCancel: false
+				})
+			},
+			//开团
+			showPopupxx() {
+				this.popupShow = true
+				let is_kai = 1
+				uni.setStorageSync('is_kai', is_kai)
+			},
+			//倒计时时间到触发
+			timeup(e) {
+				//拼团时间到触发
+				if (e == 2) {
+					this.is_timeup = 0
+				}
+				//限时折扣时间到触发
+				if (e == 1) {
+					this.pro_type = 'pro'
+					this.zk_status = 'end'
+					console.log(this.zk_status);
+				}
+			},
+			//生成海报
 			shareFc() {
 				console.log('生成海报')
 
@@ -440,7 +452,8 @@
 					title: this.list.goods_name, //标题
 					discountPrice: this.list.price, //折后价格
 					orignPrice: this.list.market_price, //原价
-					code: 'https://img0.zuipin.cn/mp_zuipin/poster/hch-code.png', //小程序码
+					// code: 'https://img0.zuipin.cn/mp_zuipin/poster/hch-code.png', //小程序码
+					code: this.code, //小程序码
 				})
 				this.$forceUpdate(); //强制渲染数据
 				setTimeout(() => {
@@ -449,67 +462,41 @@
 					this.$refs.hchPoster.createCanvasImage(); //调用子组件的方法
 				}, 500)
 			},
+			load_data() {
+				uni.showLoading({
+					title: '加载中'
+				});
+				setTimeout(() => {
+					uni.hideLoading()
+				}, 2000)
+				let a = this.$api.http.get('product/get_evaluate?id=', {
+					id: this.id
+				})
+				let b = this.$api.http.get('coupon/get_coupon')
+				Promise.all([a, b]).then(res => {
+					this.applist = res[0].data[0]
+					this.couponList = res[1].data
+					uni.hideLoading();
+				})
+			},
 			_load() {
 				this.$api.http.get('product/get_product?id=', {
 					id: this.id
-				}).then(res => {
-					this.detail = res.data.discount.id ? false : true //限时折扣 
-					if(!this.detail){
-						this.zk_price=res.data.discount.reduce_price*1
-						this.price = res.data.price*1 - this.zk_price
-					}else{
-						this.price = res.data.price*1
-					}
+				}).then(res => { 
 					this.list = res.data
-					if (this.list.discount.discount) {
-						let etime = this.list.discount.discount.end_time
-						//----------------------------------------------计算时间差
-						let now_time = new Date().getTime()
-						let end_time = new Date(etime).getTime()
-						if (end_time > now_time) {
-							let time = end_time - now_time
-							let day = Math.floor(time / (24 * 3600 * 1000))
-							var usedTime = end_time - now_time; //两个时间戳相差的毫秒数
-							var days = Math.floor(usedTime / (24 * 3600 * 1000));
-							//计算出小时数
-							var leave1 = usedTime % (24 * 3600 * 1000); //计算天数后剩余的毫秒数
-							var hours = Math.floor(leave1 / (3600 * 1000));
-							//计算相差分钟数
-							var leave2 = leave1 % (3600 * 1000); //计算小时数后剩余的毫秒数
-							var minutes = Math.floor(leave2 / (60 * 1000));
-							var leave3 = leave2 % (60 * 1000) //计算分钟数后剩余的毫秒数
-							var seconds = Math.round(leave3 / 1000)
-						}
-						this.discount_time.days = days
-						this.discount_time.hours = hours
-						this.discount_time.minutes = minutes
-						this.discount_time.seconds = seconds
-						//-----------------------------------------------计算时间差结束						
-						
-						
-						//-----------------------------------------------判断限时活动是否开启
-						let stime = this.list.discount.discount.start_time
-						let start_time = new Date(stime).getTime()
-						let anow_time = now_time
-						console.log('当前时间',anow_time)
-						console.log('开始时间',start_time)
-						if (anow_time > start_time) {
-							this.discount_start = 1
-							console.log('活动已开启')
-						} else {
-							this.discount_start = 0
-							console.log('活动还未开始')
-						}
-						//----------------------------------------------判断限时活动是否开启结束
-					}
+					console.log(res.data)
+					this.is_auto = true
+
 					const re_style = new RegExp('style=""', 'gi')
 					res.data.content = res.data.content.replace(re_style, ``);
 					const regex = new RegExp('<img', 'gi')
 					this.content = res.data.content.replace(regex, `<img style="max-width: 100%; height: auto"`);
+
 					if (this.list.sku_arr) {
 						this.sku_arr = this.list.sku_arr
 						this.xz_sku_name = '请选择规格'
 					}
+
 					if (res.data.sku.length > 0) {
 						res.data.sku_arr.initialSku = {}
 						res.data.sku_arr.initialSku['selectedNum'] = 1
@@ -517,18 +504,60 @@
 							res.data.sku_arr.initialSku[v.k_s] = ''
 						}
 					}
+					this.get_pro_type(res.data)
 				})
-				this.$api.http.get('product/get_evaluate?id=', {
-					id: this.id
+				let token = uni.getStorageSync('token') 
+			},
+			//商品分类 普通商品-pro  限时折扣-xs  普通拼团-pt 好友-haoyou_pt 新人拼团-new_pt
+			get_pro_type(item) {
+				const that = this 
+				this.pro_type = 'pro'
+			},
+			get_time(e) {
+				for (let k in e) {
+					let v = e[k]
+					this.time_list.push(v.item_time)
+				}
+				console.log(this.time_list)
+				for (let k in this.time_list) {
+					let v = this.time_list[k]
+					this.remain.push(this.zhuan_time(v))
+				}
+				console.log(this.remain)
+			},
+			zhuan_time(end) {
+				let obj = {
+					h: '',
+					m: '',
+					s: ''
+				}
+				let start = new Date().getTime()
+				let remain = end * 1000 - start
+				let h = parseInt(remain / 1000 / 60 / 60 % 24)
+				let m = parseInt(remain / 1000 / 60 % 60)
+				let s = parseInt(remain / 1000 % 60)
+				console.log(h + '-' + m + '-' + s)
+				obj.h = h
+				obj.m = m
+				obj.s = s
+				uni.setStorageSync('time', obj)
+				return obj
+			},
+			is_like(id) {
+				if(!uni.getStorageSync('token')){
+					return;
+				}
+				this.$api.http.post('favorite/get_one_fav', {
+					id: id
 				}).then(res => {
-					this.applist = res.data[0]
-					console.log(this.applist)
-				})
-				this.$api.http.get('coupon/get_coupon').then(res => {
-					this.couponList = res.data
-					console.log(this.couponList)
+					if (!res.data) {
+						this.collected = false
+					} else {
+						this.collected = true
+					}
 				})
 			},
+			//海报开关
 			canvasCancel(val) {
 				this.canvasFlag = val;
 			},
@@ -620,11 +649,11 @@
 				let arr = {}
 				let cache_obj = uni.getStorageSync('cart')
 				const cache_count = Object.keys(cache_obj).length
-
 				if (cache_count > 0) {
 					for (let [k, v] of Object.entries(cache_obj)) {
 						if (cache_id == k) {
 							that.$api.msg('已存在')
+							that.popupShow = false
 							return;
 						}
 					}
@@ -641,13 +670,13 @@
 				this.popupShow = false
 			},
 			//直接购物
-			add_shopping() { 
+			add_shopping() {
 				if (!this.check_sku()) {
 					return;
 				}
 				console.log('add_shopping')
 				const arr = this._setOrderData() //组合数据
-				if(!arr){ 
+				if (!arr) {
 					return;
 				}
 				const id = arr['goods_id'];
@@ -676,42 +705,35 @@
 				return true
 			},
 			//组合数据
-			_setOrderData() { 
+			_setOrderData() {
+				let my = uni.getStorageSync('my')
+				console.log('price:', this.price)
 				const that = this
 				const sku_index = this.sku_index
-				const goods = this.list 
+				const goods = this.list
 				if (goods.stock == 0) {
 					that.$api.msg('库存不足')
 					return;
-				} 
+				}
 				let arr = {};
 				arr['goods_id'] = goods.goods_id
 				arr['goods_name'] = goods.goods_name
 				arr['shopping_fee'] = goods.shipping_fee
 				arr['radio'] = true
 				arr['imgs'] = goods.imgs ? goods.imgs : ''
-				arr['price'] = goods.price
+				arr['price'] = this.price
 				arr['num'] = this.num
 				arr['stock'] = goods.stock
-				if (goods.sku.length > 0) {
+				console.log(my)
+				 if (goods.sku.length > 0) {
 					arr['num'] = goods.sku_arr.initialSku.selectedNum
 					arr['sku'] = goods.sku_arr.list[sku_index]
 					arr['sku_name'] = goods.sku_name
 				}
-				return arr
+				 return arr
 			},
-			is_like(id) {
-				this.$api.http.post('favorite/get_one_fav', {
-					id: id
-				}).then(res => {
-					if (!res.data) {
-						this.collected = false
-					} else {
-						this.collected = true
-					}
-				})
-			},
-			 
+
+
 			lq_coupon(id) { //领取优惠券
 
 				this.$api.http.get("coupon/add_coupon", {
@@ -725,19 +747,15 @@
 					}
 
 				})
-			},
-			//显示优惠券面板
-			toggleMask(type) {
-				let timer = type === 'show' ? 10 : 300;
-				let state = type === 'show' ? 1 : 0;
-				this.maskState = 2;
-				setTimeout(() => {
-					this.maskState = state;
-				}, timer)
-			},
+			}, 
 			jump_tohome() {
 				uni.switchTab({
 					url: '/pages/index/index'
+				})
+			},
+			jump_vip() {
+				uni.navigateTo({
+					url: '/pages/user/member/member'
 				})
 			},
 			jump_to() {
@@ -766,20 +784,20 @@
 			bannerChange: function(e) {
 				this.bannerIndex = e.detail.current
 			},
-			bigimage(index){
-				let arr=[]
-				const img=this.$getimg
+			bigimage(index) {
+				let arr = []
+				const img = this.$getimg
 				for (let k in this.list.banner_imgs_url) {
-					const v=this.list.banner_imgs_url[k]
-					arr[k]=img+v
+					const v = this.list.banner_imgs_url[k]
+					arr[k] = img + v
 				}
-				console.log('arr:',arr)
+				console.log('arr:', arr)
 				uni.previewImage({
 					current: 0,
 					urls: arr,
-					current:index
+					current: index
 				});
-			
+
 			},
 			back: function() {
 				uni.navigateBack()
@@ -790,8 +808,20 @@
 			closeMenu: function() {
 				this.menuShow = false
 			},
-			showPopup: function() {
+			showPopup: function(e) {
+				console.log(e);
+				if (e == 'car') {
+					this.shopping_type = 'car'
+				}
+				if (e == 'shopping') {
+					this.shopping_type = 'shopping'
+				}
 				this.popupShow = true
+			},
+			showPopups: function(id) {
+				this.popupShow = true
+				uni.setStorageSync('pid', id)
+				uni.setStorageSync('is_item', 1)
 			},
 			hidePopup: function() {
 				this.popupShow = false
@@ -800,7 +830,6 @@
 				this.value = e.value
 			},
 			collecting: function() {
-
 				if (this.collected) {
 					this.$api.http.put('favorite/del_fav', {
 						id: this.id
@@ -851,14 +880,282 @@
 	page {
 		background: #f7f7f7;
 	}
+
+	.kait {
+		margin: 10px;
+		background-color: #F7F8FC;
+		padding: 10px;
+		border-radius: 30px;
+		display: flex;
+		font-size: 14px;
+
+		.kt_01 {
+			background-color: #000;
+			border-radius: 50%;
+			width: 25px;
+			height: 25px;
+			text-align: center;
+
+			img {
+				width: 18px;
+				height: 18px;
+				padding-top: 3px;
+			}
+		}
+
+		.kt_02 {
+			padding-left: 5px;
+			height: 25px;
+			line-height: 25px;
+			flex-grow: 1;
+		}
+
+		.kt_03 {
+			background-color: #000;
+			color: #DDCFC2;
+			height: 25px;
+			line-height: 25px;
+			border-radius: 15px;
+			padding: 0 10px;
+			font-size: 12px;
+		}
+	}
+
+	.yxpt {
+		display: flex;
+		font-size: 12px;
+		margin-top: -30upx;
+
+		.yxpt_l {
+			width: 70%;
+			background: linear-gradient(to right, #FF4B2B, #FE1957);
+			color: #fff;
+			display: flex;
+			padding: 5px 10px;
+
+			.yxpt_l_l {
+				background-color: #CE250C;
+				font-weight: 600;
+				padding: 3px 6px;
+				border-radius: 3px;
+				margin-right: 10px;
+			}
+
+			.yxpt_l_r span {
+				font-size: 20px;
+			}
+		}
+
+		.yxpt_r {
+			width: 30%;
+			background-color: #FEE9E8;
+			text-align: center;
+			color: #E96280;
+			padding: 5px 0;
+			font-size: 12px;
+			line-height: 20px;
+		}
+	}
+
+	.pad {
+		padding: 0 5px;
+	}
+
+	.tan_pindan {
+		font-size: 14px;
+		max-height: 460px;
+		overflow: hidden;
+		position: relative;
+
+		.close {
+			position: absolute;
+			top: -30px;
+			right: -30px;
+		}
+
+		.mask {
+			position: fixed;
+			top: 0;
+			width: 100%;
+			height: 100%;
+			z-index: 21;
+			background-color: rgba(0, 0, 0, 0.6);
+		}
+
+		.tan_pd {
+			background-color: #fff;
+			padding: 10px 10px 0;
+			box-shadow: 0 1px 15px #D3D3D3;
+			position: fixed;
+			top: 150px;
+			left: 5%;
+			border-radius: 5px;
+			width: 90%;
+			z-index: 199;
+
+			.tan_pd_tit {
+				text-align: center;
+				font-size: 16px;
+				padding: 0px 0 25px;
+			}
+
+			.pt {
+				display: flex;
+				padding: 10px 0;
+				border-bottom: 1px solid #F6F6F6;
+
+				.pt_l {
+					font-size: 16px;
+					line-height: 40px;
+					display: flex;
+
+					img {
+						width: 40px;
+						height: 40px;
+						border-radius: 50%;
+						margin-right: 8px;
+					}
+				}
+
+				.pt_m {
+					flex-grow: 1;
+					padding-right: 15px;
+					font-size: 12px;
+
+					span {
+						font-size: 16px;
+						padding-right: 5px;
+					}
+
+					.pt_m_2 {
+						color: #6D6D6F;
+					}
+				}
+
+				.pt_r {
+					background-color: #ED3F14;
+					color: #fff;
+					height: 30px;
+					line-height: 30px;
+					margin-top: 5px;
+					padding: 0 12px;
+					border-radius: 3px;
+				}
+			}
+		}
+	}
+
+	.haoyou {
+		background-color: #fff;
+		font-size: 14px;
+		display: flex;
+		padding: 10px;
+
+		.hy_l {
+			color: #A3A0A0;
+			padding-right: 10px;
+		}
+
+		.hy_m {
+			flex-grow: 1;
+			padding-right: 10px;
+			height: 20px;
+			line-height: 20px;
+			overflow: hidden;
+		}
+	}
+
+	.pintuan {
+		background-color: #fff;
+		font-size: 14px;
+
+		.pt_top {
+			display: flex;
+			justify-content: space-between;
+			padding: 10px;
+			border-bottom: 1px solid #F6F6F6;
+
+			.pt_top_l {
+				font-size: 16px;
+			}
+
+			.pt_top_r {
+				color: #A0A0A0;
+			}
+		}
+
+		.pt_people {
+			padding: 0 10px;
+
+			.pt {
+				display: flex;
+				padding: 15px 0;
+				border-bottom: 1px solid #F6F6F6;
+
+				.pt_l {
+					font-size: 16px;
+					line-height: 40px;
+					display: flex;
+
+					img {
+						width: 40px;
+						height: 40px;
+						border-radius: 50%;
+						margin-right: 8px;
+					}
+				}
+
+				.pt_m {
+					flex-grow: 1;
+					text-align: right;
+					padding-right: 15px;
+
+					.pt_m_2 {
+						color: #6D6D6F;
+					}
+
+					span {
+						color: #ED3F14;
+					}
+				}
+
+				.pt_r {
+					background-color: #ED3F14;
+					color: #fff;
+					height: 30px;
+					line-height: 30px;
+					margin-top: 5px;
+					padding: 0 12px;
+					border-radius: 3px;
+				}
+			}
+		}
+	}
+
 	//返回顶部 
-	.r_b{position: fixed;right: 10px;bottom: 70px;z-index: 9;
-		.back{background-color: #EDEDED;width: 35px;height: 35px;border-radius: 50%;display: flex;justify-content: center;
-		align-items: center;margin-bottom: 10px;background-color:rgba(0,0,0,0.1);}
+	.r_b {
+		position: fixed;
+		right: 10px;
+		bottom: 70px;
+		z-index: 9;
+
+		.back {
+			background-color: #EDEDED;
+			width: 35px;
+			height: 35px;
+			border-radius: 50%;
+			display: flex;
+			justify-content: center;
+			align-items: center;
+			margin-bottom: 10px;
+			background-color: rgba(0, 0, 0, 0.1);
+		}
 	}
-	.font-red{
-		color:#FF201F
+
+	.font-red {
+		color: #FF201F
 	}
+
 	// 分享
 	.canvas {
 		position: fixed !important;
@@ -1198,8 +1495,9 @@
 
 	.tui-banner-swiper .tui-tag-class {
 		position: absolute;
+		opacity: 0.5;
 		color: #fff;
-		bottom: 30upx;
+		bottom: 10upx;
 		right: 0;
 	}
 
@@ -1916,6 +2214,12 @@
 		justify-content: space-between;
 		padding: 20upx 0 30upx 0;
 		box-sizing: border-box;
+	}
+
+	.pro-content {
+		margin-top: 30upx;
+		background: #fff;
+		padding: 0 2% 40upx;
 	}
 
 	/*底部选择弹层*/

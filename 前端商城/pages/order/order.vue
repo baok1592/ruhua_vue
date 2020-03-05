@@ -12,39 +12,43 @@
 				<scroll-view class="list-scroll-content" scroll-y>
 					<!-- 空白页 -->
 					<empty v-if="tabItem.loaded === true && tabItem.orderList.length === 0"></empty>
+					<None v-if="list_empty"></None>
 					<!-- 订单列表 -->
-					<view v-for="(item,index) in order_list" :key="index" class="order-item" v-if="tabCurrentIndex==0 || (item.payment_state==now_pay && item.shipment_state==now_drive && item.state>=now_pinjia)">
-						<view class="i-top b-b">
-							<text class="time">{{item.create_time}}</text>
-							<text class="state" :style="{color: item.stateTipColor}">{{item.stateTip}}</text>
-							<text v-if="item.payment_state == 0" class="del-btn yticon icon-iconfontshanchu1" @click="deleteOrder(item.order_id)"></text>
-						</view> 
-						<scroll-view v-if="item.order_goods.length > 1" class="goods-box" scroll-x>
-							<view v-for="(goodsItem, goodsIndex) in item.order_goods" :key="goodsIndex" class="goods-item"  @click="jumo_tomyorder(item.order_id)">
-								<image class="goods-img" :src="getimg+goodsItem.imgs.url" mode="aspectFill"></image>
+					<view v-else>
+						<view v-for="(item,index) in order_list" :key="index" class="order-item" v-if="tabCurrentIndex==0 || (item.payment_state==now_pay && item.shipment_state==now_drive && item.state<=now_pinjia) ">
+							<view class="i-top b-b">
+								<text class="time">{{item.order_num}}</text>
+								<!-- <text class="state" :style="{color: item.stateTipColor}">{{item.stateTip}}</text> -->
+								<text class="state">{{item.create_time}}</text>
+								<text v-if="item.payment_state == 0" class="del-btn yticon icon-iconfontshanchu1" @click="deleteOrder(item.order_id)"></text>
+							</view> 
+							<scroll-view v-if="item.order_goods.length > 1" class="goods-box" scroll-x>
+								<view v-for="(goodsItem, goodsIndex) in item.order_goods" :key="goodsIndex" class="goods-item"  @click="jumo_tomyorder(item.order_id)">
+									<image class="goods-img" :src="getimg+goodsItem.imgs.url" mode="aspectFill"></image>
+								</view>
+							</scroll-view>
+							<view v-if="item.order_goods.length === 1" class="goods-box-single" v-for="(goodsItem, goodsIndex) in item.order_goods" :key="goodsIndex">
+								<image class="goods-img" :src="getimg+goodsItem.imgs.url" mode="aspectFill" @click="jumo_tomyorder(item.order_id)"></image>
+								<view class="right" @click="jumo_tomyorder(item.order_id)">
+									<text class="title clamp">{{goodsItem.goods_name}}</text>
+									<text class="attr-box">{{goodsItem.sku_name?goodsItem.sku_name:''}} x {{goodsItem.num}}</text>
+									<text class="price">{{item.order_money}}</text>
+								</view>
 							</view>
-						</scroll-view>
-						<view v-if="item.order_goods.length === 1" class="goods-box-single" v-for="(goodsItem, goodsIndex) in item.order_goods"
-						 :key="goodsIndex">
-							<image class="goods-img" :src="getimg+goodsItem.imgs.url" mode="aspectFill" @click="jumo_tomyorder(item.order_id)"></image>
-							<view class="right" @click="jumo_tomyorder(item.order_id)">
-								<text class="title clamp">{{goodsItem.goods_name}}</text>
-								<text class="attr-box">{{goodsItem.sku_name}} x {{goodsItem.num}}</text>
-								<text class="price">{{goodsItem.price}}</text>
+						
+							<view class="price-box">
+								共
+								<text class="num">{{item.order_goods.length}}</text>
+								件商品 实付款
+								<text class="price">{{item.order_money}}</text>
 							</view>
-						</view>
-
-						<view class="price-box">
-							共
-							<text class="num">{{item.order_goods.length}}</text>
-							件商品 实付款
-							<text class="price">{{item.order_money}}</text>
-						</view>
-						<view class="action-box b-t" v-if="item.payment_state == 0">
-							<button class="action-btn" @click="deleteOrder(item.order_id)">取消订单</button>
-							<button class="action-btn recom" @click="pay_again(item.order_id)" v-if="item.payment_state == 0">立即支付</button>
+							<view class="action-box b-t" v-if="item.payment_state == 0">
+								<button class="action-btn" @click="deleteOrder(item.order_id)">取消订单</button>
+								<button class="action-btn recom" @click="pay_again(item.order_id)" v-if="item.payment_state == 0">立即支付</button>
+							</view>
 						</view>
 					</view>
+					
 
 					<!-- <uni-load-more :status="tabItem.loadingType"></uni-load-more> -->
 
@@ -55,15 +59,18 @@
 </template>
 
 <script>
+	import None from "@/components/qy/none.vue"
 	import uniLoadMore from '@/components/uni/uni-load-more/uni-load-more.vue';
 	import empty from "@/components/empty"; 
 	export default {
 		components: {
 			uniLoadMore,
-			empty
+			empty,
+			None
 		},
 		data() {
 			return {
+				list_empty: false,
 				now_pay:0,
 				now_drive:0,	
 				now_pinjia:0,
@@ -131,7 +138,12 @@
 			get_order() {
 				const that = this
 				this.$api.http.post('order/user/all_order').then(res => {
-					this.order_list = res.data					 
+					if (res.data=='') {
+						this.list_empty = true
+					} else {
+						this.order_list = res.data	
+					}
+									 
 					console.log(this.tabCurrentIndex)	
 				})
 			},
@@ -174,26 +186,27 @@
 			},
 			//顶部tab点击
 			tabClick(index) {
+				console.log(index)
 				this.tabCurrentIndex = index;
 				if(index==1){
 					this.now_pay=0
 					this.now_drive=0		
-					this.now_pinjia=0
+					this.now_pinjia=0 
 				}
 				if(index==2){
 					this.now_pay=1	
 					this.now_drive=0		
-					this.now_pinjia=0
+					this.now_pinjia=0 
 				}
 				if(index==3){		
 					this.now_pay=1				
 					this.now_drive=1		
-					this.now_pinjia=0
+					this.now_pinjia=0 
 				} 
 				if(index==4){
 					this.now_pay=1				
-					this.now_drive=1			
-					this.now_pinjia=2
+					this.now_drive=0			
+					this.now_pinjia=-1 
 				} 
 			},
 			//删除订单
@@ -328,7 +341,7 @@
 			}
 
 			.state {
-				color: $base-color;
+				color: $font-color-light;
 			}
 
 			.del-btn {

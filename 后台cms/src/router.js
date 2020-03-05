@@ -17,11 +17,6 @@ export default new Router({
 	  	name: 'PicList',
 	  	component: () => import('./views/PicList.vue')
 	  },
-	  {
-	    	path: '/components/video',
-	    	name: 'video',
-	    	component: () => import('./components/video.vue')
-	    },
 	{
 	  	path: '/login',
 	  	name: 'Login',
@@ -59,13 +54,6 @@ export default new Router({
 		component: () => import('./views/user/user.vue')
 	},
 	
-	
-	
-	{
-		path: '/user/admin',
-		name: 'admin',
-		component: () => import('./views/user/admin.vue')
-	},
 	
 	
 	{

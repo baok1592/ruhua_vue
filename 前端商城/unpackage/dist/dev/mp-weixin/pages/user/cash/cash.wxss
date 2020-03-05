@@ -3,6 +3,10 @@
   height: 100vh;
   font-size: 14px;
 }
+.cash .uni-input {
+  background-color: #FFFFFF;
+  margin-top: 5px;
+}
 .cash .txz {
   padding: 15px 10px;
   background-color: #fff;

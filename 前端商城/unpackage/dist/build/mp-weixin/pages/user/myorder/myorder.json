@@ -1,5 +1,7 @@
 {
   "navigationBarTitleText": "订单详情",
   "enablePullDownRefresh": true,
-  "usingComponents": {}
+  "usingComponents": {
+    "uni-icons": "/components/uni/uni-icons/uni-icons"
+  }
 }

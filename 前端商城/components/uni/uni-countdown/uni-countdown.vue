@@ -81,6 +81,13 @@
 		beforeDestroy() {
 			clearInterval(this.timer)
 		},
+		watch:{
+			hour(o,n){
+				console.log('watch:',o,n)
+				this.seconds = this.toSeconds(this.day, this.hour, this.minute, this.second)
+				this.countDown()
+			}
+		},
 		methods: {
 			toSeconds(day, hours, minutes, seconds) {
 				return (day * 60 * 60 * 24) + (hours * 60 * 60) + (minutes * 60) + seconds

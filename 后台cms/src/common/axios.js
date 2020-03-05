@@ -120,38 +120,6 @@ export default {
 			})
 		})
 	},
-	file_post(url, param) {
-		const that = this
-		return new Promise((cback, reject) => {
-			service({
-				method: 'post',
-				url,
-				data: param,
-				headers: { 
-					'Content-Type': 'multipart/form-data' //值得注意的是，这个地方一定要把请求头更改一下
-				}
-			}).then(res => {
-				var res_code = res.status.toString();
-				if (res_code.charAt(0) == 2) {
-					cback(res.data); //cback在promise执行器内部
-				} else {
-					console.log(res, '异常1')
-				}
-			}).catch(err => {
-				if (err.response.status == 401) {
-					localStorage.clear();
-					location.href = './#/login';
-				}
-				Message({
-					showClose: true,
-					message: err.response.data.msg,
-					type: 'error'
-				});
-				console.log(err.response, '异常2')
-			})
-		})
-
-	},
 
 	post_show(url, param) {
 		if (is_ys) {

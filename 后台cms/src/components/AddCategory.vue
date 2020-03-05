@@ -1,7 +1,6 @@
 <template>
 	<div class="add-cate">
 		<el-button type="primary" @click="addbox = true">添加商品分类</el-button>
-		<el-button type="primary" @click="img_manage">图库管理</el-button>
 		<div style="height:10px;"></div>
 		<el-dialog title="" :visible.sync="addbox" width="35%" center>
 			<el-form :model="addform">
@@ -83,11 +82,6 @@
 			Pic
 		},
 		methods: {
-			//图库管理
-			img_manage(){
-				this.drawer = !this.drawer
-				this.length = 50
-			},
 			//新增分类
 			onSubmit() {
 				var that = this;
@@ -111,7 +105,6 @@
 
 
 			to_choose_img() {
-				this.length = 1
 				this.drawer = !this.drawer
 			},
 			is_show() {

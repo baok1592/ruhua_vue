@@ -60,33 +60,164 @@
 									</el-table-column>
 									<el-table-column prop="operation" label="操作" width="300px">
 										<template slot-scope="scope">
+											<!-- <el-button @click="edit(scope.row)"
+											 type="success" size="small">修改</el-button> -->
+
 											<el-button style="margin-left: 10px" type="danger" size="small" slot="reference" @click="del(scope.row.id)">删除</el-button>
 										</template>
 									</el-table-column><strong></strong>
 								</el-table>
 							</template>
+
 						</div>
+						<el-pagination style="margin-top: 50px;" background layout="prev, pager, next" :total="total" :page-size="size"
+						 @current-change="jump_page">
+						</el-pagination>
 					</el-main>
+
 				</transition>
+
+
 			</el-container>
+
 		</el-container>
+
+
+		<el-dialog title="修改" :visible.sync="dialogVisible" width="30%">
+
+			<!-- 修改 -->
+			<el-form ref="form" :model="form" label-width="80px">
+				<el-form-item label="优惠券名">
+					<el-input v-model="form.name"></el-input>
+				</el-form-item>
+				<el-form-item label="使用次数">
+					<el-radio v-model="status" label="1" border size="medium">一次</el-radio>
+					<el-radio v-model="status" label="2" border size="medium">不限</el-radio>
+				</el-form-item>
+				<el-form-item label="满多少">
+					<el-input v-model="form.full"></el-input>
+				</el-form-item>
+				<el-form-item label="减多少">
+					<el-input v-model="form.reduce"></el-input>
+				</el-form-item>
+				<el-form-item label="可用商品" v-model="form.goods_ids">
+					<el-radio v-model="goods_ids" label="0" border size="medium">全部商品</el-radio>
+					<el-radio v-model="goods_ids" label="2" border size="medium">部分商品</el-radio>
+				</el-form-item>
+				<el-form-item label="日期">
+					<el-date-picker v-model="value1" type="datetimerange" range-separator="至" :start-placeholder="form.start_time" :end-placeholder="form.end_time">
+					</el-date-picker>
+				</el-form-item>
+				<el-form-item label="张数类型">
+					<el-radio v-model="form.stock_type" label="0" border size="medium">有限张</el-radio>
+					<el-radio v-model="form.stock_type" label="1" border size="medium">无限张</el-radio>
+				</el-form-item>
+
+				<!-- <el-form-item label="商品图片"> 
+					<el-upload action="" list-type="picture-card" :on-preview="handlePictureCardPreview"
+					:on-remove="handleRemove" :limit="3">
+						<i class="el-icon-plus"></i>
+					</el-upload>
+					<el-dialog :visible.sync="dialogVisiblea">
+						<img width="100%" :src="dialogImageUrl" alt="">
+					</el-dialog>
+				</el-form-item> -->
+			</el-form>
+			<span slot="footer" class="dialog-footer">
+				<el-button @click="dialogVisible = false">取 消</el-button>
+				<el-button type="primary" @click="sub_edit()">确
+					定</el-button>
+			</span>
+
+		</el-dialog>
+
+
+		<!-- 添加弹出框 -->
+		<el-dialog title="添加商品" :visible.sync="dialogVisibleadd" width="30%">
+			<el-form ref="form" :model="form_pro" label-width="80px">
+				<el-form-item label="商品名称">
+					<el-input v-model="form_pro.goods_name"></el-input>
+				</el-form-item>
+				<el-form-item label="商品内容">
+					<el-input v-model="form_pro.content"></el-input>
+				</el-form-item>
+				<el-form-item label="库存">
+					<el-input v-model="form_pro.stock"></el-input>
+				</el-form-item>
+				<el-form-item label="积分">
+					<el-input v-model="form_pro.points"></el-input>
+				</el-form-item>
+				<el-form-item label="商品图片">
+					<!-- <el-upload action="https://jsonplaceholder.typicode.com/posts/" list-type="picture-card" :on-preview="handlePictureCardPreview"
+					 :on-remove="handleRemove" :on-success="res_banner_imgs" :file-list="upfile_banner_list">
+						<i class="el-icon-plus"></i>
+					</el-upload> -->
+
+					<el-upload :action="upfile_url" :data="{use:'jp'}" :on-success="res_banner_imgs" :headers="upfile_head" :limit="5"
+					 :file-list="upfile_banner_list" name="upload-images" :on-remove="handleRemove" list-type="picture-card">
+						<i class="el-icon-plus"></i>
+					</el-upload>
+					<el-dialog :visible.sync="dialogVisiblea">
+						<img width="100%" :src="dialogImageUrl" alt="">
+					</el-dialog>
+				</el-form-item>
+			</el-form>
+			<span slot="footer" class="dialog-footer">
+				<el-button @click="dialogVisibleadd = false">取 消</el-button>
+				<el-button type="primary" @click="onSubmit">确 定</el-button>
+			</span>
+		</el-dialog>
+
 	</div>
+
 </template>
 
 <script>
+	import {
+		Loading
+	} from 'element-ui';
+	import {
+		Api_url
+	} from "@/common/config";
+
 	import NavTo from '@/components/navTo.vue'
 	import Header from '@/components/header.vue'
 	export default {
 		data() {
 			return {
-				status: '1',
-				goods_ids: '0',
+				status:'1',
+				stock_type:'0',
+				goods_ids:'0',
+				
 				dialogImageUrl: '',
+				dialogVisiblea: false,
+				tab_nav: false,
 				dialogVisible: false,
+				dialogVisibleadd: false,
+				dialogFormVisible: false,
 				oid: 0,
 				form: {},
+				form_pro: {
+					goods_name: '',
+					content: '',
+					img_id: [],
+					stock: '',
+					points: ''
+				},
+				formLabelWidth: '120px',
 				list: [],
+				all: '',
+				size: 10,
+				total: '',
+				options: [],
 				value: '',
+				typeList: [],
+				upfile_banner_list: [],
+				upfile_url: Api_url + 'com/up_img?back=id',
+				upfile_head: {
+					token: localStorage.getItem("token")
+				},
+				upfile_list: [], //上传文件列表
 			}
 		},
 		components: {
@@ -94,8 +225,30 @@
 			NavTo
 		},
 		methods: {
+			get_goods_id(){
+				
+			},
 			handleRemove(file, fileList) {
 				console.log(file, fileList);
+			},
+			handlePictureCardPreview(file) {
+				this.dialogImageUrl = file.url;
+				this.dialogVisible = true;
+			},
+			onSubmit() {
+				
+			},
+			res_banner_imgs(res) {
+
+				console.log('res:', res)
+				this.form_pro.img_id.push(res);
+				// if (this.form_pro.img_id.length < 1) {
+				// 	this.form_pro.img_id = res;
+				// } else {
+				// 	this.form_pro.img_id = this.form_pro.img_id + "," + res;
+				// }
+				console.log('xx:', this.form_pro.img_id)
+
 			},
 			add_user() {
 				this.$router.push({
@@ -105,6 +258,19 @@
 			edit(item) {
 				this.form = item
 				this.dialogVisible = true
+			},
+			sub_edit() {
+				
+			},
+			jump_page(e) {
+				const that = this;
+				let start = (e - 1) * that.size;
+				let end = e * that.size;
+				console.log(start, end)
+				this.list = this.all.slice(start, end);
+			},
+			sub() {
+				
 			},
 			//获取优惠券列表
 			get_coupon() {
@@ -132,6 +298,14 @@
 						// that.list.splice(index, 1);
 					});
 				})
+			},
+			close_fun(done) {
+				this.clear_data()
+				done(); //官方实例用法
+			},
+
+			clear_data() {
+				this.dialogFormVisible = false
 			},
 		},
 		mounted() {

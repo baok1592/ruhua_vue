@@ -304,6 +304,7 @@ page {
   -webkit-flex-direction: column;
           flex-direction: column;
   padding: 30rpx 0 10px;
+  margin-bottom: 5px;
 }
 .tui-category-img {
   height: 80rpx;

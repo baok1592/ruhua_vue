@@ -44,9 +44,9 @@
 						if (data.authSetting['scope.userInfo']) {
 							console.log('已授权过了') 
 							uni.getUserInfo({
-								success: data => { 
+								success: data => {  
 									let user=data.userInfo 
-									that.UpUser(user)
+									that.UpUser(user,data.encryptedData,data.iv)
 								}
 							})
 						} else {
@@ -61,17 +61,20 @@
 				const that = this;
 				if (res.detail.userInfo) {
 					const user = res.detail.userInfo		 
-					that.UpUser(user) 
+					that.UpUser(user,res.detail.encryptedData,res.detail.iv) 
 				}
 			},
-			UpUser(user){
+			UpUser(user,keys,iv){				
+				console.log('授权',keys)
 				const that = this
 				uni.request({
 				  	url: Api_url+'auth/upinfo',
 				  	method: 'POST',  
 					data:{
 						nickname: user.nickName,
-						headpic: user.avatarUrl
+						headpic: user.avatarUrl,
+						keys,
+						iv
 					},
 					header: {
 						token:uni.getStorageSync("token")

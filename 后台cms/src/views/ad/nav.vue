@@ -123,7 +123,7 @@
 					},
 					{
 						id: 5,
-						name: '新人团购',
+						name: '1元购',
 						url: '/pages/one/one'
 					},
 					{
@@ -140,16 +140,6 @@
 						id: 8,
 						name: '优惠券',
 						url: '/pages/coupon/coupon'
-					},
-					{
-						id: 9,
-						name: '分销商品',
-						url: '/pages/extend-view/productList/productList?type=fx'
-					},
-					{
-						id: 10,
-						name: '视频购',
-						url: '/pages/zhibo/zhibo' 
 					},
 				],
 				length: 1,

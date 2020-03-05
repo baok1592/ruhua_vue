@@ -130,7 +130,7 @@
 										success: function(res){
 											if(res.statusCode === 200){
 												//_self.value[remoteUrlIndex] = JSON.parse(res.data)  
-												//_self.value.push(JSON.parse(res.data))
+												_self.value.push(JSON.parse(res.data))
 												  
 												 
 												console.log('s3:',_self.value)

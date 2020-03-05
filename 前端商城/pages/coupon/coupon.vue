@@ -1,8 +1,8 @@
 <template>
 	<view class="coupon">
 		<view class='po'>
-			
-		  <view  v-for="(item,index) of list" :key="index">
+		  <None v-if="list_empty"></None>
+		  <view  v-for="(item,index) of list" :key="index" v-else>
 		    <!-- <view class='coupon'  v-if="item.coupon_status==state"> -->
 			<view class='coupons' >
 		      <view class='cou_t' >
@@ -37,23 +37,30 @@
 </template>
 
 <script>
+	import None from "@/components/qy/none.vue"
 	export default {
 		data() {
 			return {
 				c_index:0,
 				list:[],
 				class_name: 'cou_t_l_01',
+				list_empty: false,
 			};
+		},
+		components:{
+			None
 		},
 		onLoad(options) {
 			this._load()
 		},
 		methods:{
 			_load() {
-				
 				this.$api.http.get('coupon/get_coupon').then((res)=>{
-					this.list= res.data
-					console.log(this.list)
+					if (res.data=='') {
+						this.list_empty = true
+					} else {
+						this.list = res.data
+					}
 					uni.stopPullDownRefresh();
 				});
 			},

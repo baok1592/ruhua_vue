@@ -1,7 +1,7 @@
 <template>
 	<view class="agent">
 		<view class="head">
-			共 <span>{{length}}</span> 人
+			共 <span>{{agentList.length}}</span> 人
 		</view>
 		<view class="t_tou">
 			<view class="tou_1">头像</view>
@@ -27,10 +27,7 @@
 		data() {
 			return {
 				agentList:[],
-				agentList2:[{
-					"create_time":"2019-9-20",
-					"user":{"nickname":"sssss","headpic":require('@/imgs/head.jpg'),}
-				}],
+				
 				length:0,
 				list_empty:false
 			};
@@ -41,20 +38,9 @@
 		},
 		methods:{
 			_load(){
-				// var length
-				// this.$api.loading()
-				// let a= this.$api.http.get('user/vip_number')
-				// Promise.all([a]).then((res)=>{
-				// 	if(!res[0].length){
-				// 		this.list_empty=true
-				// 	}else{
-				// 		this.agentList = res[0]//a
-				// 		this.length = this.agentList.length
-				// 	}
-				// 	console.log(this.length)
-				// 	uni.hideLoading();
-				// 	uni.stopPullDownRefresh();
-				// })
+				this.$api.http.get('fx/user/get_bind_user').then(res=>{
+					this.agentList = res.data
+				})
 			}
 		},
 		onPullDownRefresh() {

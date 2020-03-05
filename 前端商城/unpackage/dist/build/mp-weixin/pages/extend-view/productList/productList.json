@@ -12,6 +12,7 @@
     "tui-drawer": "/components/drawer/drawer",
     "tui-loadmore": "/components/loadmore/loadmore",
     "tui-nomore": "/components/nomore/nomore",
-    "tui-top-dropdown": "/components/top-dropdown/top-dropdown"
+    "tui-top-dropdown": "/components/top-dropdown/top-dropdown",
+    "xianshi": "/components/qy/xianshi"
   }
 }

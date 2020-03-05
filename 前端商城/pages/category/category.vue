@@ -38,6 +38,11 @@
 		},
 		methods: {
 			loadData(){
+				uni.showLoading({
+				    title: '加载中'
+				});
+				this.flist = []
+				this.slist = []
 				this.tabbar = this.$api.http.get('category/all_category').then(res => {
 					let list = res.data
 					list.forEach(item=>{
@@ -51,6 +56,7 @@
 						this.currentName=list[0].category_name;
 						this.currentId = list[0].category_id;
 					}
+					uni.hideLoading();
 				})
 			},
 			//一级分类点击
@@ -95,6 +101,12 @@
 					url: `/pages/extend-view/productList/productList?cid=${cid}&sid=${sid}`
 				})
 			}
+		},
+		onPullDownRefresh() {
+			this.loadData()
+			setTimeout(function() {
+				uni.stopPullDownRefresh();
+			}, 1500);
 		}
 	}
 </script>

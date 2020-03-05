@@ -28,9 +28,6 @@
     "pages/user/user",
     "pages/one/one",
     "pages/coupon/coupon",
-    "pages/qiandao/qiandao",
-    "pages/discount/discount",
-    "pages/user/reseller/reseller",
     "pages/user/agent/agent",
     "pages/user/spread/spread",
     "pages/user/cash/cash",
@@ -70,10 +67,12 @@
     "pages/cms/edit/yfmoban/yfmoban",
     "pages/cms/edit/yfset/yfset",
     "pages/user/member/member",
-    "pages/zhibo/zhibo",
     "pages/article/article",
     "pages/cartnone/cartnone",
-    "pages/list/list"
+    "pages/list/list",
+    "pages/xieyi/xieyi",
+    "pages/login/login",
+    "pages/invoices/invoices"
   ],
   "subPackages": [],
   "window": {
@@ -112,6 +111,11 @@
       }
     ]
   },
+  "permission": {
+    "scope.address": {
+      "desc": "收货地址"
+    }
+  },
   "usingComponents": {},
-  "sitemapLocation": "sitemap29.json"
+  "sitemapLocation": "sitemap15.json"
 }

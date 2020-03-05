@@ -8,7 +8,7 @@ class XcxToken {
 	}
 
 	verify() {
-		console.log('小程序获取token')
+		console.log('小程序获取token::')
 		var that = this;
 		var token = uni.getStorageSync('token'); //获取缓存
 		if (!token) {
@@ -42,6 +42,7 @@ class XcxToken {
 		uni.login({
 			provider: 'weixin',
 			success: function(res) {
+				console.log('login:',res)
 				uni.request({
 					url: that.tokenUrl,
 					method: 'POST',

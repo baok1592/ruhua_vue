@@ -3,12 +3,38 @@ import {Api_url} from './config'
 // var token = new Token();
 
 export default { 
-	async post(url, param) {
+	async post(url, param,yanci=true) {
+		if(yanci){ 
+			uni.showLoading({
+				title:'加载中'
+			})
+			setTimeout(()=>{
+				uni.hideLoading()
+			},3000)			
+		}
 		const res = await this.uni_request(url,param,'post')  
+		if(yanci){
+			setTimeout(()=>{
+				uni.hideLoading()
+			},200)	
+		}
 		return res;
 	},
-	async get(url, param) {
+	async get(url, param,yanci=true) {
+		if(yanci){ 
+			uni.showLoading({
+				title:'加载中'
+			})
+			setTimeout(()=>{
+				uni.hideLoading()
+			},3000)			
+		}
 		const res = await this.uni_request(url,param,'get') 
+		if(yanci){
+			setTimeout(()=>{
+				uni.hideLoading()
+			},200)
+		}
 		return res;
 	}, 
 	async put(url, param) {
@@ -17,17 +43,13 @@ export default {
 	}, 
 	uni_request(url,param,method,again_quest=true) {
 		const that=this
-		let token=''
-		if(uni.getStorageSync("token")){
-			token=uni.getStorageSync("token")
-		}
 	    return new Promise((cback, reject) => {
 	    	uni.request({
 	    		url: Api_url + url,
 	    		data: param,
 	    		method:method,
 	    		header: {
-					token
+					token:uni.getStorageSync("token")  	    		 	    			
 	    		},
 	    	}).then(data => { //data为一个数组，数组第一项为错误信息，第二项为返回数据
 	    		var [error, res] = data;

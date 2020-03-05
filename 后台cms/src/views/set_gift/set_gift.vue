@@ -325,7 +325,7 @@
 				// let loadingInstance = Loading.service({
 				// 	fullscreen: true
 				// }); //显示加载 
-				this.http.get('points/get_goods').then((res) => {
+				this.http.get_show('points/get_goods').then((res) => {
 					loadingInstance.close(); //关闭加载 
 					var res_code = res.status.toString();
 					if (res_code.charAt(0) == 2) {

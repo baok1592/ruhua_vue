@@ -117,10 +117,10 @@ export default {
 	},
 	methods: {
 		_load() {
-			this.http.get('img_category/admin/get_all_img').then(res => {
+			this.http.get_show('img_category/admin/get_all_img').then(res => {
 				this.img_list = res.data;
 			});
-			this.http.get('img_category/admin/get_category').then(res => {
+			this.http.get_show('img_category/admin/get_category').then(res => {
 				this.img_category = res.data;
 			});
 		},

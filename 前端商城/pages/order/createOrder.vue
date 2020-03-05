@@ -30,13 +30,13 @@
 					<text class="spec">{{item.sku_name?item.sku_name:''}}</text>
 					<view class="price-box">
 						<text class="price">￥{{item.price}}</text>
+						<!-- <text class="price">￥{{item.price}}</text> -->
 						<text class="number">x {{item.num}}</text>
 					</view>
 				</view>
 			</view>
 
 		</view>
-
 		<!-- 优惠明细 -->
 		<view class="yt-list">
 			<view class="yt-list-cell b-b" @click="toggleMask('show')">
@@ -57,6 +57,8 @@
 				<text class="cell-tip disabled">暂无可用优惠</text>
 			</view> -->
 		</view>
+
+
 		<!-- 金额明细 -->
 		<view class="yt-list">
 			<view class="yt-list-cell b-b">
@@ -71,6 +73,11 @@
 				<text class="cell-tit clamp">运费</text>
 				<text class="cell-tip" v-if="yunfei_money">￥ {{yunfei_money}}</text>
 				<text class="cell-tip" v-else>免运费</text>
+			</view>
+			<view class="yt-list-cell b-b" @click="jump_invoices">
+				<text class="cell-tit clamp">发票</text>
+				<text class="cell-tip">不开发票</text>
+				<text class="yticon icon-you"></text>
 			</view>
 			<view class="yt-list-cell desc-cell">
 				<text class="cell-tit clamp">备注</text>
@@ -92,44 +99,68 @@
 		<view class="mask" :class="maskState===0 ? 'none' : maskState===1 ? 'show' : ''" @click="toggleMask">
 			<view class="mask-content">
 				<!-- 优惠券页面，仿mt -->
-				<scroll-view  class="scroll" scroll-y >
-				     <view class="coupon-item" v-for="(item,index) in couponList" :key="index">
-				     	<block v-if="item.status == 0">
-				     		<view class="con">
-				     			<view class="left">
-				     				<text class="title">满{{item.full}}减{{item.reduce}}</text>
-				     				<!-- <text class="time"></text> -->
-				     			</view>
-				     			<view class="right">
-				     				<text class="price">{{item.reduce}}</text>
-				     				<!-- <text>满{{item.full}}可用</text> -->
-				     			</view>
-				     
-				     			<view class="circle l"></view>
-				     			<view class="circle r"></view>
-				     		</view>
-				     		<view class="use" style="display: flex;justify-content: space-between;">
-				     			<text class="tips">有效期至{{item.end_time}}</text>
-				     			<view class="tips2" @click="to_use(index)">去使用</view>
-				     		</view>
-				     	</block>
-				     </view>
+				<scroll-view class="scroll" scroll-y>
+					<view class="coupon-item" v-for="(item,index) in couponList" :key="index">
+						<block v-if="item.status == 0">
+							<view class="con">
+								<view class="left">
+									<text class="title">满{{item.full}}减{{item.reduce}}</text>
+									<!-- <text class="time"></text> -->
+								</view>
+								<view class="right">
+									<text class="price">{{item.reduce}}</text>
+									<!-- <text>满{{item.full}}可用</text> -->
+								</view>
+
+								<view class="circle l"></view>
+								<view class="circle r"></view>
+							</view>
+							<view class="use" style="display: flex;justify-content: space-between;">
+								<text class="tips">有效期至{{item.end_time}}</text>
+								<view class="tips2" @click="to_use(index)">去使用</view>
+							</view>
+						</block>
+					</view>
 				</scroll-view>
-				
-				
+
+
 				<view class="btn" @click="cancel_use">不使用优惠券</view>
 			</view>
 		</view>
 
+		<view class="tan" v-if="xieyi">
+			<div class="black" @click="xieyi=false">
+				<div class="container"></div>
+			</div>
+			<view class="t_con">
+
+				<view class="t_c_con">
+					<rich-text :nodes="content"></rich-text>
+				</view>
+
+				<view class="t_c_btn">
+					<view class="t_c_btn_01 bg_gery" @click="xieyi=false">不同意</view>
+					<view class="t_c_btn_01 bg_red" @click="xieyi=false">同意</view>
+				</view>
+			</view>
+		</view>
 	</view>
 </template>
 
 <script>
 	export default {
 		data() {
-			return { 
-				coupon_id:0,
-				save_cache:{},
+			return {
+				content: '',
+				xieyi: false,
+				sku_id: '',
+				head: '',
+				is_kai: 0,
+				pid: '',
+				is_pt: 0,
+				pt_data: '',
+				coupon_id: 0,
+				save_cache: {},
 				order_id: 0,
 				getimg: this.$getimg,
 				maskState: 0, //优惠券面板显示状态
@@ -143,12 +174,12 @@
 				address: '',
 				paying: '', //防止多次提交订单
 				coupon_text: '选择优惠券',
-				coupon_money:0,  //优惠金额				
-				obj:{
+				coupon_money: 0, //优惠金额				
+				obj: {
 					msg: "",
 					order_from: "xcx",
 					payment_type: "wx",
-					total_price:"",
+					total_price: "",
 					shoping_price: "",
 					coupon_price: "",
 					coupon_id: 0,
@@ -165,23 +196,35 @@
 			}
 			if (option.state == 'car') {
 				let buy_data = uni.getStorageSync('cart')
-				let arr=[]
-				let cache={}
-				let x=0 
-				for(let k in buy_data){
-					const v=buy_data[k]
-					console.log(k,v)
-					if(v.radio){
-						arr[x]=v	//购物车中选中的商品
+				let arr = []
+				let cache = {}
+				let x = 0
+				for (let k in buy_data) {
+					const v = buy_data[k]
+					console.log(k, v)
+					if (v.radio) {
+						arr[x] = v //购物车中选中的商品
 						x++
-					}else{
-						cache[k]=v  //购物车未选中的商品 
+					} else {
+						cache[k] = v //购物车未选中的商品 
 					}
 				}
 				this.buy_data = arr
-				this.save_cache=cache
+				this.save_cache = cache
 			}
-
+			if (this.buy_data[0].goods_name == "如花商城商业版-授权") {
+				this.xieyi = true
+			}
+			let id = uni.getStorageSync('pid')
+			if (id) {
+				this.pid = id
+				console.log(id)
+				this.is_pt = 1
+				this.get_pid(id)
+			}
+			this.head = uni.getStorageSync('userInfo')
+			this.is_kai = uni.getStorageSync('is_kai')
+			uni.removeStorageSync('is_kai')
 			console.log('onLoad', this.buy_data)
 			this._load()
 			//商品数据s
@@ -195,18 +238,19 @@
 		},
 		computed: {
 			//商品金额
-			goods_money() { 
+			goods_money() {
 				const buy = this.buy_data
 				let total = 0
 				for (let k in buy) {
 					const v = buy[k]
 					total += v.price * v.num
 				}
+				console.log('总价', total)
 				return total;
 			},
 			//订单应付金额
-			pay_money() { 
-				return this.goods_money+this.yunfei_money-this.coupon_money;
+			pay_money() {
+				return this.goods_money + this.yunfei_money - this.coupon_money;
 			}
 		},
 		methods: {
@@ -215,11 +259,24 @@
 				this.$api.http.get('coupon/user/get_coupon').then(res => {
 					this.couponList = res.data
 				})
-				this.get_yunfei()
+				this.get_yunfei() 
+			},
+			jump_invoices() {
+				uni.navigateTo({
+					url: '/pages/invoices/invoices',
+				});
+			},
+			get_pid(id) {
+				this.$api.http.get('pt/get_one_item', {
+					id: id
+				}).then(res => {
+					this.pt_data = res.data
+					uni.removeStorageSync('pid');
+				})
 			},
 			//获取运费
 			get_yunfei() {
-				console.log('get_yunfei',this.buy_data)
+				console.log('get_yunfei', this.buy_data)
 				const buy_data = this.buy_data
 				let obj = []
 				for (let k in buy_data) {
@@ -227,9 +284,9 @@
 					obj[k] = {}
 					obj[k]['goods_id'] = v.goods_id
 					obj[k]['num'] = v.num
-				    console.log('v:',obj)
+					console.log('v:', obj)
 				}
-				console.log('get_obj',obj)
+				console.log('get_obj', obj)
 				this.$api.http.post('product/get_shipment_price', obj).then(res => {
 					this.yunfei_money = res.data
 				})
@@ -246,16 +303,16 @@
 			//使用优惠券
 			to_use(index) {
 				this.maskState = 0
-				this.coupon_id=this.couponList[index].id?this.couponList[index].id:0
-				const reduce=this.couponList[index].reduce
-				this.coupon_money=reduce
+				this.coupon_id = this.couponList[index].id ? this.couponList[index].id : 0
+				const reduce = this.couponList[index].reduce
+				this.coupon_money = reduce
 				this.coupon_text = '已优惠' + reduce + '元'
 			},
 			//取消使用优惠券
 			cancel_use() {
 				this.maskState = 0
-				this.coupon_id=0
-				this.coupon_money=0
+				this.coupon_id = 0
+				this.coupon_money = 0
 				this.coupon_text = '选择优惠券'
 			},
 			numberChange(data) {
@@ -265,33 +322,54 @@
 				this.payType = type;
 			},
 			//设置订单数据
-			set_order_data() { 
-				let obj = this.obj				
-				obj.total_price=this.pay_money				
-				obj.shoping_price=this.yunfei_money			
-				obj.coupon_price=this.coupon_money				
-				obj.coupon_id=this.coupon_id	
-							
-				let pro=this.buy_data  
-				let sku={}
+			set_order_data() {
+				console.log(this.buy_data)
+				if (this.buy_data[0].discount != '[]') {
+					this.obj.discount = 1
+				} else {
+					this.obj.discount = 0
+				}
+				let obj = this.obj
+				obj.total_price = this.pay_money
+				obj.shoping_price = this.yunfei_money
+				obj.coupon_price = this.coupon_money
+				obj.coupon_id = this.coupon_id
+				obj.goods_id = this.buy_data[0].goods_id,
+					obj.price = this.buy_data[0].price,
+					obj.num = this.buy_data[0].num,
+					obj.order_from = 0
+				obj.payment_type = 'xcx'
+
+
+				if (this.buy_data[0].pt) {
+					obj.is_captain_sign = 1
+				}
+				this.is_item = uni.getStorageSync('is_item')
+				if (this.is_item) {
+					obj.item_id = this.pt_data.id
+					uni.removeStorageSync('is_item')
+				}
+				let pro = this.buy_data
+				let sku = {}
 				for (let k in pro) {
-					const v=pro[k]  
-					let name=v.goods_id
-					if(v.sku){						
-						name=v.goods_id +'-'+ v.sku.id
+					const v = pro[k]
+					let name = v.goods_id
+					if (v.sku) {
+						name = v.goods_id + '-' + v.sku.id
+						this.sku_id = v.sku.id
 					}
-					sku[name]=v
-					sku[name].sku_id=0
-					if(v.sku){ 
-						sku[name].sku_id=v.sku.id		
-					} 	
+					sku[name] = v
+					sku[name].sku_id = 0
+					if (v.sku) {
+						sku[name].sku_id = v.sku.id
+					}
 					delete sku[name].radio
 					delete sku[name].sku
 					delete sku[name].sku_name
 					delete sku[name].goods_name
-				} 
-				obj.json=sku
-				console.log('obj',obj)
+				}
+				obj.json = sku
+				console.log('obj', obj)
 				return obj;
 			},
 			check_sub_data() {
@@ -303,103 +381,183 @@
 					return;
 				}
 				let url = ''
-				//#ifdef MP-WEIXIN
+				//#ifdef MP-WEIXIN || APP-PLUS
 				url = 'order/create'
 				//#endif
 				//#ifdef H5
 				url = 'order/create_cart'
 				//#endif
-				console.log('url:',url)
-				return url 
+				console.log('url:', url)
+				return url
 			},
 			//创建订单
 			async submit() {
-				const url=this.check_sub_data()
+				/* if (this.buy_data[0].pindan_data.length > 0) {
+					uni.navigateTo({
+						url: '../invite/invite?id=' + this.pid
+					})
+				} */
+				let is_pin = uni.getStorageSync('is_item')
+				uni.removeStorageSync('is_item')
+				const url = this.check_sub_data()
 				if (!url) {
 					return;
 				}
-				const order_data = this.set_order_data()  
-				this.paying = true
-				const order_json = await this.$api.http.post(url, order_data).then(res => { 
+				let obj = this.set_order_data()
+
+				console.log('submit:', obj)
+				/* let obj = {  
+					goods_id: this.buy_data[0].goods_id,
+					price: this.buy_data[0].price,
+					num: this.buy_data[0].num,
+					sku_id: this.sku_id,
+					msg: order_data.msg,
+					order_from: 0,
+					payment_type: 'xcx',
+					total_price: order_data.total_price,
+					shoping_price: order_data.shoping_price,
+				} */
+				if (this.sku_id == '') {
+					obj.sku_id = 0
+				} else {
+					obj.sku_id = this.sku_id
+				}
+				let order_json = ''
+
+
+
+				//普通下单
+				order_json = await this.$api.http.post(url, obj).then(res => {
 					return res
 				})
-				if(this.state=='buy'){
-					uni.removeStorageSync('buy')
-				}else{
-					uni.removeStorageSync('cart')
-					uni.setStorageSync('cart',this.save_cache)					
+
+				this.paying = true
+				console.log("创建订单：", order_json)
+				if (!order_json.data) {
+					this.$api.msg(order_json.msg)
+					setTimeout(() => {
+						uni.navigateBack({})
+					}, 1000);
+					return;
 				}
+
+
+				if (this.state == 'buy') {
+					uni.removeStorageSync('buy')
+				} else {
+					uni.removeStorageSync('cart')
+					uni.setStorageSync('cart', this.save_cache)
+				}
+				const order_id = order_json.data
+
+				this.order_id = order_id
+
 				//#ifdef MP-WEIXIN
-					this.order_id = order_json.data
-					const pay_data=await this.$api.http.post('order/pay/pre_order', {
-						id: order_json.data
-					}).then(res => {
-						console.log('pay:', res)
-						return res
-					})				
-					await this.pay(pay_data)  
+				const pay_data = await this.$api.http.post('order/pay/pre_order', {
+					id: order_id
+				}).then(res => {
+					console.log('pay:', res)
+					return res
+				})
+				await this.pay(pay_data)
 				//#endif
+
+				//#ifdef APP-PLUS 
+				console.log('id:', order_id)
+				const app_data = await this.$api.http.post('order/pay/pre_app', {
+					id: order_id
+				}).then(res => {
+					console.log('app-pay:', res)
+					return res
+				})
+				console.log('获取到app支付参数：', app_data)
+				await this.app_pay(app_data)
+				//#endif
+
+
 				//#ifdef H5
-					this.wxPay(order_json)
+				this.wxPay(order_id)
 				//#endif
 			},
 			//公众号支付
 			wxPay(json) {
-				if (typeof WeixinJSBridge == "undefined") { 
+				if (typeof WeixinJSBridge == "undefined") {
 					if (document.addEventListener) {
 						document.addEventListener("WeixinJSBridgeReady", jsApiCall, false);
 					} else if (document.attachEvent) {
 						document.attachEvent("WeixinJSBridgeReady", jsApiCall);
 						document.attachEvent("onWeixinJSBridgeReady", jsApiCall);
 					}
-				} else { 
-				    this.jsApiCall(json);
+				} else {
+					this.jsApiCall(json);
 				}
 			},
-			jsApiCall(json) { 
-				const that = this; 
-				WeixinJSBridge.invoke("getBrandWCPayRequest", json, function(res) { 
-				  WeixinJSBridge.log('a:',res.err_msg); 
-				  if (res.err_msg == "get_brand_wcpay_request:ok") {
-					that.$api.msg("支付成功!");
-				  } else if (res.err_msg == "get_brand_wcpay_request:cancel") {
-					that.$api.msg("取消支付");
-				  } else {
-					that.$api.msg("支付失败");
-				  }
-				  setTimeout(() => {
-					  uni.redirectTo({
-					  	url: '/pages/order/order'
-					  });
-				  }, 1000);
+			jsApiCall(json) {
+				const that = this;
+				WeixinJSBridge.invoke("getBrandWCPayRequest", json, function(res) {
+					WeixinJSBridge.log('a:', res.err_msg);
+					if (res.err_msg == "get_brand_wcpay_request:ok") {
+						that.$api.msg("支付成功!");
+						uni.navigateTo({
+							url: '../invite/invite?id=' + that.pid
+						})
+						return
+					} else if (res.err_msg == "get_brand_wcpay_request:cancel") {
+						that.$api.msg("取消支付");
+					} else {
+						that.$api.msg("支付失败");
+					}
+					setTimeout(() => {
+						uni.redirectTo({
+							url: '/pages/order/order'
+						});
+					}, 1000);
 				});
 			},
-			//支付
-			pay(data) { 
+			//小程序支付
+			pay(data) {
 				const order_id = this.order_id
-			    uni.requestPayment({
-			    	provider:"wxpay", 
-			    	timeStamp: data.timeStamp,
-			    	nonceStr: data.nonceStr,
-			    	package: data.package,
-			    	signType: data.signType,
-			    	paySign: data.paySign,
-			    	success: function (res) {  
-			    		console.log('success:' + JSON.stringify(res)); 
-			    		uni.redirectTo({
-			    			url:'/pages/user/myorder/myorder?id='+order_id
-			    		})
-			    	},
-			    	fail: function (err) { 						
-			    		console.log('fail:' + JSON.stringify(err)); 
-			    		uni.redirectTo({
-			    			url:'/pages/user/myorder/myorder?id='+order_id
-			    		})
-			    	}
-			    });
-			},			
-			
-			
+				uni.requestPayment({
+					provider: "wxpay",
+					timeStamp: data.timeStamp,
+					nonceStr: data.nonceStr,
+					package: data.package,
+					signType: data.signType,
+					paySign: data.paySign,
+					success: function(res) {
+						console.log('success:', res);
+						uni.redirectTo({
+							url: '/pages/user/myorder/myorder?id=' + order_id
+						})
+					},
+					fail: function(err) {
+						console.log('fail:' + JSON.stringify(err));
+						uni.redirectTo({
+							url: '/pages/user/myorder/myorder?id=' + order_id
+						})
+					}
+				});
+			},
+			//APP支付
+			app_pay(data) {
+				const order_id = this.order_id
+				uni.requestPayment({
+					provider: "wxpay",
+					orderInfo: JSON.stringify(data),
+					success: function(res) {
+						console.log('success:', res);
+						uni.redirectTo({
+							url: '/pages/user/myorder/myorder?id=' + order_id
+						})
+					},
+					fail: function(err) {
+						console.log('fail:' + JSON.stringify(err));
+						uni.redirectTo({
+							url: '/pages/user/myorder/myorder?id=' + order_id
+						})
+					}
+				});
+			},
 		},
 		onPullDownRefresh() {
 			setTimeout(function() {
@@ -413,6 +571,160 @@
 	page {
 		background: $page-color-base;
 		padding-bottom: 100upx;
+	}
+
+	.black {
+		.container {
+			background-color: #000000;
+			position: fixed;
+			top: 0;
+			opacity: 0.6;
+			width: 100%;
+			height: 100%;
+			z-index: 999;
+		}
+
+	}
+
+	.t_con {
+		background-color: #fff;
+		position: fixed;
+		top: 120px;
+		left: 10%;
+		width: 80%;
+		padding: 20px;
+		border-radius: 5px;
+		z-index: 1999;
+		overflow: hidden;
+
+		.t_c_tit {
+			font-size: 16px;
+			text-align: center;
+			font-weight: 600;
+			padding-bottom: 10px;
+		}
+
+		.t_c_con {
+			font-size: 14px;
+			height: 280px;
+			overflow-y: scroll;
+			width: 100%;
+			overflow-x: hidden;
+		}
+
+		.t_c_more {
+			text-align: center;
+			color: #868686;
+			padding: 15px 0 10px;
+			font-size: 14px;
+
+			span {
+				color: #4B73CE;
+			}
+		}
+
+		.t_c_btn {
+			display: flex;
+			justify-content: space-between;
+
+			.t_c_btn_01 {
+				height: 35px;
+				line-height: 35px;
+				color: #fff;
+				border-radius: 20px;
+				text-align: center;
+				width: 47%;
+				font-size: 14px;
+				margin-top: 10px;
+			}
+
+			.bg_red {
+				background-color: #429CE3;
+			}
+
+			.bg_gery {
+				background-color: #CCCCCC;
+			}
+		}
+	}
+
+	.tuanzhang {
+		background: #fff;
+		margin-top: 10px;
+		padding: 10px;
+		display: flex;
+		font-size: 12px;
+
+		.tz-l {
+			width: 30px;
+
+			input {
+				border: 1px solid #000;
+			}
+		}
+
+		.tz-m {
+			flex-grow: 1;
+			color: #FF8D42;
+			padding-top: 2px;
+		}
+
+		.tz-r {
+			padding-top: 3px;
+		}
+	}
+
+	.jr {
+		padding: 10px;
+		font-size: 14px;
+
+		.jr_tit {
+			font-weight: 600;
+			text-align: center;
+			padding-bottom: 10px;
+		}
+
+		.jr_img {
+			display: flex;
+			justify-content: center;
+
+			.img_01 {
+				position: relative;
+				border-radius: 50%;
+				margin: 0 7px;
+				width: 44px;
+				height: 44px;
+
+				img {
+					width: 40px;
+					height: 40px;
+					border-radius: 50%;
+				}
+
+				.zhicheng {
+					position: absolute;
+					bottom: -5px;
+					left: 0;
+					background-color: #E93B3D;
+					color: #fff;
+					font-size: 12px;
+					border-radius: 10px;
+					width: 40px;
+					text-align: center;
+				}
+			}
+
+			.img_01_border {
+				border: 2px solid #E93B3D;
+			}
+
+			.img_01_borderx {
+				border: 2px dashed #E6E6E6;
+				text-align: center;
+				line-height: 44px;
+				color: #E6E6E6;
+			}
+		}
 	}
 
 	.address-section {
@@ -736,7 +1048,8 @@
 		.mask-content {
 			width: 100%;
 			min-height: 30vh;
-			max-height: 70vh;padding: 20px 0px 60px;
+			max-height: 70vh;
+			padding: 20px 0px 60px;
 			background: #f3f3f3;
 			transform: translateY(100%);
 			transition: .3s;
@@ -769,9 +1082,11 @@
 			}
 		}
 	}
-	.scroll{
-	    max-height: 55vh;
+
+	.scroll {
+		max-height: 55vh;
 	}
+
 	/* 优惠券列表 */
 	.coupon-item {
 		display: flex;
@@ -842,15 +1157,20 @@
 		.tips {
 			font-size: 24upx;
 			color: $font-color-light;
-			line-height: 60upx;white-space: nowrap;
+			line-height: 60upx;
+			white-space: nowrap;
 			padding-left: 30upx;
 		}
 
 		.tips2 {
 			font-size: 24upx;
 			color: $font-color-light;
-			line-height: 50upx;;height: 50upx;;
-			text-align: center;margin:5upx 10px 0 0;
+			line-height: 50upx;
+			;
+			height: 50upx;
+			;
+			text-align: center;
+			margin: 5upx 10px 0 0;
 			width: 80px;
 			border: 1px solid #FA436A;
 			background-color: #FA436A;

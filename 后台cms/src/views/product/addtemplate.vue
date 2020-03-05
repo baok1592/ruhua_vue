@@ -21,7 +21,7 @@
 							<el-form-item label="计费方式" prop="resource">
 								<el-radio-group v-model="form.method">
 									<el-radio label="1">按件数</el-radio>
-									<!-- <el-radio label="2">按重量</el-radio> -->
+									<el-radio label="2">按重量</el-radio>
 								</el-radio-group>
 							</el-form-item>
 						</el-form>
@@ -55,7 +55,7 @@
 										</el-table-column>
 										<el-table-column prop="operation" label="操作" width="300px">
 											<template slot-scope="scope">
-												<!-- <el-button @click="edit(scope.row)" type="success" size="small">修改</el-button> -->
+												<el-button @click="edit(scope.row)" type="success" size="small">修改</el-button>
 
 												<el-button style="margin-left: 10px" type="danger" size="small" slot="reference" @click="del(scope.$index)">删除</el-button>
 											</template>
@@ -78,13 +78,10 @@
 			</el-container>
 		</el-container>
 		<!-- 添加弹出框 -->
-		<el-dialog title="选择配送区域" :visible.sync="dialogVisibleadd" width="30%"  >
-			<body style="height: 300px; overflow: scroll;">
-				<el-tree :data="data" show-checkbox node-key="id" ref="tree" highlight-current :props="defaultProps" @check-change="handleCheckChange"
+		<el-dialog title="选择配送区域" :visible.sync="dialogVisibleadd" width="30%">
+			<el-tree :data="data" show-checkbox node-key="id" ref="tree" highlight-current :props="defaultProps" @check-change="handleCheckChange"
 			 :accordion="true" :check-on-click-node="true">
 			</el-tree>
-			</body>
-			
 
 			<span slot="footer" class="dialog-footer">
 				<el-button @click="cancel">取 消</el-button>

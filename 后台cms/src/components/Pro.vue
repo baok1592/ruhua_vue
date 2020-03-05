@@ -6,7 +6,6 @@
 					<el-button type="primary" size="small" @click="back">返回</el-button>
 					<el-button type="primary" size="small" @click="caiji">采集商品</el-button>
 				</div>
-				
 				<!-- <el-button type="primary" size="small" @click="caiji">采集商品</el-button> -->
 				<el-form ref="forms" :model="forms" label-width="120px">
 					<el-form-item label="商品名称">
@@ -29,15 +28,21 @@
 					</el-form-item>
 
 					<el-row>
-						<el-col :span="4">
-							<el-form-item label="基础销量">
-								<el-input v-model="forms.sales" style="width: 100px"></el-input>
-								<span>件</span>
+						<el-col :span="4.8">
+							<el-form-item label="售价">
+								<el-input v-model="forms.price" style="width: 100px"></el-input>
+								<span>元</span>
 							</el-form-item>
 						</el-col>
 						<el-col :span="4">
-							<el-form-item label="市场价格">
+							<el-form-item label="市场价">
 								<el-input v-model="forms.market_price" style="width: 100px"></el-input>
+								<span>元</span>
+							</el-form-item>
+						</el-col>
+						<el-col :span="4">
+							<el-form-item label="VIP优惠金额">
+								<el-input v-model="forms.vip_price" style="width: 100px"></el-input>
 								<span>元</span>
 							</el-form-item>
 						</el-col>
@@ -51,67 +56,52 @@
 						</el-col>
 					</el-row>
 					<el-row>
-						<el-col :span="4">
-							<el-form-item label="商品大图" style="width:100%">
-								<el-button size="small" style="margin-bottom: 20px;" type="primary" @click="choose_pic" v-if="img_list.length < 6">选择图片</el-button>
-								<template>
-									<template v-if="img_list.length > 0">
-										<div style="display: flex; width:700px ; flex-wrap: wrap;">
-											<template v-for="(item,index) of img_list">
+						<el-form-item label="商品大图" style="width:100%">
+							<el-button size="small" style="margin-bottom: 20px;" type="primary" @click="choose_pic" v-if="img_list.length < 6">选择图片</el-button>
+							<template>
+								<template v-if="img_list.length > 0">
+									<div style="display: flex; width:700px ; flex-wrap: wrap;">
+										<template v-for="(item,index) of img_list">
 
-												<div class="picA" v-if="img_list.length > 0">
-													<template v-if="is_caiji == 1">
-														<img class="img" :src="item">
-													</template>
-													<template v-else>
-														<img class="img" :src="getimg + item.url">
-													</template>
-													<i class="el-icon-circle-close" @click="del_img(index)"></i>
-												</div>
-											</template>
-										</div>
-									</template>
-
-									<!-- <div class="picA" style="margin-left: 19px;" @click="choose_pic" v-if="img_list.length < 6">
-									<i class="el-icon-plus" style="margin-top: 45%; height: 28px; width: 28px;"></i>
-								</div> -->
+											<div class="picA" v-if="img_list.length > 0">
+												<template v-if="is_caiji == 1">
+													<img class="img" :src="item">
+												</template>
+												<template v-else>
+													<img class="img" :src="getimg + item.url">
+												</template>
+												<i class="el-icon-circle-close" @click="del_img(index)"></i>
+											</div>
+										</template>
+									</div>
 								</template>
 
-							</el-form-item>
-						</el-col>
+								<!-- <div class="picA" style="margin-left: 19px;" @click="choose_pic" v-if="img_list.length < 6">
+									<i class="el-icon-plus" style="margin-top: 45%; height: 28px; width: 28px;"></i>
+								</div> -->
+							</template>
 
-						<el-col :span="12">
-							<el-col :span="7">
-								<el-form-item label="商品视频">
-									<el-button size="small" style="margin-bottom: 20px;" type="primary" @click="choose_video">选择视频</el-button>
-								</el-form-item>
-							</el-col>
-							<el-col :span="4">
-								<template v-if="video_data.description">{{video_data.description}}</template>
-								<template v-else>{{video_data.url}}</template>
-							</el-col>
-
-						</el-col>
-
+						</el-form-item>
 					</el-row>
 					<el-form-item label="规格类型">
 						<el-radio v-model="show_sku" :label="0" border size="medium" :checked="show_sku?'':'checked'">无</el-radio>
 						<el-radio v-model="show_sku" :label="1" border size="medium" :checked="show_sku?'checked':''">有</el-radio>
 					</el-form-item>
-					<el-row v-if="show_sku==0">
-						<el-col :span="4.8">
+					<el-row v-if="show_sku==0">						
+						<el-col :span="4">
+							<el-form-item label="基础销量">
+								<el-input v-model="forms.sales" style="width: 100px"></el-input>
+								<span>件</span>
+							</el-form-item>
+						</el-col>
+						<el-col :span="4">
 							<el-form-item label="总库存">
 								<el-input v-model="forms.stock" style="width: 100px"></el-input>
 								<span>件</span>
 							</el-form-item>
 
 						</el-col>
-						<el-col :span="4.8">
-							<el-form-item label="销售价格">
-								<el-input v-model="forms.price" style="width: 100px"></el-input>
-								<span>元</span>
-							</el-form-item>
-						</el-col>
+						
 					</el-row>
 
 					<el-form-item>
@@ -142,7 +132,20 @@
 			</span>
 		</el-dialog>
 		<Pic ref="child" :drawer="drawer" :father_fun="get_img" :length="length" :iscg="is_cg"></Pic>
-		<Video ref="child_video" :drawer="drawer_video" :father_fun="get_video" :length="length_video" :iscg="is_cg"></Video>
+		<!-- <el-upload
+			:action="upfile_url"
+			:data="{ cid: cate_id, back: 'idurl' }"
+			:on-success="upimg_back_fun"
+			:headers="upfile_head"
+			:limit="9"
+			multiple
+			:show-file-list="false"
+			:file-list="upfile_banner_list"
+			name="img" 
+			list-type="picture"
+		>
+			<i class="el-icon-plus"></i>
+		</el-upload> -->
 	</div>
 </template>
 
@@ -152,7 +155,6 @@
 	} from "element-ui";
 	import VueUeditorWrap from "vue-ueditor-wrap";
 	import Pic from '../views/PicList.vue'
-	import Video from './video.vue'
 	import skuv from './sku.vue'
 	import {
 		Api_url
@@ -162,9 +164,7 @@
 		props: ["eid"],
 		data() {
 			return {
-				video_id: 0,
-				video_data: '',
-				fullscreenLoading: false,
+				fullscreenLoading:false,
 				is_cg: 0,
 				is_edit: false,
 				sub: 0,
@@ -172,7 +172,6 @@
 				dialogVisible: false,
 				caiji_url: '',
 				length: 6,
-				length_video: 1,
 				getimg: this.$getimg,
 				show_sku: 0,
 				sku_sub: 0, //提交时获取规格参数
@@ -181,9 +180,9 @@
 				myConfig: {
 					autoHeightEnabled: false,
 					initialFrameHeight: 500,
-					initialFrameWidth: "60%",
+					initialFrameWidth: "60%", 
 					serverUrl: '/index.php/index/admin/ue_uploads',
-					UEDITOR_HOME_URL: this.$ue + '/static/UEditor/',
+					UEDITOR_HOME_URL: this.$ue+'/static/UEditor/',
 					toolbars: [
 						[
 							"justifyleft",
@@ -200,6 +199,7 @@
 				},
 				category: [],
 				forms: {
+					video_id:'',
 					goods_name: "",
 					category_id: "",
 					people: "",
@@ -217,8 +217,7 @@
 					sales: "",
 					style: 0,
 					delivery_id: '',
-					guige: 0,
-					video_id: 0
+					guige: 0
 				},
 				upfile_url: Api_url + 'img_category/admin/upload/img',
 				upfile_head: {
@@ -232,7 +231,6 @@
 				cate_id: '0',
 				delivery: '',
 				drawer: false,
-				drawer_video: false,
 				img_list: [],
 				is_caiji: 0
 			};
@@ -240,8 +238,7 @@
 		components: {
 			VueUeditorWrap,
 			Pic,
-			skuv,
-			Video
+			skuv
 		},
 		mounted() {
 			// this.get_all_img()
@@ -254,7 +251,7 @@
 			console.log(this.img_list)
 		},
 		methods: {
-
+			
 			back() {
 				this.$emit('back')
 			},
@@ -263,10 +260,10 @@
 			},
 			//采集
 			sub_caiji() {
-				this.fullscreenLoading = true;
+				 this.fullscreenLoading = true;
 				this.is_caiji = 1
 				//this.loading = true
-				this.http.post('product/copy/get_info', {
+				this.http.post_show('product/copy/get_info', {
 					url: this.caiji_url
 				}).then(res => {
 					//this.loading = false
@@ -274,7 +271,7 @@
 						message: '采集成功',
 						type: 'success'
 					})
-					this.fullscreenLoading = false;
+					 this.fullscreenLoading = false;
 					this.caiji_url = ''
 					this.dialogVisible = false
 					this.forms.goods_name = res.data.goods_name
@@ -288,7 +285,7 @@
 					this.img_list = arr
 				})
 			},
-
+			
 
 			handleClose() {
 				this.dialogVisible = false
@@ -304,19 +301,6 @@
 				this.length = 6 - this.img_list.length
 				console.log('get_img_end:', e, this.img_list)
 			},
-			get_video(e) {
-				this.drawer_video = false
-				let video_data = {
-					id: e[0].id,
-					description: e[0].description,
-					url: e[0].url
-				}
-				this.video_data = video_data
-				this.forms.video_id = e[0].id
-				this.video_id = e[0].id
-				console.log('get_img_end:', e)
-				console.log(this.video_id)
-			},
 			del_img(index) {
 				this.img_list.splice(index, 1)
 				this.forms.banner_imgs.splice(index, 1)
@@ -330,11 +314,6 @@
 			choose_pic() {
 				this.length = 6 - this.img_list.length
 				this.drawer = true
-			},
-			//打开视频库
-			choose_video() {
-				this.length = 1 - this.img_list.length
-				this.drawer_video = true
 			},
 			//新增商品
 			on_add() {
@@ -365,36 +344,33 @@
 				}
 			},
 			upload_img(url) {
-				return this.http.post_show('index/upload/down_img', {
-					url: url
-				}).then(res => {
+				return this.http.post_show('index/upload/down_img',{url:url}).then(res=>{
 					return res
-				})
+				}) 
 			},
-			async get_banner_id() {
+			async get_banner_id(){
 				console.log(this.img_list)
 				const that = this
-				let arr = []
+				let arr=[]
 				for (let k in this.img_list) {
 					let v = that.img_list[k]
 					let s = await that.upload_img(v)
-					arr.push(s)
+					arr.push(s) 
 				}
 				return arr;
-
+				
 			},
 			//新增商品
 			async onSubmit() {
 				var that = this;
-				if (that.is_caiji == 1) {
-					that.forms.banner_imgs = await that.get_banner_id()
+				if(that.is_caiji == 1){
+					that.forms.banner_imgs= await that.get_banner_id()
 				}
 				console.log('sku:', this.forms['sku'])
 				if (this.forms['sku'][0]) {
 					this.forms['price'] = this.forms['sku'][0]['price']
 					this.forms['stock'] = this.forms['sku'][0]['stock_num']
 				}
-				this.forms.video_id = this.video_id
 				this.http.post_show("product/admin/add_product", that.forms).then(res => {
 					var res_code = res.status.toString(); //返回结果状态码转字符串取第一位数
 					if (res_code.charAt(0) == 2) {
@@ -425,12 +401,6 @@
 					that.forms[x] = "";
 				}
 				that.sku_comfirm++ //清除sku数据
-				this.video_data = {
-					id: '',
-					description: '',
-					url: '',
-
-				}
 			},
 
 			//获取分类
@@ -438,7 +408,7 @@
 				var that = this;
 				// var arr = [];
 				//获取所有分类
-				this.http.get("category/admin/all_category").then(res => {
+				this.http.get_show("category/admin/all_category").then(res => {
 					that.category = res.data;
 				});
 			},
@@ -461,9 +431,7 @@
 					fullscreen: true
 				});
 				var that = this;
-				
-				this.http.get('product/get_product?id=' + id).then(res => {
-					
+				this.http.get_show('product/get_product?id=' + id).then(res => {
 					for (var k in res.data.banner_imgs_list) {
 						const v = res.data.banner_imgs_list[k]
 						that.img_list[k] = {}
@@ -483,29 +451,15 @@
 						that.rdata = res.data.sku_arr
 					}
 					that.forms.banner_imgs = res.data.banner_imgs
-					this.forms.video_id = res.data.video_id 
 					that.forms.goods_id = res.data.goods_id;
 					that.forms.delivery_id = res.data.delivery_id
 					that.sub_btn = false;
-					if (res.data.video && res.data.video.description) {
-						that.video_data = {
-							url: res.data.video.url,
-							id: res.data.video_id,
-							description:res.data.video.description
-						}
-					}else{
-						that.video_data = {
-							url: res.data.video.url,
-							id: res.data.video_id,
-						}
-					}
 				});
 				loadingInstance.close();
 			},
 			//提交 修改商品
 			onEdit() {
 				var that = this;
-				console.log(this.forms)
 				this.http.post_show("product/admin/edit_product", that.forms).then(() => {
 					this.$message({
 						showClose: true,

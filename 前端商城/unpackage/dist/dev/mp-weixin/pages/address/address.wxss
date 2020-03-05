@@ -69,6 +69,7 @@ page {
 }
 .address-box .tag {
     font-size: 24rpx;
+    width: 100rpx;
     color: #fa436a;
     margin-right: 10rpx;
     background: #fffafb;

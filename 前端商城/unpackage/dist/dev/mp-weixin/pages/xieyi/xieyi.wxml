@@ -1,0 +1,1 @@
+<view class="xieyi"><rich-text nodes="{{content}}"></rich-text></view>

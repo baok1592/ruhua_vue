@@ -120,7 +120,7 @@ page,
               flex: 1;
 }
 .order-item .i-top .state {
-      color: #fa436a;
+      color: #909399;
 }
 .order-item .i-top .del-btn {
       padding: 10rpx 0 10rpx 36rpx;

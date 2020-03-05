@@ -60,8 +60,7 @@
 </script>
 
 <style>
-/* color start*/
-
+/* color start*/ 
 .tui-primary {
   background: #5677fc !important;
   color: #fff;

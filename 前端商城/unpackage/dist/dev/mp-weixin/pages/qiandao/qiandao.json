@@ -1,8 +1,0 @@
-{
-  "navigationBarTitleText": "签到",
-  "enablePullDownRefresh": true,
-  "navigationBarBackgroundColor": "#FE461D",
-  "usingComponents": {
-    "uni-icon": "/components/uni/uni-icon/uni-icon"
-  }
-}

@@ -1,8 +1,8 @@
 import Vue from 'vue'
-import App from './App'  
+import App from './App' 
 import http from './common/axios.js'
-import {Api_url} from './common/config'	//去这里修改API域名
-  
+import {Api_url} from './common/config'
+
 App.mpType = 'app'
 
 const msg = (title, duration=1500, mask=false, icon='none')=>{
@@ -26,7 +26,7 @@ const prePage = ()=>{
 	return prePage.$vm;
 }
 Vue.prototype.$api = {msg,http,prePage};
-Vue.prototype.$getimg = Api_url;
+Vue.prototype.$getimg = Api_url	 
  
    					 		
 

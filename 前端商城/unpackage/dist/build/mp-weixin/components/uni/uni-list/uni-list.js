@@ -1,9 +1,9 @@
-(global["webpackJsonp"]=global["webpackJsonp"]||[]).push([["components/uni/uni-list/uni-list"],{"1a94":function(n,t,u){"use strict";u.r(t);var e=u("91bb"),a=u.n(e);for(var i in e)"default"!==i&&function(n){u.d(t,n,function(){return e[n]})}(i);t["default"]=a.a},"26a6":function(n,t,u){"use strict";u.r(t);var e=u("99f0"),a=u("1a94");for(var i in a)"default"!==i&&function(n){u.d(t,n,function(){return a[n]})}(i);u("aa982");var r=u("2877"),f=Object(r["a"])(a["default"],e["a"],e["b"],!1,null,null,null);t["default"]=f.exports},"91bb":function(n,t,u){"use strict";Object.defineProperty(t,"__esModule",{value:!0}),t.default=void 0;var e={name:"UniList"};t.default=e},"99f0":function(n,t,u){"use strict";var e=function(){var n=this,t=n.$createElement;n._self._c},a=[];u.d(t,"a",function(){return e}),u.d(t,"b",function(){return a})},aa982:function(n,t,u){"use strict";var e=u("dde1"),a=u.n(e);a.a},dde1:function(n,t,u){}}]);
+(global["webpackJsonp"]=global["webpackJsonp"]||[]).push([["components/uni/uni-list/uni-list"],{6856:function(n,t,e){"use strict";Object.defineProperty(t,"__esModule",{value:!0}),t.default=void 0;var u={name:"UniList"};t.default=u},a113:function(n,t,e){"use strict";e.r(t);var u=e("db7a"),a=e("ca8b");for(var i in a)"default"!==i&&function(n){e.d(t,n,function(){return a[n]})}(i);e("a7e9");var r=e("2877"),c=Object(r["a"])(a["default"],u["a"],u["b"],!1,null,null,null);t["default"]=c.exports},a7e9:function(n,t,e){"use strict";var u=e("c9be"),a=e.n(u);a.a},c9be:function(n,t,e){},ca8b:function(n,t,e){"use strict";e.r(t);var u=e("6856"),a=e.n(u);for(var i in u)"default"!==i&&function(n){e.d(t,n,function(){return u[n]})}(i);t["default"]=a.a},db7a:function(n,t,e){"use strict";var u=function(){var n=this,t=n.$createElement;n._self._c},a=[];e.d(t,"a",function(){return u}),e.d(t,"b",function(){return a})}}]);
 ;(global["webpackJsonp"] = global["webpackJsonp"] || []).push([
     'components/uni/uni-list/uni-list-create-component',
     {
         'components/uni/uni-list/uni-list-create-component':(function(module, exports, __webpack_require__){
-            __webpack_require__('543d')['createComponent'](__webpack_require__("26a6"))
+            __webpack_require__('543d')['createComponent'](__webpack_require__("a113"))
         })
     },
     [['components/uni/uni-list/uni-list-create-component']]

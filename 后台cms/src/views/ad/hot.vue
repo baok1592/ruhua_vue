@@ -1,5 +1,5 @@
-<template> 
-	<div class="hot">
+<template>
+	<div class="home">
 		<el-container>
 			<el-aside width="200px">
 				<NavTo></NavTo>
@@ -66,7 +66,7 @@
 		},
 		methods: {
 			get_hot_data() {
-				this.http.get('search/record').then(res => {
+				this.http.get_show('search/record').then(res => {
 					this.tableData = res.data
 				})
 			},
@@ -128,18 +128,18 @@
 
 <style lang="less">
 	/* <style>   */
-	.home2 {
+	.home {
 		.el-aside {
 			color: #333;
 			text-align: center;
-			// line-height: 200px;
+			line-height: 200px;
 		}
 
 		.el-main {
 
 			color: #333;
 			text-align: center;
-			// line-height: 160px;
+			line-height: 160px;
 		}
 
 		.tishi {

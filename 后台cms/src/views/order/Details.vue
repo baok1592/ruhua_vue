@@ -51,9 +51,9 @@
 							<el-col :span="6">
 								<i class="el-icon-warning"></i>
 								订单状态：
-								<span v-if="details.payment_state == 1">
+								<span v-if="details.pay_status == 1">
 									已支付
-									<span v-if="details.shipment_state == 0">- 待发货</span>
+									<span v-if="details.drive_status == 0">- 待发货</span>
 									<span v-else>已发货</span>
 								</span>
 								<span v-else>未支付</span>
@@ -199,7 +199,7 @@
 			post_details() {
 				var that = this;
 				this.http
-					.post("order/admin/get_order_one", {
+					.post_show("order/admin/get_order_one", {
 						id: this.mid
 					})
 					.then(res => {
