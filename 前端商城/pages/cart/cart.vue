@@ -12,7 +12,9 @@
 						<text class="clamp title" @click="jump_detail(item.goods_id)">{{item.goods_name}}</text>
 						<text class="attr">{{item.attr_val}}</text>
 						<text class="price">¥{{item.price}}</text>
-						<tui-numberbox :max="item.stock" :min="1" :value="item.num" @change="numberChange($event,k)"></tui-numberbox> 
+						<view class="item-right-num">
+							<tui-numberbox :max="item.stock" :min="1" :value="item.num" @change="numberChange($event,k)"></tui-numberbox> 
+						</view>
 					</view>
 					<text class="del-btn yticon icon-fork" @click="deleteCartItem(k)"></text>
 				</view>
@@ -282,6 +284,9 @@
 			.price {
 				height: 50upx;
 				line-height: 50upx;
+			}
+			.item-right-num{
+				text-align: right;
 			}
 		}
 

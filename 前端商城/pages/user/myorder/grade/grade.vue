@@ -1,53 +1,43 @@
 <template>
 	<view class="grade">
-		<block v-for="(item,index) of order">
-			<view class="product">
-				<view class="pic"><img :src="getimg + item.imgs.url"></img></view>
-				<view class="title">
-					<view class="tit_01">{{item.goods_name}}</view>
-					<view class="tit_02">
-						<view class="tit_02_l">x{{item.num}}</view>
-						<view class="tit_02_r">共 {{item.total_price}}元</view>
-					</view>
+		<view class="product">
+			<view class="pic"><img :src="getimg + order.imgs.url"></img></view>
+			<view class="title">
+				<view class="tit_01">{{order.goods_name}}</view>
+				<view class="tit_02">
+					<view class="tit_02_l">x{{order.num}}</view>
+					<view class="tit_02_r">共 {{order.total_price}}元</view>
 				</view>
 			</view>
-			<view class="BH10"></view>
-			<view class="pingj">
-				<view class="pj_c">
-					<textarea style="height: 100px;" v-model="item.content" placeholder="请输入..."></textarea>
-				</view>
-				
-				<view class="cu-form-group">
-					<view class="grid col-4 grid-square flex-sub">
-						<view class="bg-img" v-for="(x,y) in ImgBox[index]" :key="y" @tap="ViewImage($event,index)" :data-url="x"> 
-						 <image :src="x" mode="aspectFill"></image>
-							<view class="cu-tag bg-red" @tap.stop="DelImg($event,index)" :data-index="y">
-								<text class='cuIcon-close'></text> 
-							</view>
-						</view>
-						<view class="solids" @tap="ChooseImage(index)" v-if="ImgBox.length<20">
-							<text class='cuIcon-cameraadd'></text>
-						</view>
-					</view>
-				</view>
-				
-				
-				<!-- <view class="tu">
-					<img src="../../../../static/8.jpg"></img>
-					<img src="../../../../static/8.jpg"></img>
-				</view> -->
+		</view>
+		<view class="BH10"></view>
+		<view class="pingj">
+			<view class="pj_c">
+				<textarea style="height: 100px;" v-model="form.content" placeholder="请输入..."></textarea>
 			</view>
-			<view class="BH10"></view>
-			<view class="star">
-				<view class="star_01">物流服务：<uni-rate value="0" @change="get_rate" :index="index"></uni-rate>
-				</view>
+			<view class="tui-box-upload">
+				<tui-upload :serverUrl="serverUrl" :limit="9"  @complete="result" @remove="remove" :fileKeyName="'img'"></tui-upload>
 			</view>
-			<view class="BH10"></view>
-			<view class="BH10"></view>
-			<view class="BH10"></view>
-			<view class="BH10"></view>
-			<view class="BH10"></view>
-		</block>
+		</view>
+		<view class="BH10"></view>
+		<view class="star">
+			<view class="star_01">
+				物流服务：
+				<!-- #ifdef H5 -->
+				<view class="star-01-rete">
+					<uni-rates value="0" @change="get_rate" :index="index"></uni-rates>
+				</view>
+				<!-- #endif -->
+				<!-- #ifndef H5 -->
+					<uni-rate value="0" @change="get_rate" :index="index"></uni-rate>
+				<!-- #endif -->
+			</view>
+		</view>
+		<view class="BH10"></view>
+		<view class="BH10"></view>
+		<view class="BH10"></view>
+		<view class="BH10"></view>
+		<view class="BH10"></view>
 
 		<view class="btn" @click="sub_grade">发布</view>
 		<view style="height: 50px;"></view>
@@ -55,159 +45,104 @@
 </template>
 
 <script>
+	import {
+		Api_url
+	} from '@/common/config'
+	import tuiUpload from '@/components/tui-upload/tui-upload'
 	import uniRate from "@/components/uni/uni-rate/uni-rate.vue"
+	import uniRates from "@/components/uni/uni-rate/uni-rates.vue"
 	export default {
 		data() {
 			return {
-				imgList:[],
+				imgList: [],
 				order: '',
 				order_id: '',
+				goods_id:'',
 				getimg: this.$getimg,
-				form: [],
+				form: {
+					id: '',
+					goods_id: '',
+					rate: '',
+					content: '',
+					imgs:'',
+					video:'/uploads/video/5ee08c643b4cc.mp4',//新增视频上传链接
+				},
 				grade_list: '',
-				ImgBox:[]
+				ImgBox: [],
+				imageData: [],
+				//上传地址
+				serverUrl:Api_url +'index/upload/img'
 			};
 		},
 		components: {
-			uniRate
+			uniRate,
+			tuiUpload,
+			uniRates
 		},
-		onLoad() {
+		onLoad(option) {
 			let cache = uni.getStorageSync('grade_pro')
 			this.order = cache.data
-			this.order_id = cache.id
+			this.order_id = option.order_id
+			this.goods_id = option.goods_id
+			
 			this.creat_obj()
 		},
-		onShow(){
+		onShow() {
 			console.log('触发了onshow')
 		},
 		methods: {
+			result: function(e) {
+				console.log(e)
+				this.ImgBox = e.imgArr;
+			},
+			remove: function(e) {
+				//移除图片
+				console.log(e)
+				let index = e.index
+			},
 			creat_obj() {
 				let num = this.order.length
 				console.log(num)
 				let arr = []
-				let ImgBox=[]
+				let ImgBox = []
 				let obj = {
 					goods_id: '',
 					content: '',
 					imgs: [],
 					rate: ''
 				}
-				const that=this
+				const that = this
 				for (var i = 0; i < num; i++) {
-					arr[i] = obj 
-					ImgBox[i]=[]
+					arr[i] = obj
+					ImgBox[i] = []
 				}
 				this.grade_list = arr
-				this.ImgBox=ImgBox
-				console.log('ImgBox:',this.ImgBox)
+				this.ImgBox = ImgBox
+				console.log('ImgBox:', this.ImgBox)
 			},
 			async sub_grade() {
-				uni.showLoading({
-					title: '提交中'
-				});
-				uni.hideLoading();
-				
-				for (let s in this.order) {
-					let v = this.order[s]
-//				    this.grade_list[s].imgs = await this.uploads(s) 
-					await this.uploads(s) 
-					this.grade_list[s].content = v.content
-					this.grade_list[s].goods_id = v.goods_id
-					this.grade_list[s].rate = v.rate
-					// this.grade_list[s].imgs = []
-				}
-				let obj = {
-					id: this.order_id,
-					json: this.grade_list
-				}
-				console.log(obj)
-				return
-				this.$api.http.post('order/user/set_pj', obj).then(res => {
+				this.form.imgs = this.ImgBox
+				this.form.id = this.order_id
+				this.form.goods_id = this.goods_id
+				console.log(this.form);
+				this.$api.http.post('order/user/set_pj', this.form).then(res => {
 					this.$api.msg('发布成功')
+					uni.hideLoading();
 					setTimeout(() => {
 						uni.navigateBack()
 					}, 1000);
 				})
 			},
-			async uploads(s){
-				const that=this		
-				let arr=[]
-				console.log(that.ImgBox[s])
-				for (let k in that.ImgBox[s]) {
-					const v=that.ImgBox[s][k]
-					arr[k]=await that.up_img(v)
-				} 
-				console.log('img:',arr)
-				this.grade_list[s].imgs.push(arr)
-				// this.grade_list[s].imgs=arr[]
-				//return arr;
-			},
-			up_img(url){
-				return new Promise((resolve, reject) => {  
-					uni.uploadFile({
-						url: 'https://cy.qxnjssc.com/v1/up_img', //仅为示例，非真实的接口地址
-						filePath: url,
-						name: 'img',
-						header: {
-							token:uni.getStorageSync("token")
-						},
-						formData: {
-							'user': 'test'
-						},
-						success: (uploadFileRes) => { 
-							resolve(uploadFileRes.data);  
-						}
-					});
-				})  
-			},
-			ChooseImage(index) {
-				const that=this
-				uni.chooseImage({
-					count: 20, //默认9
-					sizeType: ['original', 'compressed'], //可以指定是原图还是压缩图，默认二者都有
-					sourceType: ['album'], //从相册选择
-					success: (res) => {
-						const num=that.ImgBox[index].length
-						if (num != 0) {
-							console.log('add',res.tempFilePaths)
-							//that.ImgBox[index].push(res.tempFilePaths)
-							that.ImgBox[index].splice(num-1,0,res.tempFilePaths) 
-						} else {
-							console.log('create',res.tempFilePaths)
-							that.$set(that.ImgBox,index,res.tempFilePaths)
-						} 
-						console.log(that.ImgBox)
-					}
-				});
-			},
-			ViewImage(e,index) { 
-				const that=this
-				let box=that.ImgBox[index]				
-				console.log(box,index)
-				uni.previewImage({
-					urls: box,
-					current: e.currentTarget.dataset.url
-				});
-			},
-			DelImg(e,index) {
-				const that=this
-				console.log('del:',e.currentTarget.dataset.index,index)
-				uni.showModal({
-					title: '删除',
-					content: '确定要删除吗？',
-					cancelText: '否',
-					confirmText: '是',
-					success: res => {
-						if (res.confirm) {
-							that.ImgBox[index].splice(e.currentTarget.dataset.index, 1)
-						}
-					}
-				})
-			},
 			get_rate(e) {
 				console.log(e)
+				this.form.rate = e.value
 				this.order[e.index]['rate'] = e.value
 			},
+			upload_video(){  //视频上传接口,只有接口地址，自己修改,返回地址
+				this.$api.http.post('user/add_video').then(res=>{
+					
+				})
+			}
 		}
 	}
 </script>
@@ -215,7 +150,10 @@
 <style lang="less">
 	.grade {
 		font-size: 14px;
-
+		.tui-box-upload{
+			padding-left: 25rpx;
+			box-sizing: border-box;
+		}
 		.product {
 			padding: 10px;
 			display: flex;
@@ -280,6 +218,7 @@
 				display: flex;
 				line-height: 25px;
 				padding-bottom: 5px;
+				.star-01-rete{padding-top: 10px;}
 			}
 		}
 

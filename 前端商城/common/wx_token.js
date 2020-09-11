@@ -1,84 +1,116 @@
-import {Api_url} from './config'
+import {Api_url} from './config' 
+import http from './axios.js'
+import Vue from 'vue'
 
 const Wxcode_url= Api_url+"/auth/wxcode_url"
 const Token_url= Api_url+"/auth/gzh_token"
+const VerifyUrl = Api_url + '/auth/token_verify';
 
 // 获取openid需到公众号平台设置：IP白名单 和 授权域名；
 // ip是服务器IP，域名是前端域名
+
 class WxToken { 	
 	constructor() { 
 		
-	}
+	}	
+	 
 	
-	verify(e=''){
-		let type=''
-		if(e=='userinfo'){ 
-			type='userinfo'
-		}  
-		const code = this.GetUrlParame('code') // 截取code  
-		var domine = window.location.href.split("#")[0]; // 微信会自动识别#    并且清除#后面的内容 
-		var domine = domine.split("?code")[0]; 
+	//初始化登陆
+	async verify(e) { 		
+		console.log("H5验证登陆")
+		// 判断是否是微信浏览器打开
+		var ua = navigator.userAgent.toLowerCase();
+		var isWeixin = ua.indexOf('micromessenger') != -1;
+		if (!isWeixin) { 
+			console.log("非公众号-暂不登陆")
+		    return false;
+		} 
+		console.log("微信浏览器访问中")
+		
+		var token = uni.getStorageSync('token'); //获取缓存
+		let type = e=='userinfo'?'userinfo':'';
+		
+		if(token){		
+			console.log("验证token")	
+			this._veirfyFromServer(token,type)	//验证token是否失效
+		}else{
+			console.log("进行登陆中")
+			this.login(type)	//登陆
+		}
+		 
+	}	
+	
+	login(type){		
+		const code = this.GetUrlParame('code') // 截取code		
+		
 		if (!code) {
-			console.log('获取code')		
-			var token = uni.getStorageSync('token'); //获取缓存
-			if (token) { 
-				return; 
+			this.get_code(type)
+		}else{
+			this.get_token()
+		}	
+	}	
+	
+	get_code(type){		 
+		console.log("获取code")
+		
+		var domine = window.location.href.split("#")[0]; // 微信会自动识别#    并且清除#后面的内容
+		domine = domine.split("?code")[0]; 
+		uni.request({
+		  	url: Wxcode_url,
+		  	method: 'GET',  
+			data:{
+				url:domine,
+				type
+			},
+		  	success: function (res) {   	
+				console.log('codes:',res)
+				const err=res.data.indexOf('object')//错误的url会包含object
+				if(res.data && err<0){ 
+					window.location.href = res.data;
+				}
+		  	}
+		}); 
+	}
+	
+	get_token(e){
+		const code = this.GetUrlParame('code') // 截取code		
+		uni.request({
+		  	url: Token_url,
+		  	method: 'GET',
+			data:{code},
+		  	success: function (res) {	 
+				console.log(res)
+		  		if (res.data.token) { 
+					console.log(res)
+		  			uni.setStorageSync("token", res.data.token);						
+		  			window.location.href =domine 		 
+		  		}
+		  	}
+		});  	
+	}	
+	
+	 
+	//验证token
+	_veirfyFromServer(token,type) {
+		var that = this;
+		uni.request({
+			url: VerifyUrl,
+			method: 'POST',
+			data: {
+				token: token
+			},
+			success: function(res) {
+				var valid = res.data.isValid;
+				if (!valid) {
+					that.login(type);
+				}else{
+					console.log("token有效")
+				}
 			}
-			uni.request({
-			  	url: Wxcode_url,
-			  	method: 'GET',  
-				data:{
-					url:domine,
-					type
-				},
-			  	success: function (res) {   	
-					console.log('codes:',res)
-					const err=res.data.indexOf('object')//错误的url会包含object
-					if(res.data && err<0){ 
-						window.location.href = res.data;
-					}
-			  	}
-			}); 
-		} else {
-			console.log('获取token,跳:',domine)			
-			uni.request({
-			  	url: Token_url,
-			  	method: 'GET',
-				data:{code},
-			  	success: function (res) {	
-			  		console.log(res.data);
-			  		if (res.data.token) { 
-			  			uni.setStorageSync("token", res.data.token);						
-			  			window.location.href =domine 		
-						// uni.switchTab({
-						// 	url:'/pages/index/index'
-						// })
-			  		}
-			  	}
-			});  
-		}
+		})
 	}
-	
-	spliceCode(){	
-		const code = this.GetUrlParame('code') // 截取code  
-		var domine = window.location.href.split("?code")[0]; // 微信会自动识别#    并且清除#后面的内容 
-		if (code) {
-			uni.request({
-			  	url: Token_url,
-			  	method: 'GET',
-				data:{code},
-			  	success: function (res) {
-			  		console.log(res.data);
-			  		if (res.data.token) { 
-			  			uni.setStorageSync("gzh_token", res.data.token);	
-						console.log('页面end:',res.data.token) 						
-			  			window.location.href =domine
-			  		}
-			  	}
-			});  
-		}
-	}
-	
+	 
+	//截取code
 	GetUrlParame(parameName) {  
 		/// 获取地址栏指定参数的值
 		/// <param name="parameName">参数名</param>
@@ -99,6 +131,7 @@ class WxToken {
 			return ''
 		}
 	}
+
 } 
 
 

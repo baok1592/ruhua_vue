@@ -47,11 +47,6 @@
 									<el-table-column prop="nickname" label="昵称"></el-table-column>
 									<el-table-column prop="create_time" label="创建时间"></el-table-column>
 									<el-table-column prop="points" label="积分"></el-table-column>
-									<el-table-column prop="vip" label="是否会员">
-										<template slot-scope="scope">
-											{{scope.row.vip == 1?'是':'否'}}
-										</template>
-									</el-table-column>
 									<el-table-column prop="web_auth_id" label="前端管理权限">
 										<template slot-scope="scope">
 											<template v-if="scope.row.web_auth_id == 1">管理员</template>

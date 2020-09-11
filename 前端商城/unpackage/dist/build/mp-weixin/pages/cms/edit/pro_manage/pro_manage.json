@@ -1,6 +1,0 @@
-{
-  "enablePullDownRefresh": true,
-  "usingComponents": {
-    "uni-segmented-control": "/components/uni/uni-segmented-control/uni-segmented-control"
-  }
-}

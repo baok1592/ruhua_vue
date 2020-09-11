@@ -3,20 +3,26 @@
 		<view class="head">
 			<view class="head_l">
 				<view class="head_l_1">余额（元）</view>
-				<view class="head_l_2">0.00</view>
+				<view class="head_l_2">{{total}}</view>
 			</view>
 			<view class="head_r" @click="jump_cash">提现</view>
 		</view>
 		<block v-for="(item,index) of list" :key="index">
 			<view class="list">
 				<view class="list_01">
-					<view class="list_01_l">{{item.type}}</view>
+					<view class="list_01_l">提现</view>
 					<view class="list_01_r">-{{item.money}}</view>
 				</view>
+				<view class="list_02" v-if="item.card!=null">
+					<view class="list_01_l">卡号</view>
+					<view class="list_01_l">{{item.card}}</view>
+					
+				</view>
 				<view class="list_02">
-					<view class="list_01_l">{{item.time}}</view>
-					<view class="list_01_r" v-if="item.state==0">处理中</view>
-					<view class=""  v-if="item.state==1">交易成功</view>
+					<view class="list_01_l">{{item.update_time}}</view>
+					<view class="list_01_r" v-if="item.status==0">申请中</view>
+					<view class=""  v-if="item.status==1">已提现</view>
+					<view class=""  v-if="item.status==2">已驳回</view>
 				</view>
 			</view>
 		</block>
@@ -30,14 +36,31 @@
 				list:[],
 				list2:[{type:"提现",money:"3000.00",time:"2019.06.29 14:00",state:1},
 				{type:"提现",money:"3000.00",time:"2019.06.29 14:00",state:0},
-				{type:"提现",money:"3000.00",time:"2019.06.29 14:00",state:1}]
+				{type:"提现",money:"3000.00",time:"2019.06.29 14:00",state:1}],
+				total:0,
 			};
+		},
+		onLoad() {
+			this.get_record()
 		},
 		methods:{
 			jump_cash(){
 				uni.navigateTo({
 					url: '/pages/user/cash/cash',
 				});
+			},
+			get_record()
+			{
+				this.$api.http.get('fx/user/get_fx_record').then(res=>{
+					this.list=res.data;
+					console.log("res")
+					console.log(res.data)
+					console.log("res")
+				})
+				
+				this.$api.http.get('fx/user/get_fx_money').then(res => {
+					this.total=res.data.money
+				})
 			}
 		}
 	}

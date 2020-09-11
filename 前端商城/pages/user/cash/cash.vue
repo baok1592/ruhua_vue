@@ -16,9 +16,9 @@
 		<view class="kg_l">大额提现(单笔5万以上）</view>
 		<switch checked style="transform:scale(0.7)" />            
       </view> -->
-		<view class='khh'>银行名称 &emsp;<input type="text" /></view>
-		<view class='khh'>银行户名 &emsp;<input type="text" /></view>
-		<view class='khh'>银行卡号 &emsp;<input type="number" /></view>
+		<view class='khh'>银行名称 &emsp;<input type="text" v-model="form.bk_name" /></view>
+		<view class='khh'>银行户名 &emsp;<input type="text" v-model="form.bk_uname" /></view>
+		<view class='khh'>银行卡号 &emsp;<input type="number" v-model="form.card" /></view>
 		<view class='txfy'>
 			<view class='txfy_01'>
 				<view class='txfy_01_l'>提现费用:</view>
@@ -29,7 +29,7 @@
 				<view class='txfy_02_r'>当日到账</view>
 			</view>
 		</view>
-		<view class='btn'>提现</view>
+		<view class='btn' @click="cash">提现</view>
 	</view>
 </template>
 
@@ -37,6 +37,13 @@
 	export default {
 		data() {
 			return {
+				min_money:'',
+				form:{
+					bk_name:'',
+					card:'',
+					bk_uname:''
+				},
+				money:'',
 				checked: true
 			};
 		},
@@ -44,7 +51,64 @@
 
 		},
 		components: {},
-		methods: {}
+		onLoad(option) {
+			this.money = option.money
+			this.prmSwitch()
+			this.min_money = obj.min_money
+		},
+		methods: {
+			async prmSwitch(){
+				let obj=await this.promise_switch.then(res=>{
+					return res;
+				})
+			},
+			cash() //分销提现接口，直接使用
+			{
+				if(this.money*1 < this.min_money*1){
+					uni.showToast({
+						icon:"none",
+						title:"提现金额小于"+this.min_money+"元",
+						duration:2000
+					})
+					return
+				}
+				if(!this.form.bk_name){
+					uni.showToast({
+						icon:"none",
+						title:"未填写银行名称",
+						duration:2000
+					})
+					return
+				}
+				if(!this.form.bk_uname){
+					uni.showToast({
+						icon:"none",
+						title:"未填写银行户名",
+						duration:2000
+					})
+					return
+				}
+				if(!this.form.card){
+					uni.showToast({
+						icon:"none",
+						title:"未填写银行卡号",
+						duration:2000
+					})
+					return
+				}
+				this.$api.http.post('fx/user/apply_api',this.form).then(res=>{
+					uni.showToast({
+						icon:"none",
+						title:"提交申请成功！",
+						duration:2000
+					})
+					setTimeout(()=>{
+						uni.navigateBack()
+					},2000)
+				})
+				
+			}
+		}
 	};
 </script>
 

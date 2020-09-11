@@ -13,11 +13,12 @@
 				<view class='coupon' v-if="item.status==state">
 					<view class='cou_t'>
 						<view class='cou_t_l'>
-							<view :class='class_name'><span>¥</span> {{item.reduce}}</view>
+							<view :class='class_name'><span>¥</span>{{Math.floor(item.reduce)}}</view>
 							<!-- <view class='cou_t_l_02'>无使用门槛最多优惠12元</view> -->
 						</view>
 						<view class='cou_t_r'>
-							<view class='cou_t_r_01'>满{{item.full}}减{{item.reduce}}</view>
+							<view class='cou_t_r_01' v-if="item.full==0">减{{Math.floor(item.reduce)}}</view>
+							<view class='cou_t_r_01' v-else>满{{Math.floor(item.full)}} 减{{Math.floor(item.reduce)}}</view>
 							<view class='cou_t_r_02'>有效期：{{item.end_time}}</view>
 						</view>
 						<view :class='btn_name' v-if="state==0">
@@ -41,6 +42,7 @@
 
 <script>
 	import None from "@/components/qy/none.vue"
+	import {common} from '../../../common/mixin.js'
 	export default {
 		data() {
 			return {
@@ -52,10 +54,13 @@
 				list_empty: false,
 			};
 		},
+		mixins:[common],
 		components: {
 			None,
 		},
-		onShow() {
+		onLoad() {  
+		},
+		onShow() { 
 			this._load()
 		},
 		methods: {

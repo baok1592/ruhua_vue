@@ -20,7 +20,7 @@
 			</view>
 		</view>
 		<!--header-->
-		
+
 		<!--screen-->
 		<view class="tui-header-screen" :style="{top:height+'px'}">
 			<view class="tui-screen-top">
@@ -62,30 +62,41 @@
 			</view> -->
 		</view>
 		<!--screen-->
-		 
+
+		<!-- #ifdef MP-WEIXIN -->
+		<button class="btn1" open-type="contact" v-if="sys_switch.is_serve == 1">
+			<image class="btnImg" src="../../../static/images/kefu.png"></image>
+			<!-- <view>客服</view> -->
+		</button>
+		<!-- #endif -->
+
+
 		<!--list-->
 		<view class="tui-product-list" style="margin-top: 125px;">
 			<view class="tui-product-container">
-			<!--商品列表-->	 
-				<block v-for="(item,index) in productList" :key="index"> 
-					<view class="tui-pro-item" :class="isList?'tui-flex-list':''" 
-					@click="detail(item.goods_id)">
+				<!--商品列表-->
+				<block v-for="(item,index) in productList" :key="index">
+					<view class="tui-pro-item" :class="isList?'tui-flex-list':''" @click="detail(item.goods_id)">
 						<image v-if="item.imgs" :src="getimg+item.imgs" class="tui-pro-img" :class="isList?'tui-proimg-list':''" />
 						<image v-else :src="default_img" class="tui-pro-img" :class="isList?'tui-proimg-list':''" />
 						<view class="tui-pro-content">
 							<view class="tui-pro-tit">{{item.goods_name}}</view>
 							<view>
 								<view class="tui-pro-price">
-								   <text class="tui-sale-price"><text>￥</text>{{Math.floor(item.price)}} </text>
-								</view> 
+									<text class="tui-sale-price"><text>￥</text>{{item.price}} </text>
+									<!-- <text class="tui-factory-price">￥{{item.market_price}}</text> -->
+									<xianshi v-if="!is_fx && item.discount && item.discount.reduce_price" title="限时" :price="item.price-item.discount.reduce_price*1"></xianshi>
+									<xianshi v-if="!is_fx && item.pt && item.pt.price" title="拼团" :price="item.price-item.pt.price*1"></xianshi>
+									<xianshi v-if="is_fx" title="佣金" :price="item.fx_goods.price*1"></xianshi>
+								</view>
 								<view class="tui-pro-pay">
 									{{item.sales?item.sales:0}}人付款
-								</view> 
+								</view>
 							</view>
 						</view>
 					</view>
 				</block>
-			
+
 			</view>
 		</view>
 
@@ -166,6 +177,8 @@
 	import tuiLoadmore from "@/components/loadmore/loadmore"
 	import tuiNomore from "@/components/nomore/nomore"
 	import tuiTopDropdown from "@/components/top-dropdown/top-dropdown"
+	import xianshi from "@/components/qy/xianshi"
+	import productModel from "@/model/product.js"
 	export default {
 		components: {
 			tuiIcon,
@@ -173,12 +186,14 @@
 			tuiLoadmore,
 			tuiNomore,
 			tuiTopDropdown,
+			xianshi
 		},
 		data() {
 			return {
-				is_fx:false,
+				sys_switch:'',
+				is_fx: false,
 				getimg: this.$getimg,
-				default_img:require('@/imgs/default.jpg'),
+				default_img: require('@/imgs/default.jpg'),
 				currentId: 0,
 				current_children_id: 0,
 				currentName: '',
@@ -223,45 +238,57 @@
 				pullUpOn: true,
 				cid: '',
 				sid: '',
-				ssid:'',
-				is_search :0
+				ssid: '',
+				is_search: 0
 
 			}
 		},
-		
+
 		onLoad: function(options) {
-			if(options.type=='fx'){
-				this.is_fx=true
+			if (options.type == 'fx') {
+				this.is_fx = true
+			}
+			if (options.type == 'no_fx') {
+				this.is_fx = false
+
+				setTimeout(() => {
+					this.$api.msg("未开启分销模式")
+
+				}, 1000)
+				uni.navigateBack({
+
+				})
+
 			}
 			if (options.cid) {
 				this.cid = options.cid
-				this.currentId=options.cid
-				if (!options.sid || options.sid==0) {
+				this.currentId = options.cid
+				if (!options.sid || options.sid == 0) {
 					if (this.cid == 0) {
 						console.log('请求所有商品')
 						this.get_pro()
 					} else {
-						console.log('请求大类商品')
+						console.log('请求某大类下商品')
 						this.get_pro_cate(this.cid)
 					}
 				} else {
 					this.sid = options.sid
-					this.current_children_id=options.sid
-					console.log('有sid',this.sid)
+					this.current_children_id = options.sid
+					console.log('有sid', this.sid)
 					this.get_pro_cate(this.sid)
 				}
 			}
-			if(options.key){
+			if (options.key) {
 				this.is_search = 1
 				this.get_pro_search(options.key)
 			}
 
-
+			this.prmSwitch()
 			this._load()
-			if(this.is_search == 0){
+			if (this.is_search == 0) {
 				this.closeDrawer()
 			}
-			
+
 			let obj = {};
 			// #ifdef MP-WEIXIN
 			obj = wx.getMenuButtonBoundingClientRect();
@@ -286,6 +313,11 @@
 			})
 		},
 		methods: {
+			async prmSwitch(){
+				this.sys_switch=await this.promise_switch.then(res=>{
+					return res;
+				})
+			},
 			_load() {
 				this.tabbar = this.$api.http.get('category/all_category').then(res => {
 					let list = res.data
@@ -297,28 +329,31 @@
 						}
 					})
 				})
-				
+
 			},
-			get_pro() {  
-				this.$api.http.get('product/get_recent').then(res => { //所有商品
+			get_pro() {
+				// this.$api.http.get('product/get_recent').then(res => { //所有商品
+				productModel.getProList().then(res=>{ //所有商品
 					this.productList = res.data
 					this.all = res.data
-					console.log('获取所有商品：',res.data)
+					console.log('获取所有商品：', res.data)
 				})
 			},
 			get_pro_cate(id) {
-				this.$api.http.get('product/get_cate_pros?id=' + id).then(res => {
+				// this.$api.http.get('product/get_cate_pros?id=' + id).then(res => {
+				productModel.getProductCate(id).then(res=>{
 					this.productList = res.data
-					this.all = res.data					
-					console.log("分类商品:",this.productList)
+					this.all = res.data
+					console.log("分类商品:", this.productList)
 				})
 			},
-			get_pro_search(key){
-				this.$api.http.get('product/search?name='+key).then(res => {
+			get_pro_search(key) {
+				// this.$api.http.get('product/search?name=' + key).then(res => {
+				productModel.getProductSearch(key).then(res=>{
 					this.productList = res.data
-					this.all = res.data 
-					this.is_search = 0 
-					console.log("搜索商品:",this.productList)
+					this.all = res.data
+					this.is_search = 0
+					console.log("搜索商品:", this.productList)
 				})
 			},
 			//一级分类点击
@@ -433,33 +468,34 @@
 				this.current_children_id = 0
 			},
 			closeDrawer() {
-				let sid = this.sid?this.sid:0
-				
+				let sid = this.sid ? this.sid : 0
+
 				if (this.currentId > 0) {
 					sid = this.currentId
 					if (this.current_children_id > 0) {
 						sid = this.current_children_id
-					}  
+					}
 					console.log('获取分类商品')
 					this.get_pro_cate(sid)
-				}else{
-					if(this.is_fx){
-						this.$api.http.get('/fx/get_goods').then(res => { //分销商品
+				} else {
+					if (this.is_fx) {
+						// this.$api.http.get('/fx/get_goods').then(res => { //分销商品
+						productModel.getProductFx().then(res=>{
 							this.productList = res.data
 							this.all = res.data
-							console.log('获取所有分销商品：',res.data)
+							console.log('获取所有分销商品：', res.data)
 						})
-					}else{
+					} else {
 						this.get_pro()
 					}
-				}	
+				}
 				this.drawer = false
 				this.sid = ''
 				// if(this.cid){	
 				// 	console.log('cid:',this.cid)
 				// 	this.get_pro_cate(this.cid)
 				// }  
-				
+
 			},
 			back: function() {
 				if (this.drawer) {
@@ -488,6 +524,18 @@
 			this.loadding = false;
 			uni.stopPullDownRefresh()
 		},
+		onShareAppMessage(res) {
+			let my = uni.getStorageSync('my')
+			let path = "pages/extend-view/productList/productList"
+			if (my && my.data && my.data.sfm) {
+				path = path + '?sfm=' + my.data.sfm
+			}
+			console.log('path:', path)
+			return {
+				title: this.shop_name,
+				path: path
+			}
+		},
 		onReachBottom: function() {
 			/* if (!this.pullUpOn) return;
 			this.loadding = true;
@@ -512,6 +560,33 @@
 	page {
 		background: #f7f7f7;
 	}
+
+	/* #ifdef MP-WEIXIN */
+	.btn1{
+	  width: 60rpx;
+	  height: 60rpx; 
+	  font-size: 30rpx; 
+	  position: fixed;
+	  padding: 0px;
+	  margin: 0px;
+	  top:50%;
+	  right:10rpx;
+	  z-index: 999;
+	  background: none !important; 
+	  
+	}
+	
+	.btnImg {
+	  width: 60rpx;
+	  height: 60rpx;
+	  opacity: 0.8;
+	}
+
+	.btn1::after {
+		border: 0;
+	}
+
+	/* #endif */
 
 	.container {
 		padding-bottom: env(safe-area-inset-bottom);
@@ -1048,8 +1123,9 @@
 	.tui-flex-list {
 		display: flex;
 		width: 100%;
-		margin: 0 0 5px;padding: 10px 0px 0 10px;
-		
+		margin: 0 0 5px;
+		padding: 10px 0px 0 10px;
+
 	}
 
 	.tui-pro-img {
@@ -1086,7 +1162,8 @@
 		-webkit-line-clamp: 2;
 	}
 
-	.tui-pro-price {display: flex;
+	.tui-pro-price {
+		display: flex;
 		padding-top: 18rpx;
 	}
 
@@ -1095,7 +1172,11 @@
 		font-weight: 500;
 		color: #e41f19;
 	}
-	.tui-sale-price text{font-size: 12px;}
+
+	.tui-sale-price text {
+		font-size: 12px;
+	}
+
 	.tui-factory-price {
 		font-size: 24rpx;
 		color: #a0a0a0;

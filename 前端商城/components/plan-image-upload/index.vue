@@ -2,7 +2,7 @@
 	<view class="imageUploadContainer">
 		<view class="imageUploadList">
 			<view class="imageItem" v-bind:key="index" v-for="(path,index) in value">
-				<image :src="path" :class="{'dragging':isDragging(index)}" draggable="true" @tap="previewImage" :data-index="index" @touchstart="start" @touchmove="move" @touchend="stop"></image>
+				<image :src="Api_url + path.url" :class="{'dragging':isDragging(index)}" draggable="true" @tap="previewImage" :data-index="index" @touchstart="start" @touchmove="move" @touchend="stop"></image>
 				<view v-if="isShowDel && $api.my('role_id')>3" class="imageDel" @tap="deleteImage" :data-index="index">x</view> 
 				<view v-if="names[index]" class="name" @click="edit_name(index)">{{names[index].name}}</view>				
 			</view>
@@ -27,6 +27,9 @@
 </template>
 
 <script>
+	import {
+		Api_url
+	} from '@/common/config'
 	var _self;	
 	import uniPopup from "@/components/uni-popup/uni-popup.vue"
 	export default {
@@ -34,6 +37,7 @@
 		props: ['value','enableDel','enableAdd','enableDrag','serverUrl','formData','limit','fileKeyName','showUploadProgress','serverUrlDeleteImage','names'],
 		data() {
 			return {
+				
 				role_id:'',
 				edit_box:false,
 				e_data:'',
@@ -55,6 +59,9 @@
 		},
 		components: { 
 			uniPopup
+		},
+		created() {
+			
 		},
 		computed:{
 			posMoveImageLeft: function(){ 

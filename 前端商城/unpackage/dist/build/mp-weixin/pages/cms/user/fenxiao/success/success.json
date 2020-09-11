@@ -1,6 +1,0 @@
-{
-  "enablePullDownRefresh": true,
-  "usingComponents": {
-    "uni-steps": "/components/uni/uni-steps/uni-steps"
-  }
-}

@@ -1,7 +1,7 @@
 <template>
 	<view>
 		<!-- 地址 -->
-		<navigator url="/pages/address/address?source=1" class="address-section">
+		<navigator url="/pages/address/address?source=1" class="address-section" v-if="address_show">
 			<view class="order-content">
 				<text class="yticon icon-shouhuodizhi"></text>
 				<view class="cen" v-if="address">
@@ -16,7 +16,53 @@
 
 
 		</navigator>
-
+		<view class="H10" v-if="is_kai != 1 && is_pt == 1"></view>
+		<view class="tuanzhang" v-if="is_kai != 1 && is_pt == 1">
+			<view class="tz-l">
+				<checkbox-group>
+					<label>
+						<checkbox value="cb" style="transform:scale(0.7)" />
+					</label>
+				</checkbox-group>
+			</view>
+			<view class="tz-m">该团由团长代收包裹（免运费）</view>
+			<view class="tz-r">团长：123</view>
+		</view>
+		<view class="H10"></view>
+		<view class="uni-list">
+			<radio-group @change="radioChange">
+				<label class="uni-list-cell uni-list-cell-pd" v-if="switch_list.drive_type==1 || switch_list.drive_type==2 || switch_list.drive_type==3">
+					<view class="tuanzhang">
+						<view class="tz-l">
+							<radio value="1" style="transform:scale(0.7)" />
+						</view>
+						<view class="tz-m">快递配送</view>
+						<view class="tz-r"></view>
+					</view>
+				</label>
+				<label class="uni-list-cell uni-list-cell-pd" v-if="switch_list.drive_type==2 || switch_list.drive_type==3">
+					<view class="tuanzhang">
+						<view class="tz-l">
+							<radio value="2" style="transform:scale(0.7)" />
+						</view>
+						<view class="tz-m">同城配送</view>
+						<view class="tz-r"></view>
+					</view>
+				</label>
+				<label class="uni-list-cell uni-list-cell-pd" v-if="switch_list.drive_type==1 || switch_list.drive_type==3">
+					<view class="tuanzhang">
+						<view class="tz-l">
+							<radio value="3" style="transform:scale(0.7)" />
+						</view>
+						<view class="tz-m">到店自提</view>
+						<view class="tz-r"></view>
+					</view>
+				</label>
+			</radio-group>
+		</view>
+		<view class="ztdz" v-if="kuaidi==3">
+			{{switch_list.zt_address}}
+		</view>
 		<view class="goods-section">
 			<!-- <view class="g-header b-b">
 				<image class="logo" src="http://duoduo.qibukj.cn/./Upload/Images/20190321/201903211727515.png"></image>
@@ -29,7 +75,10 @@
 					<text class="title clamp">{{item.goods_name}}</text>
 					<text class="spec">{{item.sku_name?item.sku_name:''}}</text>
 					<view class="price-box">
-						<text class="price">￥{{item.price}}</text>
+						<text class="price" v-if="item.vip_price && !item.discount">￥{{item.price - item.vip_price}}</text>
+						<text class="price" v-if="item.vip_price && item.discount">￥{{item.price}}</text>
+						<text class="price" v-if="!item.vip_price && !item.discount">￥{{item.price}}</text>
+						<!-- <text class="price" v-if="!item.vip_price || !item.discount">￥{{item.price}}</text> -->
 						<!-- <text class="price">￥{{item.price}}</text> -->
 						<text class="number">x {{item.num}}</text>
 					</view>
@@ -37,6 +86,44 @@
 			</view>
 
 		</view>
+
+
+
+
+		<view class="yt-list" v-if="is_pt == 1">
+			<view class="jr">
+				<view class="jr_tit">为您加入仅差{{pt_data.num}}人的团，支付后即可拼购成功</view>
+				<view class="jr_img">
+					<view class="img_01 img_01_border">
+						<img :src="pt_data.c_pic"></img>
+						<view class="zhicheng">团长</view>
+					</view>
+					<view class="img_01" v-for="item of pt_data.item_pic">
+						<img :src="item"></img>
+					</view>
+					<view class="img_01">
+						<img :src="head.avatarUrl"></img>
+						<view class="zhicheng">待支付</view>
+					</view>
+				</view>
+			</view>
+		</view>
+
+		<view class="yt-list" v-if="is_kai == 1">
+			<view class="jr">
+				<view class="jr_tit">立即支付，即可开团成功</view>
+				<view class="jr_img">
+					<view class="img_01 img_01_border">
+						<img :src="head.avatarUrl"></img>
+						<view class="zhicheng">待支付</view>
+					</view>
+					<view class="img_01 img_01_borderx" v-for="(item,index) of buy_data[0].pt.pt.user_num-1" :key="index">
+						?
+					</view>
+				</view>
+			</view>
+		</view>
+
 		<!-- 优惠明细 -->
 		<view class="yt-list">
 			<view class="yt-list-cell b-b" @click="toggleMask('show')">
@@ -63,7 +150,7 @@
 		<view class="yt-list">
 			<view class="yt-list-cell b-b">
 				<text class="cell-tit clamp">商品金额</text>
-				<text class="cell-tip">￥{{goods_money}}</text>
+				<text class="cell-tip">￥{{goods_money | count_price(goods_money)}}</text>
 			</view>
 			<view class="yt-list-cell b-b" v-if="coupon_money>0">
 				<text class="cell-tit clamp">优惠金额</text>
@@ -74,11 +161,19 @@
 				<text class="cell-tip" v-if="yunfei_money">￥ {{yunfei_money}}</text>
 				<text class="cell-tip" v-else>免运费</text>
 			</view>
-			<view class="yt-list-cell b-b" @click="jump_invoices">
+			<!-- <view class="yt-list-cell b-b" @click="jump_invoices" v-if="invoice_switch">
 				<text class="cell-tit clamp">发票</text>
-				<text class="cell-tip">不开发票</text>
+				<text class="cell-tip" >不开发票</text>
 				<text class="yticon icon-you"></text>
+			</view> -->
+			<!-- -------------------------------------------万能表单组件 -->
+			<view style="margin-top: 20px;" v-if="form_switch">
+				<Formt :data_form="data_form" :farther_fun="get_data" :kg="kg"></Formt>
+				<!-- <Formt :data_form="data_form" :farther_fun="get_data"></Formt> -->
 			</view>
+			<!-- -------------------------------------------万能表单结束 -->
+
+
 			<view class="yt-list-cell desc-cell">
 				<text class="cell-tit clamp">备注</text>
 				<input class="desc" type="text" v-model="obj.msg" placeholder="请填写备注信息" placeholder-class="placeholder" />
@@ -90,7 +185,8 @@
 			<view class="price-content">
 				<text>实付款</text>
 				<text class="price-tip">￥</text>
-				<text class="price">{{pay_money}}</text>
+				<!-- <text class="price">{{pay_money.toFixed(2)}}</text> -->
+				<text class="price">{{pay_money | count_price()}}</text>
 			</view>
 			<text class="submit" @click="submit">提交订单</text>
 		</view>
@@ -104,7 +200,8 @@
 						<block v-if="item.status == 0">
 							<view class="con">
 								<view class="left">
-									<text class="title">满{{item.full}}减{{item.reduce}}</text>
+									<text class="title" v-if="item.full==0">减{{item.reduce}}</text>
+									<text class="title" v-else>满{{item.full}} 减{{item.reduce}}</text>
 									<!-- <text class="time"></text> -->
 								</view>
 								<view class="right">
@@ -117,7 +214,8 @@
 							</view>
 							<view class="use" style="display: flex;justify-content: space-between;">
 								<text class="tips">有效期至{{item.end_time}}</text>
-								<view class="tips2" @click="to_use(index)">去使用</view>
+								<view class="tips2" v-if="item.full*1 <= goods_money*1" @click="to_use(index)">去使用</view>
+								<view class="tips3" v-else>不可用</view>
 							</view>
 						</block>
 					</view>
@@ -128,31 +226,49 @@
 			</view>
 		</view>
 
+
+		<!-- 购买前的提示，不需要可以删除 -->
 		<view class="tan" v-if="xieyi">
-			<div class="black" @click="xieyi=false">
+			<div class="black">
+				<!-- 弹窗蒙层 -->
 				<div class="container"></div>
 			</div>
 			<view class="t_con">
-
 				<view class="t_c_con">
 					<rich-text :nodes="content"></rich-text>
 				</view>
 
 				<view class="t_c_btn">
-					<view class="t_c_btn_01 bg_gery" @click="xieyi=false">不同意</view>
-					<view class="t_c_btn_01 bg_red" @click="xieyi=false">同意</view>
+					<view class="t_c_btn_01 bg_gery" @click="xy_approve(false)">不同意</view>
+					<view class="t_c_btn_01 bg_red" @click="xy_approve(true)">同意</view>
 				</view>
 			</view>
 		</view>
+
+
 	</view>
 </template>
 
 <script>
+	
+	import Formt from '@/components/form_data/form_data.vue'
+	import {
+		CUser
+	} from '@/common/cache/user.js'
+	import productModel from '@/model/product.js'
+	import orderModel from '@/model/order.js'
+	var cache_user = new CUser();
 	export default {
 		data() {
 			return {
-				content: '',
-				xieyi: false,
+				address_show:false,
+				form_switch: '',
+				kuaidi: 0,
+				kg: 0,
+				data_form: [],
+				goods_money: 0,
+				content: '演示商品，请勿购买。如需测试支付功能，购买后不发货不退款',
+				xieyi: false, //购买前的弹窗提示 
 				sku_id: '',
 				head: '',
 				is_kai: 0,
@@ -174,7 +290,8 @@
 				address: '',
 				paying: '', //防止多次提交订单
 				coupon_text: '选择优惠券',
-				coupon_money: 0, //优惠金额				
+				coupon_money: 0, //优惠金额		
+				switch_list: '',
 				obj: {
 					msg: "",
 					order_from: "xcx",
@@ -183,16 +300,40 @@
 					shoping_price: "",
 					coupon_price: "",
 					coupon_id: 0,
-					discount: ""
-				}
+					discount: "",
+					switch_list: '',
+					invoice_switch: false,
+					drive_type: ''
+				},
+				wnlist: '',
 
 			}
 		},
-		onLoad(option) {
+		components: {
+			Formt
+		},
+		async onLoad(option) {
 			this.state = option.state
+			await this.prmSwitch()
+			this.check_switch()
 			if (option.state == 'buy') {
 				let buy_data = uni.getStorageSync('buy')
+				//官方测试代码，如忘记删除，请自行删除一下
+				// this.diy_form()
+				if (this.form_switch) {
+					this.get_wn_data()
+				}
 				this.buy_data = buy_data
+				//判断商品实虚  是否显示地址
+				for (let k in buy_data) {
+					let v = buy_data[k]
+					if(v.style == 0){
+						this.address_show = true
+						console.log('实物商品',this.address_show)
+						break
+					}
+				}
+				console.log('虚拟商品',this.address_show)
 			}
 			if (option.state == 'car') {
 				let buy_data = uni.getStorageSync('cart')
@@ -211,10 +352,24 @@
 				}
 				this.buy_data = arr
 				this.save_cache = cache
+				//判断商品实虚  是否显示地址
+				for (let k in buy_data) {
+					let v = buy_data[k]
+					if(v.style == 0){
+						this.address_show = true
+						console.log('实物商品',this.address_show)
+						break
+					}
+				}
+				console.log('虚拟商品',this.address_show)
+				
 			}
-			if (this.buy_data[0].goods_name == "如花商城商业版-授权") {
-				this.xieyi = true
-			}
+			// if(this.buy_data[0].goods_name=="商城商业版-授权"){				
+			// 	this.$api.http.get('index/get_file?type=3').then(res => {
+			// 		this.content = res
+			// 		this.xieyi=true
+			// 	})	
+			// }
 			let id = uni.getStorageSync('pid')
 			if (id) {
 				this.pid = id
@@ -222,44 +377,114 @@
 				this.is_pt = 1
 				this.get_pid(id)
 			}
-			this.head = uni.getStorageSync('userInfo')
+			const my = cache_user.info()
+			this.head = {
+				avatarUrl: my.headpic
+			}
 			this.is_kai = uni.getStorageSync('is_kai')
 			uni.removeStorageSync('is_kai')
 			console.log('onLoad', this.buy_data)
 			this._load()
+			this.js_goods_money()
+			this.$api.http.get('address/get_default_address').then(res => {
+			// orderModel.getAddressDefault().then(res=>{
+				this.address = res.data
+			})
 			//商品数据s
 			//let data = JSON.parse(option.data);
 			//console.log(data);
 		},
 		onShow() {
 			this.$api.http.get('address/get_default_address').then(res => {
+			// orderModel.getAddressDefault().then(res=>{
 				this.address = res.data
+				console.log("请求地址", res.data)
 			})
+
+			this.get_yunfei()
 		},
 		computed: {
-			//商品金额
-			goods_money() {
+			//订单应付金额
+			pay_money() {
+				console.log('应付金额', this.goods_money, this.yunfei_money, this.coupon_money)
+				let money = this.goods_money + this.yunfei_money - this.coupon_money
+				return money;
+			},
+
+		},
+		methods: {
+			async prmSwitch(){
+				this.switch_list=await this.promise_switch.then(res=>{
+					return res;
+				})
+				return this.switch_list
+			},
+			//获取vip
+			get_user_vip_status() {
+				let vip_status = uni.getStorageSync('my')
+				console.log(vip_status)
+				if (vip_status.data && vip_status.data.vip && vip_status.data.vip.status == 1) {
+					return true
+				}
+				return false
+			},
+			radioChange(e) {
+				this.kuaidi = e.detail.value
+				if (this.kuaidi == 1) {
+					this.obj.drive_type = '快递'
+				}
+				if (this.kuaidi == 2) {
+					this.obj.drive_type = '同城'
+				}
+				if (this.kuaidi == 3) {
+					this.obj.drive_type = '自提：' + this.switch_list.zt_address
+				}
+			},
+			get_data(e) {
+				console.log("eeee")
+				console.log(JSON.stringify(e))
+				return JSON.stringify(e)
+
+
+
+			},
+			//计算所有商品金额
+			js_goods_money() {
 				const buy = this.buy_data
+				console.log(this.get_user_vip_status())
 				let total = 0
 				for (let k in buy) {
 					const v = buy[k]
-					total += v.price * v.num
+					console.log(v)
+					if (v.discount) {
+						total += v.price * v.num
+					} else {
+						if (this.get_user_vip_status() && v.vip_price) {
+							total += (v.price - v.vip_price) * v.num
+						} else {
+							total += v.price * v.num
+						}
+					}
+					/* if(v.vip_price){
+						total = total - v.vip_price
+					} */
 				}
 				console.log('总价', total)
-				return total;
+				this.goods_money = total;
 			},
-			//订单应付金额
-			pay_money() {
-				return this.goods_money + this.yunfei_money - this.coupon_money;
-			}
-		},
-		methods: {
+			async check_switch() {
+				const that = this
+				await this.prmSwitch()
+				this.form_switch = this.switch_list.is_form == 1 ? true : false
+				that.invoice_switch = this.switch_list.is_invoice == 1 ? true : false
+			},
 			_load() {
 				console.log('load')
 				this.$api.http.get('coupon/user/get_coupon').then(res => {
+				// orderModel.getOrderUserCoupon().then(res=>{
 					this.couponList = res.data
 				})
-				this.get_yunfei() 
+				this.get_yunfei()
 			},
 			jump_invoices() {
 				uni.navigateTo({
@@ -267,12 +492,27 @@
 				});
 			},
 			get_pid(id) {
-				this.$api.http.get('pt/get_one_item', {
-					id: id
-				}).then(res => {
+				// this.$api.http.get('pt/get_one_item', {
+				// 	id: id
+				// }).then(res => {
+				orderModel.getPtItem(id).then(res=>{
 					this.pt_data = res.data
 					uni.removeStorageSync('pid');
 				})
+			},
+			//判断商品中是否有分销商品
+			check_fx_pro() {
+				const buy = this.buy_data
+
+				let fx_swtich = false
+				for (let k in buy) {
+					const v = buy[k]
+					if (v.is_fx) {
+						fx_swtich = true
+					}
+				}
+				console.log("是否为分销订单：", fx_swtich)
+				return fx_swtich
 			},
 			//获取运费
 			get_yunfei() {
@@ -288,6 +528,7 @@
 				}
 				console.log('get_obj', obj)
 				this.$api.http.post('product/get_shipment_price', obj).then(res => {
+				// productModel.postProductSimPrice(obj).then(res=>{
 					this.yunfei_money = res.data
 				})
 			},
@@ -321,25 +562,49 @@
 			changePayType(type) {
 				this.payType = type;
 			},
+
 			//设置订单数据
 			set_order_data() {
-				console.log(this.buy_data)
-				if (this.buy_data[0].discount != '[]') {
-					this.obj.discount = 1
-				} else {
-					this.obj.discount = 0
-				}
+				const that = this
 				let obj = this.obj
+				obj.discount = 0
+
+				for (let k in that.buy_data) {
+					const v = that.buy_data[k]
+
+					if (v.discount && v.discount != "[]") {
+						obj.discount = 1
+					}
+				}
 				obj.total_price = this.pay_money
 				obj.shoping_price = this.yunfei_money
 				obj.coupon_price = this.coupon_money
 				obj.coupon_id = this.coupon_id
-				obj.goods_id = this.buy_data[0].goods_id,
-					obj.price = this.buy_data[0].price,
-					obj.num = this.buy_data[0].num,
-					obj.order_from = 0
-				obj.payment_type = 'xcx'
+				obj.goods_id = this.buy_data[0].goods_id
 
+				obj.price = this.buy_data[0].price * this.buy_data[0].num
+				obj.num = this.buy_data[0].num
+				obj.order_from = 0
+				
+				
+				// #ifdef H5
+				obj.payment_type = 'wx'
+				// #endif
+				// #ifdef MP-WEIXIN
+				obj.payment_type = 'xcx'
+				// #endif
+				
+				
+				if (this.get_user_vip_status()) {
+					obj.price = (this.buy_data[0].price - this.buy_data[0].vip_price) * obj.num
+
+				}
+
+				//商品中有分销商品，则提交分销身份码
+				const level_one = uni.getStorageSync('level_one')
+				if (this.check_fx_pro() && level_one) {
+					obj.sfm = level_one
+				}
 
 				if (this.buy_data[0].pt) {
 					obj.is_captain_sign = 1
@@ -367,11 +632,13 @@
 					delete sku[name].sku
 					delete sku[name].sku_name
 					delete sku[name].goods_name
+
 				}
 				obj.json = sku
 				console.log('obj', obj)
 				return obj;
 			},
+
 			check_sub_data() {
 				if (!this.address) {
 					this.$api.msg('未填写地址')
@@ -385,18 +652,39 @@
 				url = 'order/create'
 				//#endif
 				//#ifdef H5
-				url = 'order/create_cart'
+				if (this.switch_list && this.switch_list.merge_mode == 3) {
+					//this.$api.msg('手机登陆暂无支付');
+					url = 'order/create'
+				} else {
+					url = 'order/create_cart'
+				}
 				//#endif
 				console.log('url:', url)
 				return url
 			},
+			xy_approve(e) {
+				this.xieyi = false
+				if (!e) {
+					uni.navigateBack({})
+					return;
+				}
+			},
 			//创建订单
 			async submit() {
-				/* if (this.buy_data[0].pindan_data.length > 0) {
-					uni.navigateTo({
-						url: '../invite/invite?id=' + this.pid
-					})
-				} */
+				//万能表单，不知道写的什么
+				if(this.form_switch){
+					if (this.kg == 0) {
+					this.wnlist = this.get_data()
+					this.kg = 1
+					return
+				}
+				if (this.kg == 1) {
+					this.kg = 0
+				}
+				}
+				
+
+
 				let is_pin = uni.getStorageSync('is_item')
 				uni.removeStorageSync('is_item')
 				const url = this.check_sub_data()
@@ -405,32 +693,43 @@
 				}
 				let obj = this.set_order_data()
 
+
+				if (this.switch_list.drive_type > 0 && (!obj.drive_type || obj.drive_type == '')) {
+					this.$api.msg('请选择配送方式')
+					return;
+				}
 				console.log('submit:', obj)
-				/* let obj = {  
-					goods_id: this.buy_data[0].goods_id,
-					price: this.buy_data[0].price,
-					num: this.buy_data[0].num,
-					sku_id: this.sku_id,
-					msg: order_data.msg,
-					order_from: 0,
-					payment_type: 'xcx',
-					total_price: order_data.total_price,
-					shoping_price: order_data.shoping_price,
-				} */
 				if (this.sku_id == '') {
 					obj.sku_id = 0
 				} else {
 					obj.sku_id = this.sku_id
 				}
 				let order_json = ''
-
-
-
-				//普通下单
-				order_json = await this.$api.http.post(url, obj).then(res => {
-					return res
-				})
-
+				if (this.is_kai == 1) {
+					obj.is_captain_sign = 1
+					//团长下单
+					// order_json = await this.$api.http.post('pt/create_pt_item', obj).then(res => {
+					// 	return res
+					// })
+					order_json=await orderModel.postPtCreateItem(obj).then(res=>{
+						return res
+					})
+				} else if (is_pin == 1) {
+					obj.item_id = this.pid
+					obj.is_captain_sign = 1
+					//团员下单
+					// order_json = await this.$api.http.post('pt/create_pt', obj).then(res => {
+					// 	return res
+					// })
+					order_json=await orderModel.postPtCreateItems(obj).then(res=>{
+						return res
+					})
+				} else {
+					//普通下单
+					order_json = await this.$api.http.post(url, obj).then(res => {
+						return res
+					})
+				}
 				this.paying = true
 				console.log("创建订单：", order_json)
 				if (!order_json.data) {
@@ -440,6 +739,7 @@
 					}, 1000);
 					return;
 				}
+				this.order_id = order_json.data
 
 
 				if (this.state == 'buy') {
@@ -453,10 +753,12 @@
 				this.order_id = order_id
 
 				//#ifdef MP-WEIXIN
-				const pay_data = await this.$api.http.post('order/pay/pre_order', {
-					id: order_id
-				}).then(res => {
+				// const pay_data = await this.$api.http.post('order/pay/pre_order', {
+				// 	id: order_id
+				// }).then(res => {
+				const pay_data=await orderModel.postOrderWxPay(order_id).then(res=>{
 					console.log('pay:', res)
+
 					return res
 				})
 				await this.pay(pay_data)
@@ -464,9 +766,10 @@
 
 				//#ifdef APP-PLUS 
 				console.log('id:', order_id)
-				const app_data = await this.$api.http.post('order/pay/pre_app', {
-					id: order_id
-				}).then(res => {
+				// const app_data = await this.$api.http.post('order/pay/pre_app', {
+				// 	id: order_id
+				// }).then(res => {
+				const app_data=await orderModel.postOrderAppPay(order_id).then(res=>{
 					console.log('app-pay:', res)
 					return res
 				})
@@ -476,11 +779,33 @@
 
 
 				//#ifdef H5
-				this.wxPay(order_id)
+
+				let ua = window.navigator.userAgent.toLowerCase()
+				if (ua.match(/MicroMessenger/i) == 'micromessenger') {
+					/* const pay = await this.$api.http.post('order/second_pay', {
+						id: this.order_id
+					}).then(res => {
+						console.log('pay:', res)
+						return res
+					}) */
+					console.log("进入公众号id")
+					this.wxPay(this.order_id)
+
+
+
+				} else {
+
+					uni.reLaunch({
+						url: 'pay?order_num=' + this.order_id
+					})
+
+				}
+
 				//#endif
 			},
 			//公众号支付
 			wxPay(json) {
+
 				if (typeof WeixinJSBridge == "undefined") {
 					if (document.addEventListener) {
 						document.addEventListener("WeixinJSBridgeReady", jsApiCall, false);
@@ -489,23 +814,29 @@
 						document.attachEvent("onWeixinJSBridgeReady", jsApiCall);
 					}
 				} else {
+
 					this.jsApiCall(json);
+
 				}
 			},
 			jsApiCall(json) {
 				const that = this;
+				console.log("公众号支付")
+
 				WeixinJSBridge.invoke("getBrandWCPayRequest", json, function(res) {
 					WeixinJSBridge.log('a:', res.err_msg);
 					if (res.err_msg == "get_brand_wcpay_request:ok") {
 						that.$api.msg("支付成功!");
-						uni.navigateTo({
-							url: '../invite/invite?id=' + that.pid
-						})
-						return
 					} else if (res.err_msg == "get_brand_wcpay_request:cancel") {
 						that.$api.msg("取消支付");
 					} else {
 						that.$api.msg("支付失败");
+					}
+					if (this.is_kai == 1) {
+						uni.navigateTo({
+							url: '../invite/invite?id=' + that.pid
+						})
+						return
 					}
 					setTimeout(() => {
 						uni.redirectTo({
@@ -517,6 +848,7 @@
 			//小程序支付
 			pay(data) {
 				const order_id = this.order_id
+
 				uni.requestPayment({
 					provider: "wxpay",
 					timeStamp: data.timeStamp,
@@ -540,6 +872,9 @@
 			},
 			//APP支付
 			app_pay(data) {
+				console.log("app支付")
+				console.log(this.order_id)
+				console.log("app支付")
 				const order_id = this.order_id
 				uni.requestPayment({
 					provider: "wxpay",
@@ -558,6 +893,111 @@
 					}
 				});
 			},
+			get_wn_data() {
+				let type = 2;
+				let i = 0,
+					j = 0;
+				let options = []
+				let opdata
+				let data = []
+				this.$api.http.post('wntable/getbytype', type).then(res => {
+					this.data_form = res.data;
+					console.log("dataform")
+					console.log(this.data_form)
+					console.log("dataform")
+				})
+			},
+			diy_form() {
+				this.get_wn_data()
+				/* this.data_form=[
+						{
+							type: "radio",
+							desc: "自定义选择",
+							default: "",
+							show: false,
+							option: [{
+								value: '0',
+								name: "惊雷",
+								default: 1
+							}, {
+								value: '1',
+								name: "无情"
+							}],
+							name: "sex"
+						},
+						{
+							type: "date",
+							desc: "配送日期",
+							default: "",
+							show: true,
+							options: "2020-05-06",
+							name: "dateA"
+						}, 
+						{
+							type: "time",
+							desc: "另一种时间",
+							default: "xxx",
+							show: true,
+							options: "",
+							name: "timeA"
+						},
+						{
+							type: "switch",
+							desc: "是否开关",
+							default: "xxx",
+							show: true,
+							options: "",
+							name: "switchA"
+						},
+						
+							   {
+									type: "input",
+									desc: "输入框",
+									default: "测试",
+									show: true,
+									options: "",
+									name: "nameA"
+								},
+						 {
+							type: "check",
+							desc: "多选套餐",
+							default: "",
+							show: false,
+							option: [{
+								value: 0,
+								name: "套餐A"
+							}, {
+								value: 1,
+								name: "套餐B"
+							}, {
+								value: 2,
+								name: "套餐C"
+							}],
+							name: "checkA"
+						},
+						{
+							type: "select",
+							desc: "下拉选择",
+							default: "请选择",
+							show: true,
+							options: [
+								'中国',
+								'日国',
+								'韩国',
+								'美国',
+							],
+							name: "selectA"
+						},
+						{
+							type: "address",
+							desc: "其他地址",
+							default: "请选择",
+							show: true,
+							options: [],
+							name: "address"
+						},
+					] */
+			}
 		},
 		onPullDownRefresh() {
 			setTimeout(function() {
@@ -606,7 +1046,8 @@
 
 		.t_c_con {
 			font-size: 14px;
-			height: 280px;
+			max-height: 280px;
+			min-height: 120px;
 			overflow-y: scroll;
 			width: 100%;
 			overflow-x: hidden;
@@ -639,7 +1080,7 @@
 			}
 
 			.bg_red {
-				background-color: #429CE3;
+				background-color: #FF7900;
 			}
 
 			.bg_gery {
@@ -648,10 +1089,20 @@
 		}
 	}
 
+	.H10 {
+		height: 10px;
+	}
+
+	.ztdz {
+		padding: 10px 0 10px 20px;
+		color: #777;
+		background-color: #fff;
+		font-size: 14px;
+	}
+
 	.tuanzhang {
 		background: #fff;
-		margin-top: 10px;
-		padding: 10px;
+		padding: 3px 10px;
 		display: flex;
 		font-size: 12px;
 
@@ -786,6 +1237,7 @@
 		margin-top: 16upx;
 		background: #fff;
 		padding-bottom: 1px;
+		padding-top: 10px;
 
 		.g-header {
 			display: flex;
@@ -1174,6 +1626,22 @@
 			width: 80px;
 			border: 1px solid #FA436A;
 			background-color: #FA436A;
+			color: #FFFFFF;
+			border-radius: 25px;
+		}
+
+		.tips3 {
+			font-size: 24upx;
+			color: $font-color-light;
+			line-height: 50upx;
+			;
+			height: 50upx;
+			;
+			text-align: center;
+			margin: 5upx 10px 0 0;
+			width: 80px;
+			border: 1px solid #C0C0C0;
+			background-color: #C0C0C0;
 			color: #FFFFFF;
 			border-radius: 25px;
 		}

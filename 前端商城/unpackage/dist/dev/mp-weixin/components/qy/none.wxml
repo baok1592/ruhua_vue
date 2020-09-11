@@ -1,1 +1,0 @@
-<view class="no"><view class="none"><image src="{{$root.m0}}" class="_img"></image><view>暂无数据</view><block wx:if="{{guang}}"><view class="guang"><label class="_span">{{guang}}</label></view></block></view></view>

@@ -1,8 +1,10 @@
 <template>
 	<view class="container">
-
 		<view class="user-section">
 			<image class="bg" src="/static/user-bg1.jpg"></image>
+
+
+			<!-- #ifndef APP-PLUS -->
 			<view class="user-info-box">
 				<view class="portrait-box">
 					<image class="portrait" :src="userinfo.avatarUrl || '/static/missing-face.png'"></image>
@@ -11,20 +13,17 @@
 					<text class="username">{{userinfo.nickName || '游客'}}</text>
 				</view>
 			</view>
-			<view class="vip-card-box">
-				<!-- <image class="card-bg" src="/static/vip-card-bg.png" mode=""></image> -->
-				<!-- <navigator url="/pages/user/member/member">
-					<view class="b-btn">
-						立即开通
-					</view> -->
-				</navigator>
-				<view class="tit">
-					<text class="yticon icon-iLinkapp-"></text>
-					普通用户
+			<!-- #endif -->
+			<!-- #ifdef APP-PLUS -->
+			<view class="user-info-box">
+				<view class="portrait-box" @click="jump_toset">
+					<image class="portrait" :src="userinfo.avatarUrl || '/static/app.jpg'"></image>
 				</view>
-				<text class="e-m">如花商城</text>
-				<text class="e-b">欢迎使用开源商城系统</text>
+				<view class="info-box">
+					<text class="username">{{userinfo.nickName || '游客'}}</text>
+				</view>
 			</view>
+			<!-- #endif -->
 		</view>
 
 		<view class="cover-container" :style="[{
@@ -64,7 +63,7 @@
 				</view>
 				<view class="order-item" @click="jump_toorder(2)" hover-class="common-hover" :hover-stay-time="50">
 					<text class="yticon icon-yishouhuo"></text>
-					<text>待收货</text>
+					<text>待发货</text>
 					<view class="number" v-if="list.no_shipment > 0">
 						<uni-badge :text="list.no_shipment" type="error"></uni-badge>
 					</view>
@@ -72,14 +71,21 @@
 				<view class="order-item" @click="jump_toorder(4)" hover-class="common-hover" :hover-stay-time="50">
 					<text class="yticon icon-shouhoutuikuan"></text>
 					<text>退款/售后</text>
-				</view>
-				<view class="bangding" v-if="bang">
+				</view> 
+				<view class="bangding" v-if="is_mobile">  
 					<view class="bd-l">找不到订单和优惠券？绑定手机试试</view>
 					<!-- <view class="bd-r" @click="bind">立即绑定</view> -->
-					<button class="bd-r" size="mini" open-type="getPhoneNumber" @getphonenumber="bind">授权电话</button>
+					<!-- #ifdef MP-WEIXIN -->
+					<button class="bd-r" size="mini" open-type="getPhoneNumber" @getphonenumber="bind">绑定手机</button>
+					<!-- #endif -->
+					<!-- #ifdef H5 -->
+					<button class="bd-r" size="mini" @click="bind">绑定手机</button>
+					<!-- #endif -->
+					
 				</view>
 			</view>
-
+			
+			 
 			<!-- 浏览历史 -->
 			<view class="history-section icon">
 				<view @click="jump_toaddress">
@@ -88,31 +94,20 @@
 				<view @click="jump_tolike">
 					<list-cell icon="icon-shoucang" iconColor="#DF2073" title="我的收藏"></list-cell>
 				</view>
-				<view @click="jump_tocms">
-					<list-cell icon="icon-shoucang_xuanzhongzhuangtai" iconColor="#54b4ef" title="后台(演示-无需权限)"></list-cell>
-				</view>
-				<view @click="jump_toreseller">
-					<list-cell icon="icon-iconfontweixin" iconColor="#54b4ef" title="分销商(演示-无需权限)"></list-cell>
-				</view>
 				<view @click="jump_tomycoupon">
 					<list-cell icon="icon-tuijian" iconColor="#54b4ef" title="我的优惠券"></list-cell>
+				</view> 
+				<!-- 演示 -->
+				<view @click="jump_tocms">
+					<list-cell icon="icon-shoucang_xuanzhongzhuangtai" iconColor="#54b4ef" title="演示后台"></list-cell>
 				</view>
-				<!-- #ifdef APP-PLUS -->
-				<view @click="jump_toset">
-					<list-cell icon="icon-shezhi1" iconColor="#e07472" title="设置" border=""></list-cell>
-				</view>
-				<view @click="clear_cache">
-					<list-cell icon="icon-shezhi1" iconColor="#e07472" title="清空缓存" border=""></list-cell>
-				</view>
-				<!-- #endif -->
 				<view @click="jump_tohelp">
-					<list-cell icon="icon-bangzhu" iconColor="#FF0000" title="关于如花"></list-cell>
+					<list-cell icon="icon-bangzhu" iconColor="#FF0000" title="关于我们"></list-cell>
 				</view>
 			</view>
 			<view class="cpy">
-				<view>如花商城系统</view>
-				<view>Copyringht@2019</view>
-				<!-- <view>www.ruhuashop.com</view> -->
+				<view>{{shop_name}}</view>
+				<view>Copyright@2020</view> 
 			</view>
 		</view>
 
@@ -120,12 +115,21 @@
 	</view>
 </template>
 <script>
+	var _self;
+	import Check from '@/common/check.js'
 	import uniBadge from "@/components/uni/uni-badge/uni-badge.vue"
 	import XcxAuth from "@/components/wx_auth/xcx_auth.vue"
 	import listCell from '@/components/mix-list-cell';
-	import {WxToken} from '@/common/wx_token.js'
+	import {
+		WxToken
+	} from '@/common/wx_token.js'
+	import {
+		Api_url
+	} from '@/common/config.js'
 	var wxtoken = new WxToken();
-	import {CUser} from '@/common/cache/user.js'
+	import {
+		CUser
+	} from '@/common/cache/user.js'
 	var cache_user = new CUser();
 
 	let startY = 0,
@@ -139,7 +143,11 @@
 		},
 		data() {
 			return {
-				bang: true,
+				sys_switch:'',
+				shop_name:this.shop_name,
+				is_mobile: true,
+				is_num: false,
+				gl: 1,
 				list: '',
 				auth: {
 					is_name: false,
@@ -149,75 +157,145 @@
 				coverTransform: 'translateY(0px)',
 				coverTransition: '0s',
 				moving: false,
-				userinfo: ''
+				userinfo: '',
+				switch_list: '',
+				fx_switch: false,
 			}
 		},
-		onLoad() {
-			// #ifdef MP-WEIXIN
-			this.auth.is_name = !this.auth.is_name
-			// #endif
-
-			// #ifdef H5 || APP-PLUS
-			//wxtoken.verify('userinfo'); //手动授权获取openid和头像昵称	
-			
-			const my=cache_user.info()
-			this.userinfo = {
-				avatarUrl: my.headpic,
-				nickName: my.nickname
+		watch: {
+			is_num() {
+				_self.load()
 			}
+		},
+		async onLoad() {
+			_self=this;
+			await _self.prmSwitch()
+			// _self.switch_list = _self.sys_switch
+			_self.check_switch()
+			// #ifdef H5 || APP-PLUS
+			//wxtoken.verify('userinfo'); //手动授权获取openid和头像昵称	 			
 			// #endif
+			_self.check_mobile()
 		},
 		onShow() {
-			cache_user.info()
-			this.get_number()
-		},
-		// #ifndef MP
-		onNavigationBarButtonTap(e) {
-			const index = e.index;
-			if (index === 0) {
-				this.navTo('/pages/set/set');
-			} else if (index === 1) {
-				// #ifdef APP-PLUS
-				const pages = getCurrentPages();
-				const page = pages[pages.length - 1];
-				const currentWebview = page.$getAppWebview();
-				currentWebview.hideTitleNViewButtonRedDot({
-					index
-				});
-				// #endif
-				uni.navigateTo({
-					url: '/pages/notice/notice'
-				})
+			const that = this
+			if (!Check.a()) {
+				return
 			}
+			this.get_my()
+			const t=cache_user.reset_storage()
+			that.get_number()
+			that.check_mobile()
 		},
-		// #endif
-
+		computed: {
+			
+		},
 		methods: {
+			async prmSwitch(){
+				this.sys_switch=await this.promise_switch.then(res=>{
+					return res;
+				})
+				console.log("-----",this.sys_switch)
+				_self.switch_list = _self.sys_switch
+				console.log("++++",_self.switch_list)
+			},
+			get_my(){
+				const that = this
+				const my = cache_user.info_wait()
+				my.then(res => {
+					if (res && res.headpic && res.nickname ) {
+						that.userinfo = {
+							avatarUrl: res.headpic,
+							nickName: res.nickname,
+							web_auth:res.web_auth
+						}
+					} else {
+						//auth传到组件，组件监听auth是否有变动
+						that.auth.is_name = !that.auth.is_name
+					}
+				})
+			},
+			check_mobile(){
+				let my = uni.getStorageSync('my')
+				if(my && my.data.mobile){
+					_self.is_mobile = false
+				}else{
+					_self.is_mobile = true
+				}
+			},
+			load() {
+				const that = _self
+				const my = cache_user.info_wait()
+				my.then(res => {
+					if (res && res.headpic && res.nickname) {
+						that.userinfo = {
+							avatarUrl: res.headpic,
+							nickName: res.nickname
+						}
+					} else {
+						//auth传到组件，组件监听auth是否有变动
+						that.auth.is_name = !that.auth.is_name
+					}
+				})
+				_self.get_number()
+				_self.switch_list = this.sys_switch
+				_self.check_switch()
+				// #ifdef H5 || APP-PLUS
+				//wxtoken.verify('userinfo'); //手动授权获取openid和头像昵称	 			
+				// #endif
+			},
+			check_switch() {
+				const that = _self
+				console.log("check",_self.switch_list.fx_status)
+				that.fx_switch = _self.switch_list.fx_status
+			},
 			bind(e) {
 				// #ifdef MP-WEIXIN
 				let obj = {}
 				obj.iv = e.detail.iv
 				obj.encryptedData = e.detail.encryptedData
+				console.log(obj)
 				//然后在第三方服务端结合 session_key 以及 app_id 进行解密获取手机号
 
-				// this.$api.http.post('xxxx/xxxx',obj).then(res=>{
-				// 	console.log(res)
-				// })
+				_self.$api.http.post('auth/bind_wx_mobile', obj).then(res => {
+					console.log(res)
+					if (res.data == 1) {
+						cache_user.reset_storage()
+						_self.is_num = true
+						_self.is_mobile = false
+						uni.showToast({
+						    title: '绑定成功',
+						    duration: 2000
+						});
+					}
+				})
 				// #endif
-
-
+				// #ifdef H5
+				console.log('跳转手机绑定')
+				uni.navigateTo({
+					url:'./bind_phone/bind_phone'
+				})
+				// #endif
 			},
 			get_number() {
-				this.$api.http.post('order/user/order_date', {}, false).then(res => {
-					this.list = res.data
+				let my = uni.getStorageSync('my')
+				if (!my) {
+					return;
+				}
+				_self.$api.http.post('order/user/order_date', {}, false).then(res => {
+					_self.list = res.data
 				})
 			},
 			get_userinfo(e) {
-				this.userinfo = e
+				_self.userinfo = e
 			},
 			clear_cache() {
-				uni.clearStorageSync()
-				this.$api.msg('已清空')
+				// uni.clearStorageSync()
+				uni.removeStorageSync('token')
+				_self.$api.msg('已清空')
+				uni.switchTab({
+					url: '/pages/index/index'
+				})
 			},
 			jump_tohelp() {
 				uni.navigateTo({
@@ -225,36 +303,61 @@
 				})
 			},
 			jump_toorder(e) {
-				uni.navigateTo({
-					url: '/pages/order/order?state=' + e
-				})
+				console.log(Check.a())
+				if (!Check.a()) {
+					return
+				} else {
+					if (_self.version == 'shops') {
+						uni.navigateTo({
+							url: '/shops/order/order?state=' + e
+						})
+					} else {
+						uni.navigateTo({
+							url: '/pages/order/order?state=' + e
+						})
+					}
+				}
+
 			},
 			jump_toset() {
+				/* if (!Check.a()) {
+					return
+				} */
 				uni.navigateTo({
-					url: '/pages/set/set'
+					url: '/pages/user/set/set'
 				})
 			},
 			jump_toaddress() {
-				uni.navigateTo({
-					url: '/pages/address/address'
-				})
+				if (!Check.a()) {
+					return
+				} else {
+					uni.navigateTo({
+						url: '/pages/address/address'
+					})
+				}
+
 			},
 			jump_tolike() {
+				if (!Check.a()) {
+					return
+				}
 				uni.navigateTo({
 					url: '/pages/user/like/like'
 				})
 			},
 			jump_tomycoupon() {
+				if (!Check.a()) {
+					return
+				}
 				uni.navigateTo({
 					url: '/pages/user/mycoupon/mycoupon'
 				})
 			},
-			jump_toreseller() {
-				uni.navigateTo({
-					url: '/pages/user/reseller/reseller'
-				})
-			},
+		
 			jump_tocms() {
+				if (!Check.a()) {
+					return
+				}
 				uni.navigateTo({
 					url: '/pages/cms/index/index'
 				})
@@ -264,7 +367,7 @@
 			 * navigator标签现在默认没有转场动画，所以用view
 			 */
 			navTo(url) {
-				if (!this.hasLogin) {
+				if (!_self.hasLogin) {
 					// url = '/pages/public/login';
 					uni.navigateTo({
 						url
@@ -286,36 +389,58 @@
 				if (pageAtTop === false) {
 					return;
 				}
-				this.coverTransition = 'transform .1s linear';
+				_self.coverTransition = 'transform .1s linear';
 				startY = e.touches[0].clientY;
 			},
 			coverTouchmove(e) {
 				moveY = e.touches[0].clientY;
 				let moveDistance = moveY - startY;
 				if (moveDistance < 0) {
-					this.moving = false;
+					_self.moving = false;
 					return;
 				}
-				this.moving = true;
+				_self.moving = true;
 				if (moveDistance >= 80 && moveDistance < 100) {
 					moveDistance = 80;
 				}
 
 				if (moveDistance > 0 && moveDistance <= 80) {
-					this.coverTransform = `translateY(${moveDistance}px)`;
+					_self.coverTransform = `translateY(${moveDistance}px)`;
 				}
 			},
 			coverTouchend() {
-				if (this.moving === false) {
+				if (_self.moving === false) {
 					return;
 				}
-				this.moving = false;
-				this.coverTransition = 'transform 0.3s cubic-bezier(.21,1.93,.53,.64)';
-				this.coverTransform = 'translateY(0px)';
+				_self.moving = false;
+				_self.coverTransition = 'transform 0.3s cubic-bezier(.21,1.93,.53,.64)';
+				_self.coverTransform = 'translateY(0px)';
 			}
 		},
+		// #ifndef MP
+		onNavigationBarButtonTap(e) {
+			const index = e.index;
+			if (index === 0) {
+				_self.navTo('/pages/set/set');
+			} else if (index === 1) {
+				// #ifdef APP-PLUS
+				const pages = getCurrentPages();
+				const page = pages[pages.length - 1];
+				const currentWebview = page.$getAppWebview();
+				currentWebview.hideTitleNViewButtonRedDot({
+					index
+				});
+				// #endif
+				uni.navigateTo({
+					url: '/pages/notice/notice'
+				})
+			}
+		},
+		// #endif
 		onPullDownRefresh() {
 			this.get_number()
+			uni.removeStorageSync('my')
+			this.get_my()
 			setTimeout(function() {
 				uni.stopPullDownRefresh();
 			}, 2000);
@@ -354,6 +479,7 @@
 		height: 520upx;
 		padding: 100upx 30upx 0;
 		position: relative;
+		/* background-color: #FB586A; */
 
 		.bg {
 			position: absolute;
@@ -363,6 +489,7 @@
 			height: 100%;
 			filter: blur(1px);
 			opacity: .7;
+
 		}
 	}
 

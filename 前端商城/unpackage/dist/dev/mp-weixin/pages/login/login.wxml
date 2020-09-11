@@ -1,1 +1,0 @@
-<view class="login"><view class="head"><view class="head-img"><image src="{{$root.m0}}" class="_img"></image></view></view><view class="head-name">如花</view><view class="shen">申请获取以下权限</view><view class="huo">·获得你的公开信息（昵称、头像等）</view><view class="btn"><view class="btn-l">暂不登录</view><view class="btn-r">立即登录</view></view></view>

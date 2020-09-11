@@ -7,23 +7,24 @@
 	var apptoken = new AppToken(); 
  
 	export default { 
-		onLaunch: function() { 
+		onLaunch: function(options) { 
 			// #ifdef MP-WEIXIN
 				xcxtoken.verify(); //小程序获取token 
 			// #endif
 			
-			// #ifdef H5
+			// #ifdef H5 
 				//微信公众号获取token -必须是认证的服务号 
-				//wxtoken.verify('userinfo'); //静默获取openid					
+				console.log("h5")
+			//	wxtoken.verify('userinfo'); //静默获取openid					
 			// #endif
 			
 			// #ifdef APP-PLUS 
-				apptoken.verify(); 					
+				apptoken.verify();
 			// #endif
-			console.log('App Launch')
+			
 		},
 		onShow: function() {
-			console.log('App Show')
+			console.log('App Show')			
 		},
 		onHide: function() {
 			console.log('App Hide')
@@ -41,7 +42,7 @@
 		font-style: normal;
 		src: url('https://at.alicdn.com/t/font_1078604_w4kpxh0rafi.ttf') format('truetype');
 	}
-
+	
 	.yticon {
 		font-family: "yticon" !important;
 		font-size: 16px;

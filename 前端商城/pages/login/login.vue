@@ -3,24 +3,62 @@
 		<view class="head">
 			<view class="head-img"><img src="@/imgs/8.jpg"></img></view>
 		</view>
-		<view class="head-name">如花</view>
+		<view class="head-name">商城</view>
 		<view class="shen">
 			申请获取以下权限
 		</view>
 		<view class="huo">·获得你的公开信息（昵称、头像等）</view>
 		<view class="btn">
-			<view class="btn-l">暂不登录</view>
-			<view class="btn-r">立即登录</view>
+			<view class="btn-l" @click="back">暂不登录</view>
+			<view class="btn-r" @click="login()">立即登录</view>
 		</view>
+		<!-- #ifdef APP-PLUS -->
+			<AppAuth :auth="auth" @check_login="check_login"></AppAuth>
+		<!-- #endif -->
+		<!-- #ifdef MP-WEIXIN -->
+			<XcxAuth :auth="auth" @userinfo="get_userinfo"></XcxAuth>
+		<!-- #endif -->
 	</view>
+	
 </template>
 
 <script>
+	import XcxAuth from "@/components/wx_auth/xcx_auth.vue"
 	export default {
 		data() {
 			return {
-				
+				userinfo: '',
+				auth: {
+					is_name: false,
+					is_address: false,
+					is_phone: false,
+				},
 			};
+		},
+		components:{
+			XcxAuth
+		},
+		methods:{
+			login(){
+				this.auth.is_name = !this.auth.is_name
+			},
+			back(){
+				console.log(1)
+				uni.navigateBack({})
+			},
+			get_userinfo(e) {
+				this.userinfo = e
+				uni.navigateBack({})
+			},
+			//APP登录成功
+			check_login(e) {
+					if(e){ 
+						uni.hideLoading()
+						uni.reLaunch({
+							url:"/pages/index/index"
+						})
+					}				
+			},
 		}
 	}
 </script>

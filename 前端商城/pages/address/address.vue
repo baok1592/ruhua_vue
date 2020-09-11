@@ -1,14 +1,14 @@
 <template>
 	<view class="content b-t">
 		<None v-if="list_empty"></None>
-		<view class="list b-b" v-for="(item, index) in addressList" :key="index" @click="checkAddress(item)" v-else>
+		<view class="list b-b" v-for="(item, index) in addressList" :key="index" v-else>
 			<view class="wrapper">
 				<view class="address-box">
 					<text v-if="item.is_default" class="tag">默认</text>
 					<text v-if="!item.is_default" class="tag" @click="set_default(item.id)">设默认</text>
-					<text class="address">{{item.province}} {{item.city}}{{item.county}}</text>
+					<text class="address" @click="checkAddress(item.id)" >{{item.province}} {{item.city}}{{item.county}}</text>
 				</view>
-				<view class="u-box">
+				<view class="u-box" @click="checkAddress(item.id)" >
 					<text class="name">{{item.name}}</text>
 					<text class="mobile">{{item.mobile}}</text>
 				</view>
@@ -31,6 +31,7 @@
 
 <script>
 	import None from "@/components/qy/none.vue"
+	import {common} from '../../common/mixin.js'
 	export default {
 		data() {
 			return {
@@ -51,12 +52,13 @@
 				type_add: 'add'
 			}
 		},
+		mixins:[common],
 		components:{
 			None
 		},
 		onLoad(option) {
 			this.source = option.source;
-			this._load()
+			this.check_login()
 		},
 		onShow() {
 			this._load()
@@ -81,12 +83,15 @@
 				this.form.detail = res.detailInfo
 				this.form.province = res.provinceName
 				this.form.areacode = res.postalCode
-				console.log(this.form)
-				this.$api.http.post('address/add_address', this.form).then(res => {
-					this.$api.msg('添加成功');
-					setTimeout(() => {
-						uni.navigateBack()
-					}, 1000)
+				this.$api.http.post('address/add_address', this.form).then(res => { 
+					if(res.status==200){
+						this.$api.msg('添加成功!');
+						setTimeout(() => {
+							uni.navigateBack()
+						}, 1000)
+					}else{
+						this.$api.msg(res.msg);
+					} 
 				})
 			},
 			_load() {
@@ -108,12 +113,13 @@
 				})
 			},
 			//选择地址
-			checkAddress(item) {
-				if (this.source == 1) {
-					//this.$api.prePage()获取上一页实例，在App.vue定义
-					this.$api.prePage().addressData = item;
+			checkAddress(id) { 
+				this.$api.http.post('address/set_default_address', {
+					id: id
+				}).then(res => { 
+					this._load()
 					uni.navigateBack()
-				}
+				})
 			},
 			addAddress(type, item) {
 				uni.setStorageSync('edit_data', item)

@@ -59,6 +59,8 @@
 </template>
 
 <script>
+	import productModel from '@/model/product.js'
+	
 	export default {
 		data() {
 			return {
@@ -70,7 +72,8 @@
 		},
 		methods:{
 			_load() {
-				this.$api.http.get('product/get_recent',{type:'hot'}).then(res=>{    //热门
+				// this.$api.http.get('product/get_recent',{type:'hot'}).then(res=>{    //热门
+				productModel.getProductRecent().then(res=>{
 					this.productList = res.data
 				})
 			}

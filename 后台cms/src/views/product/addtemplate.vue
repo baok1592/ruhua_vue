@@ -1,4 +1,4 @@
-<template>
+<template> 
 	<div class="root">
 		<el-container>
 			<el-aside width="200px">
@@ -20,8 +20,8 @@
 							</el-form-item>
 							<el-form-item label="计费方式" prop="resource">
 								<el-radio-group v-model="form.method">
-									<el-radio label="1">按件数</el-radio>
-									<el-radio label="2">按重量</el-radio>
+									<el-radio :label="1">按件数</el-radio>
+									<!-- <el-radio label="2">按重量</el-radio> -->
 								</el-radio-group>
 							</el-form-item>
 						</el-form>
@@ -31,7 +31,15 @@
 								<template>
 									<el-table :data="list_show" border style="width: 100%">
 										<el-table-column type="index" label="序号" width="50px"></el-table-column>
-										<el-table-column prop="region" label="可配送区域" width="550px"></el-table-column>
+										
+											<el-table-column prop="region" label="可配送区域" width="550px">
+												<template slot-scope="scope">
+													<template v-for="(item,index) of scope.row.region">
+														{{city_list[item]}}
+													</template>
+												</template>
+											</el-table-column>
+										
 										<el-table-column prop="first" label="首件（个）" width="100px">
 											<template slot-scope="scope">
 												<el-input v-model="scope.row.first" placeholder="请输入"></el-input>
@@ -55,7 +63,7 @@
 										</el-table-column>
 										<el-table-column prop="operation" label="操作" width="300px">
 											<template slot-scope="scope">
-												<el-button @click="edit(scope.row)" type="success" size="small">修改</el-button>
+												<!-- <el-button @click="edit(scope.row)" type="success" size="small">修改</el-button> -->
 
 												<el-button style="margin-left: 10px" type="danger" size="small" slot="reference" @click="del(scope.$index)">删除</el-button>
 											</template>
@@ -71,21 +79,24 @@
 
 						<span slot="footer" class="dialog-footer ">
 							<el-button @click="jumpback">取 消</el-button>
-							<el-button type="primary" @click="onSubmit">确 定</el-button>
+							<el-button type="primary" v-if="type == 'edit'"  @click="sub_edit">提交修改</el-button>
+							<el-button type="primary" v-else @click="onSubmit">确 定</el-button>
 						</span>
 					</div>
 				</el-main>
 			</el-container>
 		</el-container>
 		<!-- 添加弹出框 -->
-		<el-dialog title="选择配送区域" :visible.sync="dialogVisibleadd" width="30%">
-			<el-tree :data="data" show-checkbox node-key="id" ref="tree" highlight-current :props="defaultProps" @check-change="handleCheckChange"
-			 :accordion="true" :check-on-click-node="true">
+		<el-dialog title="选择配送区域" :visible.sync="dialogVisibleadd" width="30%"  >
+			<body style="height: 300px; overflow: scroll;">
+				<el-tree :data="data" show-checkbox node-key="id" ref="tree" highlight-current :props="defaultProps" @check-change="handleCheckChange"
+			 :accordion="true" :check-on-click-node="true" :render-after-expand="false">
 			</el-tree>
-
+			</body>
 			<span slot="footer" class="dialog-footer">
 				<el-button @click="cancel">取 消</el-button>
-				<el-button type="primary" @click="getCheckedNodes">确 定</el-button>
+				
+				<el-button type="primary"  @click="getCheckedNodes">确 定</el-button>
 			</span>
 		</el-dialog>
 	</div>
@@ -98,6 +109,8 @@
 	export default {
 		data() {
 			return {
+				type:'',
+				city_list:[],
 				arr: [],
 				choose: [],
 				input: '',
@@ -105,10 +118,6 @@
 				total: '',
 				list: [],
 				list_show: [],
-				form: {
-					name: '',
-					fanwei: '0'
-				},
 				dialogVisibleadd: false,
 				data: City,
 				defaultProps: {
@@ -134,9 +143,49 @@
 			Header
 		},
 		mounted() {
-			
+			this.type = this.$route.query.type
+			if(this.type == 'edit'){
+				this.get_edit_data()
+			}
+			this.get_all_city()
 		},
 		methods: {
+			sub_edit(){
+				console.log(this.form)
+				this.http.post_show('delivery/admin/edit_delivery',this.form).then(res=>{
+					this.$message({
+						message: '修改成功',
+						type: 'success'
+					});
+					this.jumpback()
+				})
+			},
+			get_edit_data(){
+				let data = JSON.parse(localStorage.getItem('edit_data'))
+				console.log(data)
+				this.form.id = data.id
+				this.form.method = data.method
+				this.form.name = data.name
+				this.form.rule = data.rule
+				this.list_show = data.rule
+				this.list = data.rule
+				console.log(this.form)
+			},
+			//
+			get_all_city(){
+				let arr = []
+				for (let k in City) {
+					let v = City[k]
+					arr[v.id] = v.label
+					if(v.children){
+						for (let g in v.children) {
+							let h = v.children[g]
+							arr[h.id] = h.label
+						}
+					}
+				}
+				this.city_list = arr
+			},
 			show_key(){ 
 				
 			},
@@ -159,6 +208,7 @@
 					}
 				}
 				console.log(this.choose)
+				
 			},
 			jumpback() {
 				this.$router.push({
@@ -182,28 +232,27 @@
 					additional: '',
 					additional_fee: '',
 				}
+				console.log(this.choose)
 				for (let k in this.choose) {
 					let v = this.choose[k]
 					obj.region.push(v.id)
 					obj_b.region.push(v.label + '、')
 				}
 				this.list.push(obj)
-				this.list_show.push(obj_b)
-				this.$refs.tree.setCheckedKeys([]);
+				// this.list_show.push(obj_b)
+				// this.$refs.tree.setCheckedKeys([]);
 				console.log(this.list)
+				this.list_show = this.list
+				this.form.rule = this.list
 			},
 			setCheckedNodes() {
 				this.dialogVisibleadd = true
-				// this.$refs.tree.setCheckedNodes([{
-				// 	id: 1,
-				// 	label: "北京市"
-				// }]);
-
+				this.$refs.tree.setCheckedNodes([])
 			},
-			setCheckedKeys() {
-				this.$refs.tree.setCheckedKeys([]);
+			// setCheckedKeys() {
+			// 	this.$refs.tree.setCheckedKeys([]);
 
-			},
+			// },
 			onSubmit() {
 				this.form.rule = this.list
 				for (let k in this.list_show) {
@@ -226,11 +275,11 @@
 			},
 			del(index){
 				this.list_show.splice(index,1)
-				this.list.splice(index,1)
+				this.list = this.list_show
 			},
 			cancel(){
 				this.dialogVisibleadd = false
-				this.$refs.tree.setCheckedKeys([]);
+				this.$refs.tree.setCheckedNodes([])
 			}
 			//获取
 			// get_template() {

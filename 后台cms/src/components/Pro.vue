@@ -28,24 +28,24 @@
 					</el-form-item>
 
 					<el-row>
-						<el-col :span="4.8">
-							<el-form-item label="售价">
-								<el-input v-model="forms.price" style="width: 100px"></el-input>
-								<span>元</span>
+						<el-col :span="4">
+							<el-form-item label="基础销量">
+								<el-input v-model="forms.sales" style="width: 100px"></el-input>
+								<span>件</span>
 							</el-form-item>
 						</el-col>
 						<el-col :span="4">
-							<el-form-item label="市场价">
+							<el-form-item label="市场价格">
 								<el-input v-model="forms.market_price" style="width: 100px"></el-input>
 								<span>元</span>
 							</el-form-item>
 						</el-col>
-						<el-col :span="4">
-							<el-form-item label="VIP优惠金额">
+						<!-- <el-col :span="4">
+							<el-form-item label="VIP价格">
 								<el-input v-model="forms.vip_price" style="width: 100px"></el-input>
 								<span>元</span>
 							</el-form-item>
-						</el-col>
+						</el-col> -->
 
 						<el-col :span="4">
 							<el-form-item label="运费">
@@ -87,21 +87,20 @@
 						<el-radio v-model="show_sku" :label="0" border size="medium" :checked="show_sku?'':'checked'">无</el-radio>
 						<el-radio v-model="show_sku" :label="1" border size="medium" :checked="show_sku?'checked':''">有</el-radio>
 					</el-form-item>
-					<el-row v-if="show_sku==0">						
-						<el-col :span="4">
-							<el-form-item label="基础销量">
-								<el-input v-model="forms.sales" style="width: 100px"></el-input>
-								<span>件</span>
-							</el-form-item>
-						</el-col>
-						<el-col :span="4">
+					<el-row v-if="show_sku==0">
+						<el-col :span="4.8">
 							<el-form-item label="总库存">
 								<el-input v-model="forms.stock" style="width: 100px"></el-input>
 								<span>件</span>
 							</el-form-item>
 
 						</el-col>
-						
+						<el-col :span="4.8">
+							<el-form-item label="销售价格">
+								<el-input v-model="forms.price" style="width: 100px"></el-input>
+								<span>元</span>
+							</el-form-item>
+						</el-col>
 					</el-row>
 
 					<el-form-item>
@@ -206,7 +205,7 @@
 					shipping_fee: "",
 					market_price: "",
 					price: "",
-					vip_price: "",
+					vip_price: 0,
 					stock: "",
 					max_buy: "",
 					// people: "",

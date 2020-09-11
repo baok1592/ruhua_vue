@@ -1,30 +1,41 @@
 <template>
 	<view class="content">
 		<scroll-view scroll-y class="left-aside">
-			<view v-for="item in flist" :key="item.category_id" class="f-item b-b" :class="{active: item.category_id === currentId}" @click="tabtap(item)">
+			<view v-for="item in flist" :key="item.category_id" class="f-item b-b" :class="{active: item.category_id === currentId}"
+			 @click="tabtap(item)">
 				{{item.category_name}}
 			</view>
 		</scroll-view>
+
 		<scroll-view scroll-with-animation scroll-y class="right-aside" @scroll="asideScroll" :scroll-top="tabScrollTop">
 			<view class="s-list">
 				<view class="nav-title" @click="navToList(0)">——— {{currentName}} ———</view>
 				<view class="t-list">
-					<view v-for="titem in slist" :key="titem.category_id" v-if="titem.pid == currentId"
-						@click="navToList(titem.category_id)" class="t-item" > 
+					<view v-for="titem in slist" :key="titem.category_id" v-if="titem.pid == currentId" @click="navToList(titem.category_id)"
+					 class="t-item">
 						<image :src="getimg+titem.imgs"></image>
 						<text>{{titem.category_name}}</text>
 					</view>
 				</view>
 			</view>
 		</scroll-view>
+		<!-- #ifdef MP-WEIXIN -->
+		<button class="btn1" open-type="contact" v-if="sys_switch && sys_switch.is_serve == 1">
+			<image class="btnImg" src="../../static/images/kefu.png"></image>
+			<!-- <view>客服</view> -->
+		</button>
+		<!-- #endif -->
 	</view>
 </template>
 
 <script>
+	import categoryModel from '@/model/category.js'
+	
 	export default {
 		data() {
 			return {
-				getimg:this.$getimg,
+				sys_switch:'',
+				getimg: this.$getimg,
 				sizeCalcState: false,
 				tabScrollTop: 0,
 				currentId: 1,
@@ -33,57 +44,68 @@
 				slist: []
 			}
 		},
-		onLoad(){ 
-			this.loadData() 
+		onLoad() {
+			this.loadPrmSwitch()
+			this.loadData()
 		},
 		methods: {
-			loadData(){
+			async loadPrmSwitch(){
+				this.sys_switch=await this.promise_switch.then(res=>{
+					return res;
+				})
+				console.log(">>>>")
+				console.log(this.sys_switch);
+			},
+			loadData() {
 				uni.showLoading({
-				    title: '加载中'
+					title: '加载中'
 				});
 				this.flist = []
 				this.slist = []
-				this.tabbar = this.$api.http.get('category/all_category').then(res => {
+				// this.tabbar = this.$api.http.get('category/all_category').then(res => {
+					
+				this.tabbar= categoryModel.getCategoryAll().then( res=>{
+					console.log(res)
 					let list = res.data
-					list.forEach(item=>{
-						if(!item.pid){
-							this.flist.push(item);  //pid为父级id, 没有pid或者pid=0是一级分类
-						}else {
+					list.forEach(item => {
+						if (!item.pid) {
+							this.flist.push(item); //pid为父级id, 没有pid或者pid=0是一级分类
+						} else {
 							this.slist.push(item); //2级分类
 						}
-					}) 					
-					if(list[0]){
-						this.currentName=list[0].category_name;
+					})
+					if (list[0]) {
+						this.currentName = list[0].category_name;
 						this.currentId = list[0].category_id;
 					}
 					uni.hideLoading();
 				})
 			},
 			//一级分类点击
-			tabtap(item){
-				if(!this.sizeCalcState){
+			tabtap(item) {
+				if (!this.sizeCalcState) {
 					this.calcSize();
 				}
-				this.currentName=item.category_name;
+				this.currentName = item.category_name;
 				this.currentId = item.category_id;
-				let index = this.slist.findIndex(sitem=>sitem.pid === item.category_id);
+				let index = this.slist.findIndex(sitem => sitem.pid === item.category_id);
 				this.tabScrollTop = this.slist[index].top;
 			},
 			//右侧栏滚动
-			asideScroll(e){
-				if(!this.sizeCalcState){
+			asideScroll(e) {
+				if (!this.sizeCalcState) {
 					this.calcSize();
 				}
 				let scrollTop = e.detail.scrollTop;
-				let tabs = this.slist.filter(item=>item.top <= scrollTop).reverse();
-				if(tabs.length > 0){
+				let tabs = this.slist.filter(item => item.top <= scrollTop).reverse();
+				if (tabs.length > 0) {
 					this.currentId = tabs[0].pid;
 				}
 			},
 			//计算右侧栏每个tab的高度等信息
-			calcSize(){
+			calcSize() {
 				let h = 0;
-				this.slist.forEach(item=>{
+				this.slist.forEach(item => {
 					let view = uni.createSelectorQuery().select("#main-" + item.category_id);
 					view.fields({
 						size: true
@@ -95,8 +117,8 @@
 				})
 				this.sizeCalcState = true;
 			},
-			navToList(sid){
-				const cid=this.currentId
+			navToList(sid) {
+				const cid = this.currentId
 				uni.navigateTo({
 					url: `/pages/extend-view/productList/productList?cid=${cid}&sid=${sid}`
 				})
@@ -107,29 +129,73 @@
 			setTimeout(function() {
 				uni.stopPullDownRefresh();
 			}, 1500);
-		}
+		},
+		//小程序右上角原生菜单分享按钮，也可是页面中放置的分享按钮
+		onShareAppMessage(res) {
+			let my = uni.getStorageSync('my')
+			let path = "/pages/category/category"
+			if (my && my.data && my.data.sfm) {
+				path = path + '?sfm=' + my.data.sfm
+			}
+			console.log('path:', path)
+			return {
+				title: this.shop_name,
+				path: path
+			}
+		},
 	}
 </script>
 
 <style lang='scss'>
-	page,
+	.content{min-height: 100vh;}
+	/* #ifdef MP-WEIXIN */
+	.btn1{
+	  width: 60rpx;
+	  height: 60rpx; 
+	  font-size: 30rpx; 
+	  position: fixed;
+	  padding: 0px;
+	  margin: 0px;
+	  top:50%;
+	  right:10rpx;
+	  z-index: 999;
+	  background: none !important; 
+	  
+	}
+	
+	.btnImg {
+	  width: 60rpx;
+	  height: 60rpx;
+	  opacity: 0.8;
+	}
+
+	.btn1::after {
+		border: 0;
+	}
+
+	/* #endif */
+
 	.content {
 		height: 100%;
 		background-color: #f8f8f8;
 	}
-	.nav-title{
+
+	.nav-title {
 		text-align: center;
-		padding:20px 0;
+		padding: 20px 0;
 	}
+
 	.content {
 		display: flex;
 	}
+
 	.left-aside {
 		flex-shrink: 0;
 		width: 200upx;
 		height: 100%;
 		background-color: #fff;
 	}
+
 	.f-item {
 		display: flex;
 		align-items: center;
@@ -139,10 +205,12 @@
 		font-size: 28upx;
 		color: $font-color-base;
 		position: relative;
-		&.active{
+
+		&.active {
 			color: $base-color;
 			background: #f8f8f8;
-			&:before{
+
+			&:before {
 				content: '';
 				position: absolute;
 				left: 0;
@@ -157,12 +225,13 @@
 		}
 	}
 
-	.right-aside{
+	.right-aside {
 		flex: 1;
 		overflow: hidden;
 		padding-left: 20upx;
 	}
-	.s-item{
+
+	.s-item {
 		display: flex;
 		align-items: center;
 		height: 70upx;
@@ -170,23 +239,27 @@
 		font-size: 28upx;
 		color: $font-color-dark;
 	}
-	.s-list{
+
+	.s-list {
 		width: 100%;
 		background: #fff;
 	}
-	.t-list{
+
+	.t-list {
 		display: flex;
 		flex-wrap: wrap;
 		width: 100%;
 		background: #fff;
 		padding-top: 12upx;
-		&:after{
+
+		&:after {
 			content: '';
 			flex: 99;
 			height: 0;
 		}
 	}
-	.t-item{
+
+	.t-item {
 		flex-shrink: 0;
 		display: flex;
 		justify-content: center;
@@ -196,8 +269,8 @@
 		font-size: 26upx;
 		color: #666;
 		padding-bottom: 20upx;
-		
-		image{
+
+		image {
 			width: 140upx;
 			height: 140upx;
 		}

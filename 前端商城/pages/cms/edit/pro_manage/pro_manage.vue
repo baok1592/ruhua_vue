@@ -43,6 +43,7 @@
 </template>
 
 <script>
+	import productModel from '@/model/product.js'
 	import uniSegmentedControl from "@/components/uni/uni-segmented-control/uni-segmented-control.vue"
 	export default {
 		components: {uniSegmentedControl},
@@ -63,7 +64,8 @@
 		},
 		methods: {
 			get_pro(){
-				this.$api.http.post('product/mcms/all_goods_info').then(res=>{
+				// this.$api.http.post('product/mcms/all_goods_info').then(res=>{
+				productModel.postProductAllInfo().then(res=>{
 					this.list = res.data
 				})
 			},
@@ -76,11 +78,12 @@
 					title:'确定下架？',
 					success(res){
 						if(res.confirm==true){
-							that.$api.http.put('/mcms/update',{
-								id:id,
-								db:'goods',
-								field:'state'
-							}).then(res=>{
+							// that.$api.http.put('/mcms/update',{
+							// 	id:id,
+							// 	db:'goods',
+							// 	field:'state'
+							// }).then(res=>{
+							productModel.putProductUpdate(id).then(res=>{
 								that.$api.msg('下架成功')
 								that.get_pro()
 							})  
@@ -95,9 +98,10 @@
 					title:'确定删除？',
 					success(res){
 						if(res.confirm==true){
-							that.$api.http.put('product/mcms/del_product',{
-								id:id,
-							}).then(res=>{
+							// that.$api.http.put('product/mcms/del_product',{
+							// 	id:id,
+							// }).then(res=>{
+							productModel.putProductDel(id).then(res=>{
 								that.$api.msg('删除成功')
 								that.get_pro()
 							})
@@ -111,11 +115,12 @@
 					title:'确定上架？',
 					success(res){
 						if(res.confirm==true){
-							that.$api.http.put('/mcms/update',{
-								id:id,
-								db:'goods',
-								field:'state'
-							}).then(res=>{
+							// that.$api.http.put('/mcms/update',{
+							// 	id:id,
+							// 	db:'goods',
+							// 	field:'state'
+							// }).then(res=>{
+							productModel.putProductUpdate(id).then(res=>{
 								that.$api.msg('上架成功')
 								that.get_pro()
 							})

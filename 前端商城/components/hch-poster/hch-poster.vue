@@ -2,10 +2,11 @@
 	<!-- 海报(想让海报显示隐藏要用hidden，v-if关闭后没办法在完整的出来海报) 保存海报按钮和关闭按钮 在html代码中写出来 绑定点击方法然后透明 再用canvas 覆盖 -->
 	<view class="canvas_box" :hidden="canvasFlag">
 		<view class="canvas_box_mask"></view><!-- 遮罩 -->
-		<icon type="cancel" class="canvas_close_btn" size="60" @tap="canvasCancelEvn" color="transparent" /><!-- 关闭 -->
-		<view class="button-wrapper">
+		<icon type="cancel" class="canvas_close_btn" size="60" @tap="canvasCancelEvn"
+		 color="transparent" />
+		<view class="button-wrapper" @tap="saveCanvasImage">
 			<!-- 保存海报按钮 -->
-			<cover-view class="save_btn" @tap="saveCanvasImage"></cover-view>
+			<cover-view class="save_btn" ></cover-view>
 		</view>
 	</view>
 </template>
@@ -26,11 +27,12 @@
 				type: Object,
 				default: {
 					url: '', //商品主图
-					icon: 'https://img0.zuipin.cn/mp_zuipin/poster/hch-hyj.png', //会员价图标
+					icon: '', //会员价图标
 					title: "", //标题
 					discountPrice: "", //折后价格
 					orignPrice: "", //原价
-					code: 'https://img0.zuipin.cn/mp_zuipin/poster/hch-code.png', //小程序码
+					code: '', //小程序码
+					code: '', //小程序码
 				}
 			}
 		},
@@ -133,64 +135,11 @@
 				}
 				return row;
 			},
-			// 获取海报的小程序码
-			codeImg() {
-				return new Promise((resolve, reject) => {
-					request({
-						method: 'get',
-						url: '/spSupport/getwxacodeunlimit',
-						header: {
-							'Content-Type': 'application/x-www-form-urlencoded'
-						},
-						data: {
-							version: this.$parent.globalData.version,
-							scene: `sku=${this.sku}`,
-							page: "pages/product/detail",
-							width: "128px",
-						},
-					}).then((res) => {
-						if (res.data.code == 0) {
-							const fsm = wx.getFileSystemManager();
-							const FILE_BASE_NAME = 'tmp_img_src';
-							let filePath = `${wx.env.USER_DATA_PATH}/${FILE_BASE_NAME}.jpg`;
-							fsm.writeFile({
-								filePath,
-								data: res.data.data,
-								encoding: 'binary',
-								success() {
-									resolve(filePath)
-								},
-								fail() {
-									this.canvasFlag = true;
-									uni.showToast({
-										title: '海报生成失败',
-										duration: 2000,
-										icon: 'none'
-									});
-								},
-							});
-						} else {
-							uni.showToast({
-								title: res.data.message,
-								icon: 'none',
-								duration: 2000,
-								icon: 'none'
-							})
-						}
-					}).catch(() => {
-						this.canvasFlag = true;
-						uni.showToast({
-							title: '海报生成失败',
-							duration: 2000,
-							icon: 'none'
-						});
-					})
-				})
-			},
-
+			  
+			
 			// 生成海报
 			createCanvasImage() {
-				console.log(this.posterObj, 'posterObj')
+				console.log('posterObj：',this.posterObj) 
 				// this.canvasFlag=false;
 				// this.deliveryFlag = false;//关闭分享的弹窗
 				console.log("海报生成中")
@@ -208,16 +157,15 @@
 				let url = this.posterObj.url; //商品主图
 				let zpPriceIcon = this.posterObj.icon //图标
 				let code = this.posterObj.code
-				let closeBtn = 'https://imgzuipin.oss-cn-hangzhou.aliyuncs.com/mp_zuipin/poster/close_btn.png'
-				console.log(ctx)
-				console.log(this)
+				let closeBtn = this.posterObj.closeBtn
+				console.log("aa:",closeBtn) 
 
 				ctx.draw() //清空原来的画图内容
 				ctx.save();
-				this.roundRect(ctx, 50, 100, (this.phoneW - 100), (this.phoneH - 130), 10, '#fff', '#fff'); //绘制海报圆角背景白色的
+				this.roundRect(ctx, 50, 40, (this.phoneW - 100), (this.phoneH - 80), 10, '#fff', '#fff'); //绘制海报圆角背景白色的
 				ctx.restore(); //恢复之前保存的绘图上下文 恢复之前保存的绘图上下午即状态 可以继续绘制
 				ctx.save();
-				this.roundRect(ctx, 50, 100, (this.phoneW - 100), (370) * scaleH, 10, '#f7f7f7', '#f7f7f7'); //绘制海报圆角背景 上半截灰色的
+				this.roundRect(ctx, 50, 40, (this.phoneW - 100), (360) * scaleH, 10, '#f7f7f7', '#f7f7f7'); //绘制海报圆角背景 上半截灰色的
 				ctx.restore();
 				//将网络图片转成本地路径 商品图片
 				wx.getImageInfo({
@@ -228,10 +176,10 @@
 						//问题：在微信小程序使用canvas绘制圆角图片时，微信调试工具正常显示，android真机都不显示。
 						// 原因：因为ctx.clip()剪切区域使用的填充颜色是透明的，所以图片没出来。
 						// 解决方案：将剪切区域设置成实体颜色就好了。
-						_this.roundRect(ctx, (_this.phoneW - ((_this.phoneW - 130))) / 2, 120,
-						 (_this.phoneW - 130),230 * scaleH, 10,
+						_this.roundRect(ctx, (_this.phoneW - ((_this.phoneW - 130))) / 2, 55,
+						 (_this.phoneW - 130),240 * scaleH, 10,
 							'#f7f7f7', '#f7f7f7') //绘制图片圆角背景
-						ctx.drawImage(res.path, (_this.phoneW - ((_this.phoneW - 130))) / 2, 120, (_this.phoneW - 130), 230 * scaleH, 10); //绘制图
+						ctx.drawImage(res.path, (_this.phoneW - ((_this.phoneW - 130))) / 2, 0, (_this.phoneW - 130), 350 * scaleH, 10); //绘制图
 						ctx.restore(); //恢复之前保存的绘图上下文 恢复之前保存的绘图上下午即状态 可以继续绘制
 						ctx.draw(true)
 					},
@@ -269,7 +217,7 @@
 					ctx.font = 'normal bold 14px sans-serif';
 					let text = this.posterObj.title;
 					let row = this.canvasMultiLineText(ctx, text, (this.phoneW - 130), 2); //计算绘制的2行文本
-					let contentTextY = 360; // 这段文字起始的y位置
+					let contentTextY = 320; // 这段文字起始的y位置
 					let leftSpace = 65; // 这段文字起始的X位置
 					let textLineHeight = 18; // 一行文字加一行行间距
 					for (let b = 0; b < row.length; b++) { //一行一行绘制文本
@@ -282,7 +230,7 @@
 				wx.getImageInfo({
 					src: zpPriceIcon,
 					success(res) {
-						ctx.drawImage(res.path, 65, 460 * scaleH, 44, 15)
+						ctx.drawImage(res.path, 65, 415 * scaleH, 44, 15)
 						ctx.draw(true)
 					},
 					fail() {
@@ -299,26 +247,25 @@
 				ctx.setFontSize(12) //设置字体大小，默认10
 				ctx.setFillStyle('#c00000') //文字颜色：默认黑色
 				ctx.font = 'normal 12px sans-serif';
-				ctx.fillText('￥', 110, 476 * scaleH, 60);
+				ctx.fillText('￥', 110, 431 * scaleH, 60);
 				ctx.setFontSize(16) //设置字体大小，默认10
 				let zpPrice = this.posterObj.discountPrice; //会员价格
 				let orignPrice = this.posterObj.orignPrice; //市场价
 
 				let zpPriceW = ctx.measureText(zpPrice).width; //文本的宽度
-				ctx.fillText(zpPrice, 120, 476 * scaleH, zpPriceW);
+				ctx.fillText(zpPrice, 120, 431 * scaleH, zpPriceW);
 
 				ctx.beginPath(); //开始一个新的路径
 				ctx.setFontSize(10) //设置字体大小，默认10
 				ctx.setFillStyle('#999') //文字颜色：默认黑色
 				let orignPriceW = ctx.measureText(orignPrice).width //去掉市场价
-				ctx.fillText(`￥${orignPrice}`, 120 + zpPriceW + 5, 475 * scaleH, orignPriceW); //5价格间距
-				ctx.moveTo(120 + zpPriceW + 5, 470 * scaleH); //设置线条的起始路径坐标
-				ctx.lineTo(120 + zpPriceW + 5 + orignPriceW, 470 * scaleH); //设置线条的终点路径坐标
+				ctx.fillText(`￥${orignPrice}`, 120 + zpPriceW + 5, 431 * scaleH, orignPriceW); //5价格间距
+				ctx.moveTo(120 + zpPriceW + 5, 426 * scaleH); //设置线条的起始路径坐标
+				ctx.lineTo(120 + zpPriceW + 5 + orignPriceW, 426 * scaleH); //设置线条的终点路径坐标
 				ctx.setStrokeStyle('#999')
 				ctx.stroke(); //对当前路径进行描边
 				ctx.closePath(); //关闭当前路径
-				//绘制价格 end
-				// this.codeImg().then((res)=>{
+				//绘制价格 end 
 				// 小程序码
 				wx.getImageInfo({
 					src: code,
@@ -343,7 +290,8 @@
 				ctx.setFontSize(14)
 				ctx.setFillStyle('#2f1709') //文字颜色：默认黑色
 				ctx.font = 'normal bold 14px sans-serif';
-				ctx.fillText('小程序的名称', (_this.phoneW - 90) / 2, 610 * scaleH, 90);
+				console.log('标题长度',this.shop_name.length)
+				ctx.fillText(this.shop_name, ((_this.phoneW - this.shop_name.length*1*14) / 2), 605 * scaleH, 90);
 				// 小程序的名称end
 				// 长按/扫描识别查看商品
 				// ctx.setFontSize(14)
@@ -353,12 +301,12 @@
 				// 长按/扫描识别查看商品end
 				//绘制保存按钮
 				ctx.save();
-				this.roundRect(ctx, (this.phoneW - 160) / 2, (this.phoneH - 55)+60, 160, 36, 18, '#ff3600', '#ff6a00', 'btn')
+				this.roundRect(ctx, (this.phoneW - 160) / 2, (this.phoneH - 55)+30, 160, 36, 18, '#ff3600', '#ff6a00', 'btn')
 				ctx.restore();
 				ctx.setFontSize(14)
 				ctx.setFillStyle('#fff') //文字颜色：默认黑色
 				ctx.font = 'normal bold 14px sans-serif';
-				ctx.fillText('保存图片', (_this.phoneW - 58) / 2, (this.phoneH - 33)+60, 58);
+				ctx.fillText('保存图片', (_this.phoneW - 58) / 2, (this.phoneH - 33)+30, 58);
 				//绘制保存按钮 end
 				wx.hideLoading();
 			},
@@ -375,9 +323,9 @@
 					x: 50,
 					y: 40,
 					width: (this.phoneW - 100), // 画布的宽
-					height: (this.phoneH - 120), // 画布的高
+					height: (this.phoneH - 80), // 画布的高
 					destWidth: (this.phoneW - 100) * 5,
-					destHeight: (this.phoneH - 120) * 5,
+					destHeight: (this.phoneH - 80) * 5,
 					canvasId: 'myCanvas',
 					success(res) {
 						// 2-保存图片至相册
@@ -451,14 +399,14 @@
 
 		.button-wrapper { 
 			width: 320rpx;
-			height: 72rpx;
+			height: 120rpx;
 			position: absolute;
-			bottom: 200rpx;
+			bottom: 140rpx;
 			left: 215rpx;
-			z-index: 16;
+			z-index: 16; 
 		}
 
-		.save_btn {
+		.save_btn {  
 			font-size: 30rpx;
 			line-height: 72rpx;
 			color: #fff;
@@ -466,15 +414,15 @@
 			height: 100%;
 			text-align: center;
 			border-radius: 45rpx;
-			border-radius: 36rpx;
-			z-index: 10;
+			border-radius: 36rpx; 
+			z-index: 10; 
 		}
 
 		.canvas_close_btn { 
 			position: fixed;
 			top: 140rpx;
 			right: 0;
-			z-index: 12;
+			z-index: 12; 
 
 		}
 	}

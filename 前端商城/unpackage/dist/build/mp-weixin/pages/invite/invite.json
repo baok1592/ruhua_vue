@@ -1,6 +1,0 @@
-{
-  "usingComponents": {
-    "xianshi": "/components/qy/xianshi",
-    "uni-countdown": "/components/uni/uni-countdown/uni-countdown"
-  }
-}

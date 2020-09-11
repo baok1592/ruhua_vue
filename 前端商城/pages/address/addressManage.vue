@@ -126,11 +126,15 @@
 					this.$api.msg('请输入正确的的手机号')
 					return
 				}
-				this.$api.http.post('address/add_address', data).then(res => {
-					this.$api.msg('添加成功');
-					setTimeout(() => {
-						uni.navigateBack()
-					}, 1000)
+				this.$api.http.post('address/add_address', data).then(res => { 
+					if(res.status==200){
+						this.$api.msg('添加成功!');
+						setTimeout(() => {
+							uni.navigateBack()
+						}, 1000)
+					}else{
+						this.$api.msg(res.msg);
+					}
 				})
 			}
 

@@ -1,4 +1,5 @@
 import {Api_url} from './config'
+import Vue from 'vue'
 
 class XcxToken {
 	constructor() {
@@ -6,9 +7,16 @@ class XcxToken {
 		this.verifyUrl = Api_url + 'auth/token_verify';
 		this.getInfo = Api_url + 'user/info';
 	}
-
-	verify() {
-		console.log('小程序获取token::')
+	
+	//初始化登陆
+	async verify() { 
+		const swtich=await Vue.prototype.promise_switch.then(res=>{
+			return res;
+		})
+		if(swtich==3){
+			//手机登陆不属于初始化登陆
+			return;
+		} 
 		var that = this;
 		var token = uni.getStorageSync('token'); //获取缓存
 		if (!token) {
@@ -50,6 +58,7 @@ class XcxToken {
 						code: res.code
 					},
 					success: function(res) {
+						console.log(res)
 						uni.setStorageSync('token', res.data.token);
 					}
 				})

@@ -105,10 +105,10 @@
 				total: '',
 				list: [],
 				list_show: [],
-				form: {
-					name: '',
-					fanwei: '0'
-				},
+				// form: {
+				// 	name: '',
+				// 	fanwei: '0'
+				// },
 				dialogVisibleadd: false,
 				data: City,
 				defaultProps: {

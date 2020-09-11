@@ -15,10 +15,12 @@
 
 		<!--banner-->
 		<view class="tui-banner-swiper">
-			<swiper :autoplay="is_auto" :interval="5000" :duration="150" :circular="true" :style="{height:scrollH + 'px'}" @change="bannerChange">
+			<swiper :autoplay="is_auto" :interval="5000" :duration="150" :circular="true" :style="{height:scrollH + 'px'}"
+			 @change="bannerChange">
 				<swiper-item v-if="list.video">
-						<video :style="{height:scrollH+'px'}" style="width: 100%;"  id="myVideo" :src="getimg+list.video.url" @error="videoErrorCallback" show-fullscreen-btn controls objectFit="fill" :poster="getimg+list.banner_imgs_url[0]"></video>
-					
+					<video :style="{height:scrollH+'px'}" style="width: 100%;" id="myVideo" :src="getimg+list.video.url" @error="videoErrorCallback"
+					 show-fullscreen-btn controls objectFit="fill" :poster="getimg+list.banner_imgs_url[0]"></video>
+
 				</swiper-item>
 				<block v-for="(item,index) in list.banner_imgs_url" :key="index">
 					<swiper-item :data-index="index" @click="bigimage(index)">
@@ -26,19 +28,24 @@
 					</swiper-item>
 				</block>
 			</swiper>
-			<!-- <tui-tag type="translucent" shape="circleLeft" size="small">{{bannerIndex+1}}
-				/{{banner_length}}</tui-tag> -->
-			
+			<tui-tag type="translucent" shape="circleLeft" size="small">{{bannerIndex+1}}
+				/{{banner_length}}</tui-tag>
+
 			<view class="xszk" v-if="label_name && zk_status=='start'">{{label_name}}</view>
 		</view>
 		<!--banner-->
+		<!-- #ifdef MP-WEIXIN -->
+		<button class="btn1" open-type="contact">
+			<image class="btnImg" src="../../../static/images/kefu.png"></image>
+			<!-- <view>客服</view> -->
+		</button>
+		<!-- #endif -->
 
-		
 		<!--商品简介-->
 		<view class="tui-pro-detail">
 			<view class="tui-product-title tui-border-radius">
 				<!-- 邀新拼团 -->
-				<!-- <view class="yxpt" v-if="pro_type == 'new_pt'">
+				<view class="yxpt" v-if="pro_type == 'new_pt'">
 					<view class="yxpt_l">
 						<view class="yxpt_l_l">邀新<br />专享</view>
 						<view class="yxpt_l_r">
@@ -46,16 +53,17 @@
 						</view>
 					</view>
 					<view class="yxpt_r">邀请新用户参团<br />限拼购1件</view>
-				</view> -->
+				</view>
 
 
 				<!-- 限时折扣 ↓↓	-->
-				<!-- <block v-if="zk_status=='start'">
+				<block v-if="zk_status=='start'">
 					<view class="detail">
 						<view>
 							<view class="tui-pro-pricebox tui-padding red">
 								<view class="tui-pro-price">
 									<view>￥<text class="tui-price">{{price}}</text></view>
+									<!-- <view class="tag">新品</view> -->
 								</view>
 							</view>
 							<view class="tui-original-price tui-gray">
@@ -66,22 +74,23 @@
 						<view class="time">
 							<view class="juli">距离活动结束还剩</view>
 							<uni-countdown :day="discount_time.days" border-color="#FF4342" color="#FF4342" splitor-color="#fff" :hour="discount_time.hours"
-							 :minute="discount_time.minutes" :second="discount_time.seconds">
+							 :minute="discount_time.minutes" :second="discount_time.seconds" @timeup="timeup(1)">
 							</uni-countdown>
 
 						</view>
 					</view>
 
-				</block> -->
+				</block>
 
 
 				<!-- 一般拼团 ↓↓ -->
-				<!-- <block v-if="pro_type == 'pt'">
+				<block v-if="pro_type == 'pt'">
 					<view class="tui-pro-pricebox tui-padding">
 						<view class="tui-pro-price">
 							<view>{{is_vip?'VIP':'¥'}}
 								<text class="tui-price">{{price}}</text>
 							</view>
+							<!-- <tui-tag :plain="true" type="high-green" shape="circle">新品</tui-tag> -->
 						</view>
 
 						<view class="tui-original-price tui-gray" style="font-weight: 100;flex-grow: 1;" v-if="is_vip">
@@ -89,14 +98,14 @@
 							<text class="tui-line-through">￥{{list.market_price}}</text>
 						</view>
 					</view>
-				</block> -->
+				</block>
 
 				<!-- 普通商品 -->
-				<block >
+				<block v-if="pro_type == 'pro' ">
 					<view class="tui-pro-pricebox tui-padding">
 						<view class="tui-pro-price">
-							<view>{{my.vip?'VIP':'¥'}}
-								<text class="tui-price">{{price}}</text>
+							<view>¥
+								<text class="tui-price">{{list.price}}</text>
 							</view>
 						</view>
 						<view class="tui-original-price tui-gray" style="font-weight: 100;flex-grow: 1;" v-if="is_vip">
@@ -104,13 +113,14 @@
 							<text class="tui-line-through">￥{{list.market_price}}</text>
 						</view>
 					</view>
-					<!-- <view class="kait" v-if="!my.vip">
+					<view class="kait" v-if="vip_switch">
+
 						<view class="kt_01">
 							<img src="@/imgs/vip.png"></img>
 						</view>
-						<view class="kt_02">VIP享超值优惠价¥1</view>
-						<view class="kt_03" @click="jump_vip">立即开通 ></view>
-					</view> -->
+						<view class="kt_02">VIP享超值优惠价¥{{list.price - list.vip_price}}</view>
+						<view v-if="!my.vip" class="kt_03" @click="jump_vip">立即开通 ></view>
+					</view>
 				</block>
 
 
@@ -124,14 +134,13 @@
 						<tui-tag type="gray" tui-tag-class="tui-tag-share tui-size" shape="circleLeft" size="small">
 							<view class="tui-icon tui-icon-partake" style="color:#999;font-size:15px"></view>
 							<text class="tui-share-text tui-gray">分享</text>
-
 						</tui-tag>
 					</button>
 					<!-- #endif -->
 
 
 				</view>
-				<!-- <view class="tui-padding" v-if="zk_status=='wait'">
+				<view class="tui-padding" v-if="zk_status=='wait'">
 					<block>
 						<view class="tui-sub-title tui-size font-red">此商品将于{{list.discount.discount.start_time}}开启限时折扣</view>
 					</block>
@@ -140,11 +149,22 @@
 						<view>月销：{{list.sales}}</view>
 						<view>{{list.city}}</view>
 					</view>
-				</view> -->
+				</view>
 			</view>
 
-			 
-			<view class="tui-basic-info tui-mtop tui-radius-all" v-if="list.sku.length>0">
+			<view class="tui-discount-box tui-radius-all tui-mtop" v-if="couponList.length > 0">
+				<view class="tui-list-cell" @click="toggleMask('show')">
+					<view class="tui-bold tui-cell-title">领券</view>
+					<view class="tui-tag-coupon-box">
+						<template v-for="(item,index) of couponList" v-if="index <= 2">
+							<tui-tag size="small" type="red" shape="circle" tui-tag-class="tui-tag-coupon">满{{item.full}}减{{item.reduce}}</tui-tag>
+						</template>
+					</view>
+					<tui-icon name="more-fill" :size="20" class="tui-right tui-top40" color="#666"></tui-icon>
+				</view>
+			</view>
+
+			<view class="tui-basic-info tui-mtop tui-radius-all" v-if="list.sku && list.sku.length>0">
 				<view class="tui-list-cell" @tap="showPopup">
 					<view class="tui-bold tui-cell-title">已选</view>
 					<view class="tui-selected-box">{{xz_sku_name}}</view>
@@ -152,7 +172,42 @@
 				</view>
 			</view>
 
-			 
+			<!-- *****************  拼团  start ***************** -->
+			<view class="pintuan tui-radius-all tui-mtop" v-if="is_pt && !is_new_pt && list.pt.pt.is_cou_tuan == 0">
+				<view class="pt_top">
+					<view class="pt_top_l">{{pindan.length}}人在拼单，可直接参与</view>
+					<view class="pt_top_r" @click="is_pindan=true">查看更多
+						<tui-icon name="arrowright" :size="22" color='#A0A0A0'></tui-icon>
+					</view>
+				</view>
+				<view class="pt_people">
+					<view class="pt" v-for="(item,index) of pindan" :key="index" v-if="index<2">
+						<block v-if="is_timeup == 1">
+							<view class="pt_l">
+								<img :src="item.c_pic"></img>
+								<view>{{item.c_name}}</view>
+							</view>
+							<view class="pt_m">
+								<view>还差<span>{{item.num}}人</span>拼成</view>
+								<view class="pt_m_2">剩余
+									<uni-countdown :show-day="false" border-color="#fff" color="#6D6D6F" :hour="remain[index].h" :minute="remain[index].m"
+									 :second="remain[index].s" @timeup="timeup(2)"></uni-countdown>
+								</view>
+							</view>
+							<view class="pt_r" @tap="showPopups(item.id)">去拼单</view>
+						</block>
+
+					</view>
+				</view>
+			</view>
+			<view class="haoyou tui-radius-all tui-mtop" v-if="is_pt && list.pt.pt.is_cou_tuan == 1">
+				<view class="hy_l">玩法</view>
+				<view class="hy_m">开团后邀请好友参团，人满发货（不满退款）</view>
+				<view class="hy_r">
+					<tui-icon name="arrowright" :size="22" color='#A0A0A0'></tui-icon>
+				</view>
+			</view>
+			<!-- *****************  拼团 end ***************** -->
 
 			<view class="tui-cmt-box tui-mtop tui-radius-all">
 				<view class="tui-list-cell tui-last tui-between">
@@ -197,7 +252,7 @@
 					<tui-icon name="shop" :size="22" color='#333'></tui-icon>
 					<view class="tui-operation-text tui-scale-small">首页</view>
 				</view>
-				<view class="tui-operation-item " hover-class="opcity" :hover-stay-time="150" @click="jump_tocart">
+				<view class="tui-operation-item " hover-class="opcity" :hover-stay-time="150" v-if="cart_switch" @click="jump_tocart">
 					<tui-icon name="cart" :size="22" color='#333'></tui-icon>
 					<view class="tui-operation-text tui-scale-small">购物车</view>
 					<tui-badge type="danger" size="small" v-if="shop_car_num>0">{{shop_car_num}}</tui-badge>
@@ -209,14 +264,14 @@
 				<view style="width: 20px;"></view>
 			</view>
 			<view class="tui-operation-right tui-right-flex tui-col-7 tui-btnbox-4">
-				<view class="tui-flex-1">
-					<tui-button type="danger" shape="circle" size="mini" @click="showPopup">加入购物车</tui-button>
+				<view class="tui-flex-1" v-if="list.pt && !list.pt.price && cart_switch ">
+					<tui-button type="danger" shape="circle" size="mini" @click="showPopup('car')">加入购物车</tui-button>
 				</view>
-				<!-- <view class="tui-flex-1" v-if="list.pt.price">
+				<view class="tui-flex-1" v-if="list.pt && list.pt.price">
 					<tui-button type="warning" shape="circle" size="mini" @click="showPopupxx">我要开团</tui-button>
-				</view> -->
-				<view class="tui-flex-1">
-					<tui-button type="warning" shape="circle" size="mini" @click="showPopup">立即购买</tui-button>
+				</view>
+				<view class="tui-flex-1" v-else>
+					<tui-button type="warning" shape="circle" size="mini" @click="showPopup('shopping')">立即购买</tui-button>
 				</view>
 			</view>
 		</view>
@@ -242,7 +297,6 @@
 
 				<scroll-view scroll-y class="tui-popup-scroll">
 					<view class="tui-scrollview-box">
-
 						<template v-for="(item,index) of sku_arr.tree">
 							<view class="tui-bold tui-attr-title">{{item.k}}</view>
 							<view class="tui-attr-box">
@@ -257,15 +311,15 @@
 
 						<view class="tui-number-box tui-bold tui-attr-title">
 							<view class="tui-attr-title">数量</view>
-							<tui-numberbox :max="list.stock" :min="1" :value="num" @change="sku_change_num"></tui-numberbox>
+							<tui-numberbox :max="list.stock*1" :min="1" :value="num" @change="sku_change_num"></tui-numberbox>
 						</view>
 
 					</view>
 				</scroll-view>
 				<view class="tui-operation tui-operation-right tui-right-flex tui-popup-btn">
-					<tui-button v-if="!list.pt.price" type="red" tui-button-class="tui-btn-equals" shape="circle" size="mini" class="tui-flex-1"
-					 @click="add_cart">加入购物车</tui-button>
-					<tui-button type="warning" tui-button-class="tui-btn-equals" shape="circle" size="mini" class="tui-flex-1" @click="add_shopping">立即购买</tui-button>
+					<!-- <tui-button v-if="!list.pt.price" type="red" tui-button-class="tui-btn-equals" shape="circle" size="mini" class="tui-flex-1"
+					 @click="sure">确定</tui-button> -->
+					<tui-button type="warning" tui-button-class="tui-btn-equals" shape="circle" size="mini" class="tui-flex-1" @click="sure">确定</tui-button>
 				</view>
 				<view class="tui-icon tui-icon-close-fill tui-icon-close" style="color: #999;font-size:20px" @tap="hidePopup"></view>
 				<!-- <tui-icon name="close-fill" color="#999" class="tui-icon-close" size="20" @tap="hidePopup"></tui-icon> -->
@@ -349,7 +403,8 @@
 						<view class="pt_m">
 							<view><span>{{item.c_name}}</span>还差{{item.num}}人拼成</view>
 							<view class="pt_m_2">剩余
-								<uni-countdown :show-day="false" :hour="remain[index].h" :minute="remain[index].m" border-color="#fff" :second="remain[index].s" color="#6D6D6F" @timeup="timeup"></uni-countdown>
+								<uni-countdown :show-day="false" :hour="remain[index].h" :minute="remain[index].m" border-color="#fff" :second="remain[index].s"
+								 color="#6D6D6F" @timeup="timeup"></uni-countdown>
 							</view>
 						</view>
 						<view class="pt_r" @tap="showPopup">去拼单</view>
@@ -362,6 +417,7 @@
 </template>
 
 <script>
+	import Check from '@/common/check.js'
 	import uniCountdown from "@/components/uni/uni-countdown/uni-countdown.vue"
 	import tuiIcon from "@/components/icon/icon"
 	import tuiTag from "@/components/tag/tag"
@@ -372,6 +428,14 @@
 	import tuiBottomPopup from "@/components/bottom-popup/bottom-popup"
 	import tuiNumberbox from "@/components/numberbox/numberbox"
 	import hchPoster from '@/components/hch-poster/hch-poster.vue'
+	import {
+		Api_url
+	} from '@/common/config.js'
+	import {
+		CUser
+	} from '@/common/cache/user.js'
+	import productModel from "@/model/product.js"
+	var cache_user = new CUser();
 
 	export default {
 		components: {
@@ -388,10 +452,15 @@
 		},
 		data() {
 			return {
-				is_new_pt:false,
-				is_auto:'',
-				my: '',
-				pro_type: 0,
+				// zk_status:"",
+				is_new_pt: false,
+				is_auto: '',
+				my: {
+					vip:{
+						status:0
+					}
+				},
+				pro_type: 'pro',
 				is_timeup: 1,
 				remain: [],
 				time_list: [],
@@ -443,14 +512,34 @@
 				applist: [],
 				collected: '',
 				detailData: '',
-				shareList: ''
+				shareList: '',
+				shopping_type: '',
+				code: '',
+				switch_list:'', 
+				cart_switch:false
 			}
 		},
+		
 		onLoad: function(options) {
 			this.id = options.id
+	
+			console.log("res",this.sys_switch)
+			this.check_switch()
+			// #ifdef H5
+			let token = uni.getStorageSync('token')
+			if (token) {
+				this.load_data()
+				this.is_like(options.id)
+			}
+			// #endif
+
+			// #ifdef MP-WEIXIN
 			this.is_like(options.id)
-			this.load_data()
+
+			// #endif
+
 			this._load()
+
 			let cache = uni.getStorageSync('cart')
 			if (!cache) {
 				this.shop_car_num = 0
@@ -477,8 +566,25 @@
 					this.scrollH = res.windowWidth //APP不支持css的vw，所以用这种
 				}
 			})
+			this.get_code()
 		},
 		computed: {
+			//是否显示会员价
+			async vip_switch(){ 
+				//是否开启会员功能
+				await prmSwitch()
+				console.log("is_vip:",this.switch_list.is_vip)
+				if(this.switch_list.is_vip==1){					
+					//是否会员优惠金额大于0 
+					const vip_price=this.list.vip_price*1
+					if(vip_price<=0){
+						return false
+					}
+					return true
+				}else{
+					return false;
+				} 
+			},
 			//最终售价
 			price() {
 				const old = this.list.price * 1
@@ -492,61 +598,117 @@
 				return result.toFixed(2)
 			},
 			//轮播与视频个数
-			banner_length(){ 
-				//const a=this.list.banner_imgs_url.length 
-				const a= 1;
-				return a
+			banner_length() { 
+				if(this.list.banner_imgs_url){
+					const a = this.list.banner_imgs_url.length
+					const b = this.list.video ? 1 : 0
+					return  a + b
+				}				
+				return 1;	
 			},
 			//限时折扣状态  
-			zk_status(){
-				let is_zk=false	//折扣状态 false wait start end
-				let start_time=0	//限时活动开始时间
-				let end_time=0	//限时活动结束时间
-				let now_time=new Date().getTime()	//当前时间戳
-				if(this.list.discount && this.list.discount.discount){
-					is_zk=true
-				}else{
-					return
-				}					 
-				const stime=this.list.discount.discount.start_time 
-				const etime=this.list.discount.discount.end_time
-				start_time = new Date(stime).getTime() 
+			zk_status() {
+				let is_zk = false //折扣状态 false wait start end
+				let start_time = 0 //限时活动开始时间
+				let end_time = 0 //限时活动结束时间
+				let now_time = new Date().getTime() //当前时间戳
+				if (this.list.discount && this.list.discount.discount) {
+					is_zk = true
+				} else {
+					return false
+				}
+				const stime = this.list.discount.discount.start_time
+				const etime = this.list.discount.discount.end_time
+				start_time = new Date(stime).getTime()
 				end_time = new Date(etime).getTime()
-				console.log('限时开始：',start_time,"限时结束：",end_time)
-				
-				if(now_time < start_time){
+				console.log('限时开始：', start_time, "限时结束：", end_time)
+
+				if (now_time < start_time) {
 					return 'wait';
 				}
-				if(now_time >= start_time && now_time < end_time){
+				if (now_time >= start_time && now_time < end_time) {
 					return 'start';
 				}
-				if(now_time > start_time && now_time >= end_time){
+				if (now_time > start_time && now_time >= end_time) {
 					return 'end';
-				} 
+				}
 			},
 			//活动标签-轮播底部
-			label_name(){
-				if(this.list.discount && this.list.discount.discount && this.list.discount.discount.label){
+			label_name() {
+				if (this.list.discount && this.list.discount.discount && this.list.discount.discount.label) {
 					return this.list.discount.discount.label
 				}
 				return;
 			},
 		},
 		methods: {
+			async prmSwitch(){
+				this.switch_list =await this.promise_switch.then(res=>{
+					return res;
+				})
+			},
+			async check_switch(){
+				const that = this 
+				await prmSwitch()
+				that.cart_switch = this.switch_list.is_cart?true:false
+			},
+			get_code() {
+				const that = this
+				// #ifdef MP-WEIXIN
+				this.$api.http.post('user/get_xcx_code', {
+					path: 'pages/extend-view/productDetail/productDetail',
+					scene: '?id=' + this.id
+				}).then(res => {
+					this.code = res.data
+				})
+
+				// this.code = res.data
+
+				// #endif
+
+				// #ifdef H5
+				/* this.$api.http.post('user/get_web_code', {
+					path: 'pages/extend-view/productDetail/productDetail?id=' + this.id,
+				}).then(res => {
+					this.code = res.data
+				}) */
+				// #endif
+
+			},
+			sure() {
+				console.log(this.shopping_type);
+				if (this.shopping_type == 'car') {
+					this.add_cart()
+				}
+				if (this.shopping_type == 'shopping') {
+					this.add_shopping()
+				}
+			},
 			videoErrorCallback: function(e) {
 				uni.showModal({
 					content: e.target.errMsg,
 					showCancel: false
 				})
 			},
+			//开团
 			showPopupxx() {
+				if(!Check.a()){return}
 				this.popupShow = true
 				let is_kai = 1
 				uni.setStorageSync('is_kai', is_kai)
 			},
 			//倒计时时间到触发
-			timeup() {
-				this.is_timeup = 0
+			timeup(e) {
+				//拼团时间到触发
+				if (e == 2) {
+					this.is_timeup = 0
+				}
+				//限时折扣时间到触发
+				if (e == 1) {
+					this.pro_type = 'pro'
+					this.zk_status = 'end'
+					console.log(this.zk_status);
+				}
 			},
 			//生成海报
 			shareFc() {
@@ -559,7 +721,8 @@
 					title: this.list.goods_name, //标题
 					discountPrice: this.list.price, //折后价格
 					orignPrice: this.list.market_price, //原价
-					code: 'https://img0.zuipin.cn/mp_zuipin/poster/hch-code.png', //小程序码
+					// code: 'https://img0.zuipin.cn/mp_zuipin/poster/hch-code.png', //小程序码
+					code: this.code, //小程序码
 				})
 				this.$forceUpdate(); //强制渲染数据
 				setTimeout(() => {
@@ -586,21 +749,25 @@
 				})
 			},
 			_load() {
-				this.$api.http.get('product/get_product?id=', {
-					id: this.id
-				}).then(res => {
-					this.detail = res.data.discount.id ? false : true //限时折扣 
-					if (!this.detail) {
-						this.zk_price = res.data.discount.reduce_price * 1
-					}
-					this.list = res.data
-					console.log(res.data)
-					if(res.data.video){
-						this.is_auto = false
+				// this.$api.http.get('product/get_product?id=', {
+				// 	id: this.id
+				// }).then(res => {
+				productModel.getProduct(this.id).then(res=>{
+					console.log("descount:",res.data)
+					//限时折扣
+					if(!res.data || !res.data.discount || res.data.discount.id){
+						this.detail=false
 					}else{
+						this.detail=true 
+						this.zk_price = res.data.discount.reduce_price * 1
+					}  
+					this.list = res.data 
+					if (res.data.video) {
+						this.is_auto = false
+					} else {
 						this.is_auto = true
 					}
-					if (this.list.discount.discount) {
+					if (this.list.discount && this.list.discount.discount) {
 						let etime = this.list.discount.discount.end_time
 						//----------------------------------------------计算时间差
 						let now_time = new Date().getTime()
@@ -644,13 +811,14 @@
 					}
 					if (res.data.pt.price) {
 						this.is_pt = true
-						this.$api.http.get('pt/get_item', {
-							id: this.id
-						}).then(res => {
+						// this.$api.http.get('pt/get_item', {
+						// 	id: this.id
+						// }).then(res => {
+						productModel.getPtItem(this.id).then(res=>{
 							this.pindan = res.data
 							this.get_time(res.data)
 						})
-						if(res.data.pt.pt.is_new_user == 1){
+						if (res.data.pt.pt.is_new_user == 1) {
 							this.is_new_pt = true
 						}
 					}
@@ -672,28 +840,41 @@
 					}
 					this.get_pro_type(res.data)
 				})
-				if(uni.getStorageSync('token')){
-					this.$api.http.get('user/info').then(res => {
-						this.my = res.data
-						if (this.my.vip) {
-							this.is_vip = 1
-						}
-					}) 
-				}
-				
-
+				this.wait()
 			},
+			
+			async wait(){				
+				let token = uni.getStorageSync('token')
+				if (token) {					
+					console.log("aa")
+					let my = await cache_user.info_wait()
+					this.my = my
+					console.log("my:",this.my)
+					// if (this.my.vip.status == 1) {
+					// 	this.is_vip = 1
+					// } else {
+					// 	this.is_vip = 0
+					// }
+				}else{
+					this.my={
+						vip:{
+							status:0
+						}
+					}
+				}
+			},
+			
 			//商品分类 普通商品-pro  限时折扣-xs  普通拼团-pt 好友-haoyou_pt 新人拼团-new_pt
 			get_pro_type(item) {
 				const that = this
-				if (item.discount != '[]') {
+				if (item.discount && item.discount.discount) {
 					this.pro_type = 'xs'
 					return;
 				}
 				if (item.pt != '[]') {
 					that.pro_type = 'pt'
-					
-					if(item.pt.pt.is_cou_tuan == 1){
+
+					if (item.pt.pt.is_cou_tuan == 1) {
 						that.pro_type = 'haoyou_pt'
 					}
 					if (item.pt.pt.is_new_user == 1) {
@@ -734,12 +915,10 @@
 				return obj
 			},
 			is_like(id) {
-				if(!uni.getStorageSync('token')){
-					return;
-				}
-				this.$api.http.post('favorite/get_one_fav', {
-					id: id
-				}).then(res => {
+				// this.$api.http.post('favorite/get_one_fav', {
+				// 	id: id
+				// }).then(res => {
+				productModel.postIsLike(this.id).then(res=>{
 					if (!res.data) {
 						this.collected = false
 					} else {
@@ -839,11 +1018,11 @@
 				let arr = {}
 				let cache_obj = uni.getStorageSync('cart')
 				const cache_count = Object.keys(cache_obj).length
-
 				if (cache_count > 0) {
 					for (let [k, v] of Object.entries(cache_obj)) {
 						if (cache_id == k) {
 							that.$api.msg('已存在')
+							that.popupShow = false
 							return;
 						}
 					}
@@ -864,6 +1043,20 @@
 				if (!this.check_sku()) {
 					return;
 				}
+				// #ifndef APP-PLUS
+					if (!Check.a()) {
+						return
+					} 
+				// #endif
+				
+				// #ifdef APP-PLUS
+					const token = uni.getStorageSync('token')
+					if(!token){ 
+						Check.judge_gl()
+						return;
+					} 
+				// #endif
+				
 				console.log('add_shopping')
 				const arr = this._setOrderData() //组合数据
 				if (!arr) {
@@ -874,6 +1067,7 @@
 				uni.setStorageSync('buy', {
 					0: arr
 				})
+				console.log('affff')
 				uni.redirectTo({
 					url: '/pages/order/createOrder?state=buy'
 				})
@@ -896,6 +1090,7 @@
 			},
 			//组合数据
 			_setOrderData() {
+				let my = uni.getStorageSync('my')
 				console.log('price:', this.price)
 				const that = this
 				const sku_index = this.sku_index
@@ -913,6 +1108,9 @@
 				arr['price'] = this.price
 				arr['num'] = this.num
 				arr['stock'] = goods.stock
+				if(goods.vip_price != 0 && ( my.data && my.data.vip && my.data.vip.status == 1)){
+					arr['vip_price'] = goods.vip_price
+				}
 				if (goods.sku.length > 0) {
 					arr['num'] = goods.sku_arr.initialSku.selectedNum
 					arr['sku'] = goods.sku_arr.list[sku_index]
@@ -931,9 +1129,10 @@
 
 			lq_coupon(id) { //领取优惠券
 
-				this.$api.http.get("coupon/add_coupon", {
-					id: id
-				}).then(res => {
+				// this.$api.http.get("coupon/add_coupon", {
+				// 	id: id
+				// }).then(res => {
+				productModel.getAddCoupons(id).then(res=>{
 					if (res.status == 200) {
 						this.$api.msg('领取成功')
 					}
@@ -995,7 +1194,6 @@
 					const v = this.list.banner_imgs_url[k]
 					arr[k] = img + v
 				}
-				console.log('arr:', arr)
 				uni.previewImage({
 					current: 0,
 					urls: arr,
@@ -1012,7 +1210,14 @@
 			closeMenu: function() {
 				this.menuShow = false
 			},
-			showPopup: function() {
+			showPopup: function(e) {
+				if (e == 'car') {
+					this.shopping_type = 'car'
+				}
+				if (e == 'shopping') {
+					
+					this.shopping_type = 'shopping'
+				}
 				this.popupShow = true
 			},
 			showPopups: function(id) {
@@ -1027,7 +1232,7 @@
 				this.value = e.value
 			},
 			collecting: function() {
-
+				if (!Check.a()){ return}
 				if (this.collected) {
 					this.$api.http.put('favorite/del_fav', {
 						id: this.id
@@ -1059,7 +1264,7 @@
 		},
 		onShareAppMessage(res) {
 			return {
-				title: '如花',
+				title: '商城',
 			}
 		},
 		onPullDownRefresh() {
@@ -1078,6 +1283,36 @@
 	page {
 		background: #f7f7f7;
 	}
+	
+	/* #ifdef MP-WEIXIN */
+	.btn1{
+	  width: 60rpx;
+	  height: 60rpx;
+	  // margin-top: 20rpx;
+	  // background-color: white;
+	  color: #999999;
+	  border-radius: 30rpx;
+	  display: flex;
+	  flex-direction: column;
+	  align-items: center;
+	  justify-content: flex-end;
+	  font-size: 30rpx;
+	  margin-left: 90%;
+	  position: fixed;
+	  z-index: 999;
+	  
+	}
+	
+	.btnImg {
+	  width: 60rpx;
+	  height: 60rpx;opacity: 0.5;
+	}
+	
+	.btn1::after {
+	  border: 0; 
+	}
+	
+	/* #endif */
 
 	.kait {
 		margin: 10px;

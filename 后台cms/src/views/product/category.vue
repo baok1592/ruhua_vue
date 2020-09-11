@@ -96,7 +96,7 @@
 				</transition>
 			</el-container>
 		</el-container>
-		<Pic :drawer="drawer" @drawer="is_show" @get_img="get_img" :length="length"></Pic>
+		<Pic ref="child" :drawer="drawer" :father_fun="get_img" :length="length" :iscg="is_cg"></Pic>
 	</div>
 </template>
 
@@ -184,6 +184,7 @@
 				this.drawer = !this.drawer
 			},
 			get_img(e) {
+				this.drawer = false
 				this.img_list = e
 				for (let v in e) {
 					this.editform.category_pic = e[v].id
@@ -191,6 +192,16 @@
 				}
 				console.log(this.form.img_id)
 			},
+			// get_img(e) {
+				
+			// 	for (let k in e) {
+			// 		const v = e[k]
+			// 		this.img_list.push(v)
+			// 		this.forms.banner_imgs.push(v.id + '')
+			// 	}
+			// 	this.length = 6 - this.img_list.length
+			// 	console.log('get_img_end:', e, this.img_list)
+			// },
 			delimg(index) {
 				// this.img_list.splice(index, 1)
 				this.editform.imgs = ''

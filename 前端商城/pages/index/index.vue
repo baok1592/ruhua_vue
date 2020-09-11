@@ -2,30 +2,38 @@
 	<view class="container">
 
 		<!--header-->
+
 		<view class="tui-header">
-			<view class="tui-category" hover-class="opcity" :hover-stay-time="150" @tap="classify">
-				<tui-icon name="manage-fill" color="#fff" :size="22"></tui-icon>
-				<view class="tui-category-scale">分类</view>
+			<view class="notice" v-if="gundong">
+				<uni-notice-bar scrollable="true" single="true" :text="gundong"></uni-notice-bar>
 			</view>
-			<view class="tui-rolling-search">
-				<!-- #ifdef APP-PLUS || MP -->
-				<icon type="search" :size='13' color='#999'></icon>
-				<!-- #endif -->
-				<!-- #ifdef H5 -->
-				<view>
-					<tui-icon name="search" :size='16' color='#999'></tui-icon>
+			<view class="tui-header-dis">
+				<view class="tui-category" hover-class="opcity" :hover-stay-time="150" @tap="classify">
+					<tui-icon name="manage-fill" color="#fff" :size="22"></tui-icon>
+					<view class="tui-category-scale">所有</view>
 				</view>
-				<!-- #endif -->
-				<swiper vertical autoplay circular interval="8000" class="tui-swiper">
-					<swiper-item v-for="(item,index) in hotSearch" :key="index" class="tui-swiper-item" @tap="search">
-						<view class="tui-hot-item">{{item}}</view>
-					</swiper-item>
-				</swiper>
+				<view class="tui-rolling-search" @click="search">
+					<!-- #ifdef APP-PLUS || MAP -->
+					<icon type="search" :size='13' color='#999'></icon>
+					<!-- #endif -->
+					<!-- #ifdef H5 -->
+					<view>
+						<tui-icon name="search" :size='16' color='#999'></tui-icon>
+					</view>
+					<!-- #endif -->
+					<swiper vertical autoplay circular interval="8000" class="tui-swiper">
+						<swiper-item v-for="(item,index) in hotSearch" :key="index" class="tui-swiper-item" >
+							<view class="tui-hot-item">{{item}}</view>
+						</swiper-item>
+					</swiper>
+				</view>
 			</view>
 		</view>
+
+
 		<!--header-->
 		<view class="tui-header-banner">
-			<view class="tui-hot-search">
+			<view class="tui-hot-search" :style="gundong?'margin-top: 70px':'margin-top: 40px'" v-if="sys_switch && sys_switch.hot_swicth == 1">
 				<view style="width: 50px;flex-shrink: 0;">热搜</view>
 				<view class="tui-hot-tag" v-for="(item,index) of resou" :key="index" v-if="index<4">
 					<view @click="tosearch(item)">{{item}}</view>
@@ -45,18 +53,51 @@
 				</view>
 			</view>
 		</view>
- 
 
 		<view class="tui-product-category">
-			<view class="tui-category-item" v-for="(item,index) in category" :key="index" :data-key="item.name"> 
+			<swiper :indicator-dots="true" :interval="5000" :duration="150" class="tui-banner-swiper" style='height:160px'
+			 :circular="true" indicator-color="#ccc" indicator-active-color="rgba(251,88,106, 0.8)">
+				<swiper-item>
+					<view style="display: flex;flex-wrap: wrap;">
+						<view class="tui-category-item" v-for="(item,index) in category" :key="index" :data-key="item.name" v-if="index<8">
+							<!-- <navigator :url="item.url">
+								<image :src="getimg+item.img_id" class="tui-category-img" mode="scaleToFill"></image>
+								<view class="tui-category-name">{{item.nav_name}}</view>
+							</navigator> -->
+
+							<img :src="getimg+item.img_id" @click="jump(item.url,item.id,item.url_name)" class="tui-category-img" mode="scaleToFill"></img>
+							<view class="tui-category-name" @click="jump(item.url,item.id,item.url_name)">{{item.nav_name}}</view>
+
+						</view>
+					</view>
+				</swiper-item>
+				<swiper-item>
+					<view style="display: flex;flex-wrap: wrap;">
+						<view class="tui-category-item" v-for="(item,index) in category" :key="index" :data-key="item.name" v-if="index>7">
+							<navigator :url="item.url">
+								<block v-if="item.nav_name == '优惠券'" @click="check">
+									<image :src="getimg+item.img_id" class="tui-category-img" mode="scaleToFill"></image>
+									<view class="tui-category-name">{{item.nav_name}}</view>
+								</block>
+								<block v-else>
+									<image :src="getimg+item.img_id" class="tui-category-img" mode="scaleToFill"></image>
+									<view class="tui-category-name">{{item.nav_name}}</view>
+								</block>
+
+							</navigator>
+						</view>
+					</view>
+				</swiper-item>
+			</swiper>
+			<!-- <view class="tui-category-item" v-for="(item,index) in category" :key="index" :data-key="item.name"> 
 				<navigator :url="item.url">
 					<image :src="getimg+item.img_id" class="tui-category-img" mode="scaleToFill"></image>
 					<view class="tui-category-name">{{item.nav_name}}</view>
 				</navigator>
-			</view>
+			</view> -->
 		</view>
 
-	<!-- 	 <view class="tui-product-box tui-pb-20 tui-bg-white">
+		<!-- 	 <view class="tui-product-box tui-pb-20 tui-bg-white">
 			<view class="tui-group-name" @tap="more">
 				<text>新人专享</text>
 				<tui-icon name="arrowright" :size="20" color="#555"></tui-icon>
@@ -65,11 +106,18 @@
 				<image src="../../static/images/mall/activity/activity_1.jpg" class="tui-activity-img" mode="widthFix"></image>
 				<image src="../../static/images//mall/activity/activity_2.jpg" class="tui-activity-img" mode="widthFix"></image>
 			</view>
-		</view> --> 
+		</view> -->
+		<!-- #ifdef MP-WEIXIN -->
+		
+		<button class="btn1" open-type="contact" v-if="sys_switch && sys_switch.is_serve == 1">
+			<image class="btnImg" src="../../static/images/kefu.png"></image>
+			<!-- <view>客服</view> -->
+		</button>
+		<!-- #endif -->
 
 		<view class="tui-product-box tui-pb-20 tui-bg-white">
 			<view class="tui-group-name">
-				<text>新品推荐</text> 
+				<text>新品推荐</text>
 			</view>
 			<view class="tui-new-box">
 				<view class="tui-new-item" :class="[index!=0 && index!=1 ?'tui-new-mtop':'']" v-for="(item,index) in newProduct"
@@ -101,10 +149,10 @@
 							<view class='pic'>
 								<image :src="getimg+item.imgs" class="tui-pro-img" style="height: 46vw;width: 46vw;" />
 								<view v-if="item.stock==0">
-								  <view class='cont-img'> </view>
-								  <view class='maiguang'>
-									<img src='@/imgs/x.png'></img>
-								  </view>
+									<view class='cont-img'> </view>
+									<view class='maiguang'>
+										<img src='@/imgs/x.png'></img>
+									</view>
 								</view>
 							</view>
 							<view class="tui-pro-content">
@@ -114,7 +162,8 @@
 										<text class="tui-sale-price" v-if="is_vip">vip{{item.price}}</text>
 										<text class="tui-sale-price" v-else>￥{{item.price}}</text>
 										<text class="tui-factory-price" v-if="is_vip">￥{{item.market_price}}</text>
-										
+										<xianshi v-if="item.discount && item.discount.reduce_price" title="限时" :price="item.price-item.discount.reduce_price*1"></xianshi>
+										<xianshi v-if="item.pt && item.pt.price" title="拼团" :price="(item.price*100-item.pt.price*100)/100"></xianshi>
 									</view>
 									<!-- <view class="tui-pro-pay">{{item.sales}}人付款</view> -->
 								</view>
@@ -128,24 +177,25 @@
 					<block v-for="(item,index) in productList" :key="index" v-if="(index+1)%2==0">
 						<!--商品列表-->
 						<view class="tui-pro-item" hover-class="hover" :hover-start-time="150" @tap="detail(item.goods_id)">
-							
+
 							<view class='pic'>
 								<image :src="getimg+item.imgs" class="tui-pro-img" style="height: 46vw;width: 46vw;" />
 								<view v-if="item.stock==0">
-								  <view class='cont-img'> </view>
-								  <view class='maiguang'>
-									<img src='@/imgs/x.png'></img>
-								  </view>
+									<view class='cont-img'> </view>
+									<view class='maiguang'>
+										<img src='@/imgs/x.png'></img>
+									</view>
 								</view>
 							</view>
 							<view class="tui-pro-content">
 								<view class="tui-pro-tit">{{item.goods_name}}</view>
-								<view>
+								<view> 
 									<view class="tui-pro-price">
 										<text class="tui-sale-price" v-if="is_vip">vip {{item.price}}</text>
 										<text class="tui-sale-price" v-else>￥{{item.price}}</text>
 										<text class="tui-factory-price" v-if="is_vip">￥{{item.market_price}}</text>
-										
+										<xianshi v-if="item.discount.reduce_price" title="限时" :price="item.price-item.discount.reduce_price*1"></xianshi>
+										<xianshi v-if="item.pt.price" title="拼团" :price="item.price-item.pt.price*1"></xianshi>
 									</view>
 									<!-- <view class="tui-pro-pay">{{item.sales}}人付款</view> -->
 								</view>
@@ -166,18 +216,22 @@
 		<!-- <Coupon :coupon="coupon" :coulist="coulist" @close_add="close_add"></Coupon> -->
 		<!-- 弹出 -->
 		<!-- #ifdef APP-PLUS -->
-			<Xieyi></Xieyi>		
+		<Xieyi></Xieyi>
 		<!-- #endif -->
 	</view>
 </template>
 <script>
+	import uniNoticeBar from '@/components/uni/uni-notice-bar/uni-notice-bar.vue'
+	import Check from '@/common/check.js'
 	import Xieyi from "@/components/qy/xieyi"
 	import tuiIcon from "@/components/icon/icon"
-	import Coupon from "@/components/qy/Coupon" 
+	import Coupon from "@/components/qy/Coupon"
 	import tuiTag from "@/components/tag/tag"
 	import tuiLoadmore from "@/components/loadmore/loadmore"
 	import tuiNomore from "@/components/nomore/nomore"
 	import Cache from "@/common/cache.js"
+	import xianshi from "@/components/qy/xianshi"
+	import productModel from '@/model/product.js'
 	export default {
 		components: {
 			tuiIcon,
@@ -185,11 +239,15 @@
 			tuiLoadmore,
 			tuiNomore,
 			Coupon,
-			Xieyi
+			xianshi,
+			Xieyi,
+			uniNoticeBar
 		},
 		data() {
 			return {
-				xy:true,
+				sys_switch:'',
+				gundong: '',
+				xy: true,
 				resou: '',
 				coulist: [1, 2, 3, 4],
 				coupon: true,
@@ -221,12 +279,20 @@
 
 				pageIndex: 1,
 				loadding: false,
-				pullUpOn: true
+				pullUpOn: true,
+				switch_list: '',
+				fx_switch: false
 			}
 		},
-		onLoad() {
+		onLoad(options) {
+			this.prmSwitch()
+			
+			if (options.sfm) {
+				uni.setStorageSync('level_one', options.sfm) //上级分销的身份码
+			}
+			
+			this.check_switch()
 			this._load()
-			console.log(this.$getimg)
 			// this.laoddata()
 			// let time = Date.parse(new Date()) / 1000 //当前时间
 
@@ -242,6 +308,46 @@
 			// }
 		},
 		methods: {
+			async prmSwitch(){
+				this.sys_switch=await this.promise_switch.then(res=>{
+					return res;
+				})
+				this.switch_list = this.sys_switch
+			},
+			async check_switch() {
+				const that = this
+				await this.prmSwitch()
+				that.fx_switch = that.switch_list.fx_status == 0 ? false : true
+			},
+			jump(url, id, name) {
+				const that = this
+				if (name == "优惠券") { //优惠券
+					if (!Check.a()) {
+						return
+					}
+					console.log(url,id,name)
+				}
+				if (name == '分销商品') { //分销
+					//判断分销开关是否开启
+					if (!this.fx_switch) {
+						this.$api.msg('未开启分销模式')
+						return
+						url = '/pages/extend-view/productList/productList?type=no_fx'
+						uni.navigateTo({
+							url: url
+						})
+						return
+					}
+				}
+				console.log(url)
+				uni.navigateTo({
+					url: url
+				})
+				
+				console.log('跳转')
+
+			},
+
 			close_add() {
 				this.coupon = false
 			},
@@ -263,24 +369,38 @@
 				}
 			},
 			_load() {
+				console.log('开始获取数据')
+				this.$api.http.get('article/type_article?type=3').then(res => {
+					if(res.data && res.data[0]){
+						this.gundong = res.data[0].title
+					}
+				})
 				this.$api.http.get('search/record').then(res => { //首页banner 
 					this.resou = res.data
-					if(res.data==1){
+					if (res.data == 1) {
 						return;
 					}
 					this.hotSearch = res.data.slice(0, 3)
 					uni.setStorageSync('hotSearch', this.resou)
 				})
-				let a = this.$api.http.get('product/get_recent', {type: 'hot'})//热门推荐
-				let b = this.$api.http.get('product/get_recent', {type: 'new'})//新品推荐
-				let c = this.$api.http.get('nav/get_nav')//导航
-				let d = this.$api.http.get('banner/get_banner?id=1')//轮播图
-				
+				let a= productModel.getProductHotRecent()
+				// let a = this.$api.http.get('product/get_recent', {
+				// 	type: 'hot'
+				// }) //热门推荐
+				let b=productModel.getProductNewRecent()
+				// let b = this.$api.http.get('product/get_recent', {
+				// 	type: 'new'
+				// }) //新品推荐
+				let c = this.$api.http.get('nav/get_nav') //导航
+				// let d = this.$api.http.get('banner/get_banner?id=1') //轮播图
+				let d = this.$api.http.get('banner/banner_all_item') //轮播图
+
 				Promise.all([a, b, c, d]).then(res => {
+					console.log('获取数据成功')
 					this.productList = res[0].data
 					this.newProduct = res[1].data
 					this.category = res[2].data
-					this.banner = res[3].data.items
+					this.banner = res[3].data
 				})
 			},
 			_CheckCacheTime(times, xs = 5) {
@@ -289,13 +409,21 @@
 				return time > end_time ? true : false
 			},
 			detail: function(id) {
+				let url = '/pages/extend-view/productDetail/productDetail?id=' + id
+				// #ifdef H5
+					let my = uni.getStorageSync('my') 
+					if (my && my.data && my.data.sfm) {
+						url = url+'&sfm=' + my.data.sfm
+					}					
+				// #endif
 				uni.navigateTo({
-					url: '/pages/extend-view/productDetail/productDetail?id=' + id
+					url: url
 				})
+
 			},
-			classify: function() {
-				uni.switchTab({
-					url: '/pages/category/category'
+			classify() {
+				uni.navigateTo({
+					url: '/pages/extend-view/productList/productList'
 				})
 			},
 			more: function(e) {
@@ -305,15 +433,18 @@
 				})
 
 			},
-			search: function() {
+			search(){
 				uni.navigateTo({
 					url: '/pages/extend-view/news-search/news-search'
 				})
 			},
-			jump_article(id,type) {
-				let url='/pages/article/article?id='+id
-				if(type=='goods'){
-					url='/pages/extend-view/productDetail/productDetail?id='+id
+			jump_article(id, type) {
+				if(!type){
+					return
+				}
+				let url = '/pages/article/article?id=' + id
+				if (type == 'goods') {
+					url = '/pages/extend-view/productDetail/productDetail?id=' + id
 				}
 				uni.navigateTo({
 					url: url
@@ -323,7 +454,7 @@
 				console.log(this.resou)
 				console.log(item)
 				uni.navigateTo({
-					url:'../extend-view/productList/productList?key='+item
+					url: '../extend-view/productList/productList?key=' + item
 				})
 			}
 		},
@@ -333,11 +464,20 @@
 				uni.stopPullDownRefresh();
 			}, 2000);
 		},
+
+		//小程序右上角原生菜单分享按钮，也可是页面中放置的分享按钮
 		onShareAppMessage(res) {
-			return {
-				title: '如花',
+			let my = uni.getStorageSync('my')
+			let path = "/pages/index/index"
+			if (my && my.data && my.data.sfm) {
+				path = path + '?sfm=' + my.data.sfm
 			}
-		}
+			console.log('path:', path)
+			return {
+				title: this.shop_name,
+				path: path
+			}
+		},
 	}
 </script>
 
@@ -345,7 +485,35 @@
 	page {
 		background: #f7f7f7;
 	}
-	
+
+	/* #ifdef MP-WEIXIN */
+	.btn1 {
+		width: 60rpx;
+		height: 60rpx;
+		font-size: 30rpx;
+		position: fixed;
+		padding: 0px;
+		margin: 0px;
+		right: 10rpx;
+		z-index: 999;
+		background: none !important;
+
+	}
+
+	.btnImg {
+		width: 60rpx;
+		height: 60rpx;
+		opacity: 0.8;
+	}
+
+	.btn1::after {
+		border: 0;
+	}
+
+	/* #endif */
+
+
+
 	.container {
 		padding-bottom: 100rpx;
 		color: #333;
@@ -391,23 +559,33 @@
 	}
 
 	/*tabbar*/
+	.notice {
+		width: 100%;
+		height: 30px;
+	}
 
 	.tui-header {
 		width: 100%;
-		height: 100rpx;
-		padding: 0 30rpx 0 20rpx;
 		box-sizing: border-box;
 		background: #FB586A;
 		display: flex;
+		flex-wrap: wrap;
 		align-items: center;
 		justify-content: space-between;
-		position: fixed;
+		position: absolute;
 		left: 0;
-		top: 0;
+		top: 0px;
 		/* #ifdef H5 */
-		top: 44px; 
+		top: 0px;
 		/* #endif */
 		z-index: 999;
+
+		.tui-header-dis {
+			display: flex;
+			padding-top: 4px;
+			width: 100%;
+			padding: 10px 30rpx 0 20rpx;
+		}
 	}
 
 	.tui-rolling-search {
@@ -464,9 +642,11 @@
 		text-overflow: ellipsis;
 	}
 
+
+
 	.tui-header-banner {
-		padding-top: 100rpx;
 		box-sizing: border-box;
+		padding: 10px 0 0px 0rpx;
 		background: #FB586A;
 	}
 
@@ -545,29 +725,29 @@
 	}
 
 	/* #ifdef APP-PLUS || MP */
-	.tui-banner-swiper .wx-swiper-dot {
-		width: 8rpx;
-		height: 8rpx;
-		display: inline-flex;
-		background: none;
-		justify-content: space-between;
-	}
+	// .tui-banner-swiper .wx-swiper-dot {
+	// 	width: 8rpx;
+	// 	height: 8rpx;
+	// 	display: inline-flex;
+	// 	background: none;
+	// 	justify-content: space-between;
+	// }
 
-	.tui-banner-swiper .wx-swiper-dot::before {
-		content: '';
-		flex-grow: 1;
-		background: rgba(255, 255, 255, 0.8);
-		border-radius: 16rpx;
-		overflow: hidden;
-	}
+	// .tui-banner-swiper .wx-swiper-dot::before {
+	// 	content: '';
+	// 	flex-grow: 1;
+	// 	background: rgba(255, 255, 255, 0.8);
+	// 	border-radius: 16rpx;
+	// 	overflow: hidden;
+	// }
 
-	.tui-banner-swiper .wx-swiper-dot-active::before {
-		background: #fff;
-	}
+	// .tui-banner-swiper .wx-swiper-dot-active::before {
+	// 	background: #fff;
+	// }
 
-	.tui-banner-swiper .wx-swiper-dot.wx-swiper-dot-active {
-		width: 16rpx;
-	}
+	// .tui-banner-swiper .wx-swiper-dot.wx-swiper-dot-active {
+	// 	width: 16rpx;
+	// }
 
 	/* #endif */
 
@@ -600,7 +780,7 @@
 
 	.tui-product-category {
 		background: #fff;
-		padding: 80rpx 20rpx 40rpx 20rpx;
+		padding: 45px 20rpx 0rpx 20rpx;
 		box-sizing: border-box;
 		display: flex;
 		align-items: center;
@@ -613,18 +793,20 @@
 
 	.tui-category-item {
 		width: 25%;
-		height: 130rpx;
+		height: 120rpx;
 		display: flex;
 		align-items: center;
 		justify-content: space-between;
 		flex-direction: column;
-		padding: 30rpx 0 10px;margin-bottom: 5px;
+		margin: 0px 0 0px;
+		margin: 10px 0 0;
+
 	}
 
 	.tui-category-img {
 		height: 80rpx;
 		width: 80rpx;
-		display: block;
+
 	}
 
 	.tui-category-name {
@@ -772,17 +954,34 @@
 		box-sizing: border-box;
 		border-radius: 12rpx;
 		overflow: hidden;
-		
-		.pic {position: relative;
-			.maiguang{position: absolute;top: 50%;left: 50%;z-index: 199;width: 100px;height: 100px;margin:-50px 0 0 -50px;}
-			.maiguang img{width: 100px;height: 100px;}
+
+		.pic {
+			position: relative;
+
+			.maiguang {
+				position: absolute;
+				top: 50%;
+				left: 50%;
+				z-index: 199;
+				width: 100px;
+				height: 100px;
+				margin: -50px 0 0 -50px;
+			}
+
+			.maiguang img {
+				width: 100px;
+				height: 100px;
+			}
+
 			.cont-img {
 				background-color: #000000;
 				opacity: 0.3;
 				width: 100%;
 				height: 100%;
 				z-index: 99;
-				position: absolute;top: 0;left: 0;
+				position: absolute;
+				top: 0;
+				left: 0;
 			}
 		}
 	}
@@ -815,17 +1014,31 @@
 	}
 
 	.tui-pro-price {
-		padding-top: 18rpx;display: flex;flex-wrap: wrap;
+		padding-top: 18rpx;
+		display: flex;
+		flex-wrap: wrap;
 	}
 
 	.tui-sale-price {
-		font-size: 14px;margin-bottom: 5px;
+		/* #ifndef H5 */
+		font-size: 14px;
+		/* #endif */
+		/* #ifdef H5 */
+		font-size: 12px;
+		/* #endif */
+		margin-bottom: 5px;
 		font-weight: 500;
 		color: #FB586A;
+		
 	}
 
 	.tui-factory-price {
-		font-size: 24rpx;
+		/* #ifndef H5 */
+		font-size: 14px;
+		/* #endif */
+		/* #ifdef H5 */
+		font-size: 12px;
+		/* #endif */
 		color: #a0a0a0;
 		padding-left: 12rpx;
 	}

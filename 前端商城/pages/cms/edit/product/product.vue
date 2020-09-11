@@ -2,9 +2,8 @@
 	<view class="product">
 		<view class="pic">
 			商品幻灯图(可拖动)
-			<view>
-				<robby-image-upload :value="pics" :server-url="serverUrl" :form-data="formData" :server-url-delete-image="DelServelUrl"
-				 @delete="delImage" @add="onImg" @move="onMove" :limit="3"></robby-image-upload>
+			<view class="tui-box-upload">
+				<tui-upload :serverUrl="serverUrl" :limit="6"  @complete="result" @remove="remove" :fileKeyName="'img'"></tui-upload>
 			</view>
 		</view>
 		<view class="top">
@@ -158,7 +157,6 @@
 			<textarea v-model="goods.content"></textarea>
 		</view>
  
-
 		<view class="H50"></view>
 		<view class="p_btn">
 			<!-- <cover-view class="btn-save">    -->
@@ -201,21 +199,22 @@
 <script>
 	import uniIcon from "@/components/uni/uni-icon/uni-icon.vue"
 	import uniPopup from "@/components/uni/uni-popup/uni-popup.vue"
-	import robbyImageUpload from '@/components/plan-image-upload/up_img'
+	import tuiUpload from '@/components/tui-upload/tui-upload'
 	import {
 		Api_url
 	} from '@/common/config'
+	import productModel from '@/model/product.js'
 	export default {
 		data() {
 			return {
 				groupList: '',
 				group_id: '',
-
 				pics: [],
 				photos: [],
 				c_pics: [],
 				c_photos: [],
-				serverUrl: Api_url + 'up_img',
+				imageData: [],
+				serverUrl: Api_url +'index/upload/img',
 				DelServelUrl: Api_url + 'del_img',
 				formData: {
 					use: 'pro_banner',
@@ -314,7 +313,7 @@
 		components: {
 			uniIcon,
 			uniPopup,
-			robbyImageUpload
+			tuiUpload
 		},
 		computed: {
 			is_sku() {
@@ -353,9 +352,7 @@
 		onLoad(options) {
 			this._request()
 			this.id = options.id
-			this.get_groupList()
-
-
+			// this.get_groupList()
 		},
 		onShow() {
 			const group_data = uni.getStorageSync('groupList')
@@ -373,6 +370,15 @@
 
 		},
 		methods: {
+			result: function(e) {
+				console.log(e)
+				this.imageData = e.imgArr;
+			},
+			remove: function(e) {
+				//移除图片
+				console.log(e)
+				let index = e.index
+			},
 			is_set_category(){ 
 				this.show_cate_list=true
 			},
@@ -424,13 +430,16 @@
 				let cate = this.category_list
 				this.is_edit = true
 				const that = this
-				this.$api.http.get('/product/get_product',{id}).then(res2 => {
+				// this.$api.http.get('/product/get_product',{id}).then(res2 => {
+				productModel.getProduct(id).then(res2=>{
 					const res=res2.data
+					console.log(res)
 					this.goods = res
 					this.pics = res.banner_imgs_list
 					this.photos = res.banner_imgs
-					this.c_pics = res.c_imgs_list
-					this.c_photos = res.c_imgs
+					this.c_pics = res.banner_imgs_list
+					this.c_photos = res.banner_imgs
+					console.log(this.c_photos)
 					if(res.shop_category_id && res.shop_category_id[0]){
 						this.edit_group_id = res.shop_category_id
 					}else{
@@ -566,13 +575,15 @@
 						return;
 					}
 				}
+				this.photos = this.imageData
 				if(this.photos.length<1){
 					that.$api.msg('未上传商品幻灯图')
 					return;
 				}
 				
-				this.goods.banner_imgs = this.photos
-				this.goods.c_imgs = this.c_photos
+				this.goods.banner_imgs = this.imageData
+				
+				this.goods.c_imgs = this.imageData
 				that.$api.http.post('shop/add_product', that.goods).then(res => {
 					that.$api.msg('操作成功')
 					setTimeout(() => {
@@ -585,21 +596,26 @@
 
 			},
 			sub_edit() {
+				console.log('点击了修改')
 				const that = this
-				console.log('sku:', this.sku)
-				if (this.sku.length != 0) {
+				console.log('sku:', this.sku.length)
+				if (that.sku.length > 0 || that.sku.length < 0) {
 					that.goods.sku = that.sku
 				} else {
 					that.goods.sku = []
 				}
 				that.goods.goods_id = this.id
 				this.goods.banner_imgs = this.photos
-				if (this.c_photos.length > 0) {
-					this.goods.c_imgs = this.c_photos
+				console.log(this.c_photos)
+				// -----------------------------------------------------------------修改商品报错点
+				if (that.c_photos.length > 0) {
+					that.goods.banner_imgs = that.c_photos
 				} else {
-					this.goods.c_imgs = [] //避免空让c_imgs由[]变成""
+					that.goods.banner_imgs = [] //避免空让c_imgs由[]变成""
 				}
-				that.$api.http.post('shop/edit_product', that.goods).then(res => {
+				// -------------------------------------------------------------------修改商品报错点结束
+				// that.$api.http.post('product/mcms/edit_product', that.goods).then(res => {
+				productModel.postProductEdit(that.goods).then(res=>{
 					that.$api.msg('操作成功')
 					setTimeout(() => {
 						uni.redirectTo({
@@ -700,7 +716,7 @@
 		},
 		onPullDownRefresh() {
 			this._request()
-			this.get_groupList()
+			// this.get_groupList()
 			setTimeout(function() {
 				uni.stopPullDownRefresh();
 			}, 2000);
@@ -712,7 +728,13 @@
 	.pic {
 		padding: 20upx 10upx;
 	}
-
+	.tui-box-upload{
+		padding-left: 25rpx;
+		box-sizing: border-box;
+		padding-bottom: 20px;
+		padding-top: 20px;
+		background-color: #FFFFFF;
+	}
 	.input-view {
 		font-size: 28upx;
 	}

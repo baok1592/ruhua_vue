@@ -1,8 +1,0 @@
-{
-  "navigationBarTitleText": "通知",
-  "enablePullDownRefresh": true,
-  "navigationBarBackgroundColor": "#F7F7F7",
-  "usingComponents": {
-    "none": "/components/qy/none"
-  }
-}

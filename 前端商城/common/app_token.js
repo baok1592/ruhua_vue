@@ -1,22 +1,20 @@
 import {Api_url} from './config'
+import http from './axios.js'
 
 class AppToken {
-	constructor() {
-		this.tokenUrl = Api_url + 'auth/get_app_token';
+	constructor() { 
 		this.verifyUrl = Api_url + 'auth/token_verify'; 
 	}
 
-	verify() {
-		var that = this;
-		var token = uni.getStorageSync('token'); //获取缓存
-		if (!token) {
-			console.log('APP获取token:')
-			//向微信api拿openid和unionid,并返回Token
-			this.getTokenFromServer();
+	//初始化登陆
+	verify() { 
+		console.log("app验证token") 
+		var token = uni.getStorageSync('token'); //获取缓存2
+		if (!token) { 
+			this.login_page();
 		} else {
-			console.log('APP缓存token')
 			this._veirfyFromServer(token); //验证token是否过期，过期调用.getTokenFromServer函数获取
-		}
+		} 
 	}
 	//验证token
 	_veirfyFromServer(token) {
@@ -30,30 +28,38 @@ class AppToken {
 			success: function(res) {
 				var valid = res.data.isValid;
 				if (!valid) {
-					that.getTokenFromServer();
+					that.login_page();
 				}
 			}
 		})
 	}
-	////向微信api拿openid和unionid,并返回Token
-	getTokenFromServer() {
-		var that = this; 
-		uni.login({
-			provider: 'weixin',
-			success: function(res) {
-				console.log('app_wx::',res)
-				uni.request({
-					url: that.tokenUrl,
-					method: 'POST',
-					data: res,
-					success: function(rest) { 
-						console.log('token::',rest)
-						uni.setStorageSync('token', rest.data.token);
-					}
+	 
+	login_page(){
+		let gl=1
+		http.get("index/user/sys_config").then(res=>{
+			for (let k in res.data) { 
+				let v = res.data[k]
+				if(v.key=="merge_mode"){
+					gl=v.value
+				} 
+			} 
+			if (gl == 1) {
+				uni.redirectTo({
+					url: '/pages/login/login'
 				})
-			}
-		})
+			} else if (gl == 2) {
+				uni.redirectTo({
+					url: '/pages/login/loginA/loginA'
+				})
+			} else{
+				uni.redirectTo({
+					url: '/pages/login/loginB/loginB'
+				}) 
+			} 
+		})    
 	}
+	
+	
 }
 export {
 	AppToken

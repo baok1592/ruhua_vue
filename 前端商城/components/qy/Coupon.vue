@@ -1,7 +1,7 @@
 <template>
 	<view class="Tan">
 		<view class='' v-if="coupon">
-		    <view class="coupon" >
+		    <view class="coupon" :style="'background: url('+web_url+'/static/web/51.jpg) no-repeat;'">
 				<view class="cou_01" v-for="(item,index) of coulist" :key="index" v-if="index<3">
 					<view class="cou_01_01">
 						<view class="cou_01_01_l"><span>10</span>元</view>
@@ -55,7 +55,7 @@
 <style lang="less">
 .Tan{
 	.coupon{position: fixed;top: 60px;left: 8%;width: 84%;height: 500px;background-color: #fff;box-sizing: border-box;color: #BE3A48;
-	z-index: 10001;padding: 180px 30px 35px;background: url(../../imgs/51.jpg) no-repeat;background-size: 100% 100%;
+	z-index: 10001;padding: 180px 30px 35px;background-size: 100% 100%;
 		.cou_01{background-color:#FFE8B2;border-radius: 3px;margin-bottom: 10px;
 			.cou_01_01{display: flex;padding: 5px 0;border-bottom: 1px dashed #F5E2AA;position: relative;
 				.cou_01_01_l{width: 40%;text-align: center;font-weight: 600;font-size: 16px;

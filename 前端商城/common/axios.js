@@ -3,7 +3,7 @@ import {Api_url} from './config'
 // var token = new Token();
 
 export default { 
-	async post(url, param,yanci=true) {
+	async post(url, param,yanci=false) {
 		if(yanci){ 
 			uni.showLoading({
 				title:'加载中'
@@ -20,7 +20,7 @@ export default {
 		}
 		return res;
 	},
-	async get(url, param,yanci=true) {
+	async get(url, param,yanci=false) {
 		if(yanci){ 
 			uni.showLoading({
 				title:'加载中'
@@ -41,7 +41,7 @@ export default {
 		const res = await this.uni_request(url,param,'put') 
 		return res;
 	}, 
-	uni_request(url,param,method,again_quest=true) {
+	uni_request(url,param,method,again_quest=false) {
 		const that=this
 	    return new Promise((cback, reject) => {
 	    	uni.request({

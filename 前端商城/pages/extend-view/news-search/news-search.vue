@@ -6,15 +6,19 @@
 				<icon type="search" :size='13' color='#333'></icon>
 				<!-- #endif -->
 				<!-- #ifdef H5 -->
-				<view><tui-icon name="search" :size='16' color='#333'></tui-icon></view>
+				<view>
+					<tui-icon name="search" :size='16' color='#333'></tui-icon>
+				</view>
 				<!-- #endif -->
-				<input confirm-type="search" placeholder="搜索" :focus="true" auto-focus 
-				placeholder-class="tui-input-plholder" class="tui-input" v-model.trim="key" />
+				<input confirm-type="search" placeholder="搜索" :focus="true" auto-focus placeholder-class="tui-input-plholder" class="tui-input"
+				 v-model.trim="key" />
 				<!-- #ifdef APP-PLUS || MP -->
 				<icon type="clear" :size='13' color='#bcbcbc' @tap="cleanKey" v-show="key"></icon>
 				<!-- #endif -->
 				<!-- #ifdef H5 -->
-				<view @tap="cleanKey" v-show="key"><tui-icon name="close-fill" :size='16' color='#bcbcbc'></tui-icon></view>
+				<view @tap="cleanKey" v-show="key">
+					<tui-icon name="close-fill" :size='16' color='#bcbcbc'></tui-icon>
+				</view>
 				<!-- #endif -->
 			</view>
 			<view class="tui-cancle" @tap="sub">搜索</view>
@@ -26,8 +30,8 @@
 				<tui-icon name="delete" :size='14' color='#333' @tap="openActionSheet" class="tui-icon-delete"></tui-icon>
 			</view>
 			<view class="tui-history-content">
-				<block v-for="(item,index) in history" :key="index" >
-					<tui-tag type="gray" shape="circle" @click="to_search(item)">{{item}}</tui-tag>
+				<block v-for="(item,index) in history" :key="index">
+					<tui-tag type="gray" shape="circle" @click="to_search_history(item)">{{item}}</tui-tag>
 				</block>
 			</view>
 		</view>
@@ -37,8 +41,11 @@
 				<view class="tui-search-title">大家正在搜</view>
 			</view>
 			<view class="tui-hot-content">
-				<block v-for="(item,index) in hot" :key="index" >
-					<tui-tag type="gray" shape="circle" @click="to_search(item)">{{item}}</tui-tag>
+				<block v-for="(item,index) in hot" :key="index">
+					<tui-tag type="light-blue" v-if="index%4==0"  shape="circle" @click="to_search(item)">{{item}}</tui-tag>
+					<tui-tag type="light-brownish" v-if="index%4==1"  shape="circle" @click="to_search(item)">{{item}}</tui-tag>
+					<tui-tag type="light-orange" v-if="index%4==2"  shape="circle" @click="to_search(item)">{{item}}</tui-tag>
+					<tui-tag type="light-green" v-if="index%4==3"  shape="circle" @click="to_search(item)">{{item}}</tui-tag>
 				</block>
 			</view>
 		</view>
@@ -59,7 +66,7 @@
 		},
 		data() {
 			return {
-				record_list:[1],
+				record_list: [],
 				history: [],
 				hot: [],
 				key: "",
@@ -72,29 +79,42 @@
 			this.get_hotSearch()
 		},
 		methods: {
-			get_record(){
+			get_record() {
 				let cache = uni.getStorageSync('record')
-				this.record_list = cache?cache:this.record_list
+				this.record_list = cache ? cache : this.record_list
 				this.history = cache
 			},
-			get_hotSearch(){
+			get_hotSearch() {
 				let cache = uni.getStorageSync('hotSearch')
 				this.hot = cache
 			},
-			sub(){ 
-				console.log('xx:',this.record_list)
+			sub() {
+				const that = this
 				this.record_list.push(this.key)
-				if(this.record_list.length > 9){
-					this.record_list.splice(0,1)
+				if (this.record_list.length > 9) {
+					this.record_list.splice(0, 1)
 				}
-				uni.setStorageSync('record',this.record_list)
+				//数组去重
+				let arr = that.record_list
+				let arrs = arr.filter(function(ele, index, self) {
+					return self.indexOf(ele) === index;
+				})
+				//数组去重结束赋值
+				that.record_list = arrs
+				uni.setStorageSync('record', this.record_list)
 				uni.redirectTo({
-					url:'../productList/productList?key='+this.key
+					url: '../productList/productList?key=' + this.key
 				})
 			},
-			to_search(item){
+			to_search(item) {
+				
 				this.key = item
 				this.sub()
+			},
+			to_search_history(item){
+				uni.redirectTo({
+					url: '../productList/productList?key=' + item
+				})
 			},
 			back: function() {
 				uni.navigateBack();
@@ -113,6 +133,8 @@
 				if (index == 0) {
 					this.showActionSheet = false;
 					this.history = []
+					this.record_list = []
+					uni.removeStorageSync('record')
 				}
 			}
 		}

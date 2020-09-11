@@ -12,15 +12,78 @@
 					</el-col>
 				</template>
 			</el-row>
+			<template v-for="(item,index) in list" v-key="index">
+				<el-row class="inp" v-if="item.switch == 2">
+					<el-form-item :label="item.desc">
+						<template v-if="item.key == 'fx_status'">
+							<el-radio-group v-model="item.value">
+								<el-radio label="0">关闭分销</el-radio>
+								<el-tooltip placement="top">
+									<div slot="content">需指定代理人才能<br/>进行分销</div>
+									<el-radio label="1">代理商分销</el-radio>
+								</el-tooltip>
+								<el-tooltip placement="right">
+									<div slot="content">每个人都可以<br/>进行分销</div>
+									<el-radio label="2">人人分销</el-radio>
+								</el-tooltip>
+							</el-radio-group>
+						</template>
+						<template v-if="item.key == 'merge_mode'">
+							<el-radio-group v-model="item.value">
+								<el-tooltip placement="bottom">
+									<div slot="content">可通过微信号绑定公<br/>众号、小程序和APP</div>
+									<el-radio label="1">微信开放平台关联</el-radio>
+								</el-tooltip>
+								<el-tooltip placement="bottom">
+									<div slot="content">可通过手机号绑定公<br/>众号、小程序和APP</div>
+									<el-radio label="2">手机关联</el-radio>
+								</el-tooltip>
+								<el-tooltip placement="right">
+									<div slot="content">适用于不通过微信来绑定<br/>公众号、小程序和APP</div>
+									<el-radio label="3">手机登录</el-radio>
+								</el-tooltip>
+							</el-radio-group>
+						</template>
+						<template v-if="item.key == 'fx_royalty'">
+							<el-radio-group v-model="item.value">
+								<el-tooltip placement="bottom">
+									<div slot="content">提现需手动进行申请</div>
+									<el-radio label="0">手动提现</el-radio>
+								</el-tooltip>
+								<el-tooltip placement="right">
+									<div slot="content">企业自动打款<br/>(需开启微信公众平台权限)</div>
+									<el-radio label="1">自动打款</el-radio>
+								</el-tooltip>
+							</el-radio-group>
+						</template>
+						<template v-if="item.key == 'drive_type'">
+							<el-radio-group v-model="item.value">
+								<el-radio label="0">快递</el-radio>
+								<el-radio label="1">快递+自提</el-radio>
+								<el-radio label="2">快递+同城</el-radio>
+								<el-radio label="3">所有</el-radio>
+							</el-radio-group>
+						</template>
+					</el-form-item>
+
+				</el-row>
+			</template>
 
 			<template v-for="(item,index) in list" v-key="index">
-				<el-row class="inp" v-if="item.switch != 1">
+				<el-row class="inp" v-if="item.switch == 0">
 					<el-form-item :label="item.desc">
 						<el-input v-model="item.value"></el-input>
 					</el-form-item>
 				</el-row>
 			</template>
-			</el-row>
+			
+			<template v-for="(item,index) in list" v-key="index">
+				<el-row class="inp" v-if="item.switch == 3">
+					<el-form-item :label="item.desc">
+						<el-input type="textarea" v-model="item.value"></el-input>
+					</el-form-item>
+				</el-row>
+			</template>
 
 			<el-form-item style="width: 80%">
 				<el-button type="primary" @click="onSubmit">提交修改</el-button>
@@ -34,6 +97,8 @@
 		name: "Set-a",
 		data() {
 			return {
+				fx_radio: '',
+				tx_radio:'',
 				list: [],
 				value1: true,
 				value2: true,

@@ -1,7 +1,0 @@
-{
-  "navigationBarTitleText": "收货地址",
-  "enablePullDownRefresh": true,
-  "usingComponents": {
-    "none": "/components/qy/none"
-  }
-}

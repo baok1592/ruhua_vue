@@ -39,19 +39,22 @@
 				console.log('授权开始')
 				const that = this;
 				uni.getSetting({
-					success(data) {
-						console.log('获取已授权列表', data)
+					success(data) { 
 						if (data.authSetting['scope.userInfo']) {
-							console.log('已授权过了') 
+							console.log('已授权过了')
+							 
 							uni.getUserInfo({
 								success: data => {  
 									let user=data.userInfo 
 									that.UpUser(user,data.encryptedData,data.iv)
 								}
 							})
-						} else {
-							console.log('弹出授权框')
+							uni.navigateBack({
+								
+							})
+						} else { 
 							that.login = true
+							
 						}
 					}
 				})
@@ -64,8 +67,7 @@
 					that.UpUser(user,res.detail.encryptedData,res.detail.iv) 
 				}
 			},
-			UpUser(user,keys,iv){				
-				console.log('授权',keys)
+			UpUser(user,keys,iv){		 
 				const that = this
 				uni.request({
 				  	url: Api_url+'auth/upinfo',

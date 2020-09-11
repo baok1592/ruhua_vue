@@ -4,15 +4,15 @@
 			"path": "pages/index/index",
 			"style": {
 				// #ifdef H5
-				"navigationBarBackgroundColor": "#FFF",
-				"navigationBarTitleText": "如花商城系统",
+				"navigationBarBackgroundColor": "#FFF", 
+				"navigationStyle": "custom",
 				// #endif
-				
+
 				// #ifdef MP-WEIXIN
 				"navigationBarBackgroundColor": "#FB586A",
 				"navigationBarTitleText": "",
 				// #endif
-				
+
 				// #ifdef APP-PLUS
 				"navigationBarBackgroundColor": "#FB586A",
 				"navigationBarTitleText": "",
@@ -20,23 +20,30 @@
 				"navigationBarTextStyle": "black",
 				"backgroundColorTop": "#F7F7F7",
 				"backgroundColorBottom": "#F7F7F7",
-				
+
 				"enablePullDownRefresh": true,
 				"onReachBottomDistance": 50
 			}
-		},{
+		}, {
 			"path": "pages/extend-view/mall/mall",
 			"style": {
-				
+
 			}
-		},{
-			"path": "pages/user/sort/sort",
-			"style": {				
+		},
+		
+		{
+			"path": "pages/form/form",
+			"style": {
+				"navigationBarTitleText": ""
 			}
-		},{
+		},
+		// ---------活动----------
+		
+
+		// ---------活动结束----------
+		{
 			"path": "pages/wxauth",
-			"style": {				
-			}
+			"style": {}
 		},
 		{
 			"path": "pages/cart/cart",
@@ -60,9 +67,22 @@
 			}
 		},
 		{
+			"path": "pages/user/bind_phone/bind_phone",
+			"style": {
+				"navigationBarTitleText": "绑定手机"
+			}
+		},
+		{
 			"path": "pages/user/myorder/myorder",
 			"style": {
 				"navigationBarTitleText": "订单详情",
+				"enablePullDownRefresh": true
+			}
+		},
+		{
+			"path": "pages/user/myorder/drive/drive",
+			"style": {
+				"navigationBarTitleText": "物流",
 				"enablePullDownRefresh": true
 			}
 		},
@@ -73,13 +93,7 @@
 				"enablePullDownRefresh": true
 			}
 		},
-		{
-			"path": "pages/user/mingxi",
-			"style": {
-				"navigationBarTitleText": "收入明细",
-				"enablePullDownRefresh": true
-			} 
-		},
+	
 		{
 			"path": "pages/evaluate/evaluate",
 			"style": {
@@ -99,11 +113,27 @@
 				"navigationBarTitleText": "收藏",
 				"enablePullDownRefresh": true
 			}
+		},{
+			"path": "pages/zhibo/zhibo",
+			"style": {
+				"enablePullDownRefresh": true,
+				"navigationBarBackgroundColor": "#FB586A",
+				"mp-weixin": {
+					"usingComponents": {
+						"subscribe": "plugin-private://wx2b03c6e691cd7370/components/subscribe/subscribe"
+					}
+				}
+			}
+		}, {
+			"path": "pages/zhibo/detail",
+			"style": {
+				"enablePullDownRefresh": true,
+				"navigationBarBackgroundColor": "#FD3830"
+			}
 		},
-		
 		{
 			"path": "pages/user/myorder/grade/grade",
-			"style": { 
+			"style": {
 				"navigationBarTitleText": "评分"
 			}
 		},
@@ -123,7 +153,7 @@
 		{
 			"path": "pages/cms/order/send/send",
 			"style": {
-				"navigationBarTitleText": ""
+				"navigationBarTitleText": "发货"
 			}
 		},
 		{
@@ -134,18 +164,7 @@
 				"navigationBarTextStyle": "black",
 				"backgroundColorTop": "#fff",
 				"backgroundColorBottom": "#fff"
-				
-			}
-		},
-		{
-			"path": "pages/public/login",
-			"style": {
-				"navigationBarTitleText": "",
-				"navigationStyle": "custom",
-				"app-plus": {
-					"titleNView": false,
-					"animationType": "slide-in-bottom"
-				}
+
 			}
 		},
 		{
@@ -158,20 +177,13 @@
 				"enablePullDownRefresh": true
 			}
 		},
-		{
-		    "path" : "pages/notice/notice",
-		    "style" : {
-				"navigationBarTitleText": "通知",
-				"enablePullDownRefresh": true,
-				"navigationBarBackgroundColor": "#F7F7F7"
-			}
-		},
+		 
 		{
 			"path": "pages/order/createOrder",
 			"style": {
 				"navigationBarTitleText": "创建订单",
 				"enablePullDownRefresh": true
-				
+
 			}
 		},
 		{
@@ -219,7 +231,7 @@
 				},
 				"enablePullDownRefresh": true
 			}
-		},
+		},		
 		{
 			"path": "pages/user/user",
 			"style": {
@@ -252,45 +264,18 @@
 					}
 				}
 			}
-		}
-		
-		
-	    ,{
-            "path" : "pages/one/one",
-            "style" : {
+		}, {
+			"path": "pages/user/cash/cash",
+			"style": {
+				"navigationBarTitleText": " "
+			}
+		}, {
+			"path": "pages/user/record/record",
+			"style": {
 				"enablePullDownRefresh": true,
-				"navigationBarBackgroundColor": "#F2F2F2"
+				"navigationBarTitleText": " "
 			}
-        }
-        ,{
-            "path" : "pages/coupon/coupon",
-            "style" : {
-				"enablePullDownRefresh": true
-			}
-        }
-        
-        ,{
-            "path" : "pages/user/agent/agent",
-            "style" : {
-				"enablePullDownRefresh": true
-			}
-        }
-        ,{
-            "path" : "pages/user/spread/spread",
-            "style" : {
-				"enablePullDownRefresh": true
-			}
-        }
-        ,{
-            "path" : "pages/user/cash/cash",
-            "style" : {}
-        }
-        ,{
-            "path" : "pages/user/record/record",
-            "style" : {
-				"enablePullDownRefresh": true
-			}
-        },
+		},
 		{
 			"path": "pages/cms/index/index",
 			"style": {
@@ -299,217 +284,274 @@
 				"enablePullDownRefresh": true,
 				"navigationBarBackgroundColor": "#51C592"
 			}
-		}
-		,{
-		    "path" : "pages/cms/login/login",
-		    "style" : {}
-		}
-		,{
-		    "path" : "pages/cms/login/login-old",
-		    "style" : {}
-		}
-		,{
-		    "path" : "pages/cms/notice/notice",
-		    "style" : {
+		}, {
+			"path": "pages/cms/login/login",
+			"style": {}
+		}, {
+			"path": "pages/login/login",
+			"style": {
+				"navigationBarTitleText": " "
+			}
+		}, {
+			"path": "pages/cms/notice/notice",
+			"style": {
 				"enablePullDownRefresh": true
 			}
-		}
-		,
+		},
 		{
-		    "path" : "pages/cms/coupon/coupon",
-		    "style" : {
+			"path": "pages/cms/coupon/coupon",
+			"style": {}
+		}, {
+			"path": "pages/cms/kedetail/kedetail",
+			"style": {
+				"enablePullDownRefresh": true
 			}
+		},
+		{
+			"path": "pages/cms/kehu/kehu",
+			"style": {
+				"enablePullDownRefresh": true
+			}
+		},
+		{
+			"path": "pages/cms/couponxuan/couponxuan",
+			"style": {}
+		},
+		{
+			"path": "pages/cms/couponlist/couponlist",
+			"style": {
+				"enablePullDownRefresh": true
+			}
+		},
+		{
+			"path": "pages/cms/tag_manage/tag_manage",
+			"style": {
+				"enablePullDownRefresh": true
+			}
+		}, {
+			"path": "pages/cms/coupon_VIP/coupon_VIP",
+			"style": {}
+		},
+		{
+			"path": "pages/cms/edit/product/product",
+			"style": {}
+		}, {
+			"path": "pages/cms/edit/shop/shop",
+			"style": {}
+		}, {
+			"path": "pages/cms/edit/shop_login/shop_login",
+			"style": {}
+		}, {
+			"path": "pages/cms/user/user",
+			"style": {}
+		}, {
+			"path": "pages/cms/user/agent/agent",
+			"style": {
+				"enablePullDownRefresh": true
+			}
+		}, {
+			"path": "pages/cms/user/fenxiao/fenxiao",
+			"style": {
+				"enablePullDownRefresh": true
+			}
+		}, {
+			"path": "pages/cms/user/tongji/tongji",
+			"style": {
+				"enablePullDownRefresh": true
+			}
+		}, {
+			"path": "pages/cms/user/mingxi/mingxi",
+			"style": {
+				"enablePullDownRefresh": true
+			}
+		}, {
+			"path": "pages/cms/kucun/kucun",
+			"style": {
+				"enablePullDownRefresh": true
+			}
+		}, {
+			"path": "pages/cms/user/fenxiao/tixian/tixian",
+			"style": {
+				"enablePullDownRefresh": true
+			}
+		}, {
+			"path": "pages/cms/edit/yanzheng/yanzheng",
+			"style": {}
+		}, {
+			"path": "pages/cms/order/order",
+			"style": {
+				"enablePullDownRefresh": true
+			}
+		}, {
+			"path": "pages/cms/order/yz_order",
+			"style": {
+
+			}
+		}, {
+			"path": "pages/cms/order/detail",
+			"style": {
+				"enablePullDownRefresh": true
+			}
+		}, {
+			"path": "pages/cms/user/fenxiao/success/success",
+			"style": {
+				"enablePullDownRefresh": true
+			}
+		}, {
+			"path": "pages/cms/user/fenxiao/bankcard/bankcard",
+			"style": {
+				"enablePullDownRefresh": true
+			}
+		}, {
+			"path": "pages/cms/user/fenxiao/addcard/addcard",
+			"style": {}
+		}, {
+			"path": "pages/cms/edit/product/addgroup/addgroup",
+			"style": {
+				"enablePullDownRefresh": true
+			}
+		},
+		{
+			"path": "pages/cms/edit/pro_manage/pro_manage",
+			"style": {
+				"enablePullDownRefresh": true
+			}
+		}, {
+			"path": "pages/cms/order/detail/detail",
+			"style": {
+				"enablePullDownRefresh": true
+			}
+		}, {
+			"path": "pages/cms/edit/yunfei/yunfei",
+			"style": {}
+		}, {
+			"path": "pages/cms/edit/yfmoban/yfmoban",
+			"style": {}
+		}, {
+			"path": "pages/cms/edit/yfset/yfset",
+			"style": {}
+		}, 
+		  {
+			"path": "pages/article/article",
+			"style": {
+				"enablePullDownRefresh": true,
+				"navigationBarTitleText": " "
+			}
+		}, {
+			"path": "pages/cartnone/cartnone",
+			"style": {}
+		}, {
+			"path": "pages/list/list",
+			"style": {
+				"navigationBarTitleText": " "
+			}
+		}, {
+			"path": "pages/invite/invite",
+			"style": {
+				"navigationBarTitleText": "参团"
+			}
+		}, {
+			"path": "pages/pindetail/pindetail",
+			"style": {
+				"navigationBarTitleText": "拼团成功"
+			}
+		}, 
+		 {
+			"path": "pages/xieyi/xieyi",
+			"style": {}
+		}, {
+			"path": "pages/invoices/invoices",
+			"style": {
+				"navigationBarTitleText": "发票信息"
+			}
+		}, {
+			"path": "pages/login/loginA/loginA",
+			"style": {
+				"navigationBarTitleText": " "
+			}
+		}, {
+			"path": "pages/login/loginB/loginB",
+			"style": {
+				"navigationBarTitleText": " "
+			}
+		}
+
+		, {
+			"path": "pages/user/set/set",
+			"style": {}
 		},{
-		    "path" : "pages/cms/kedetail/kedetail",
-		    "style" : {
-				"enablePullDownRefresh": true
-			}
-		},
-		{
-		    "path" : "pages/cms/kehu/kehu",
-		    "style" : {
-				"enablePullDownRefresh": true
-			}
-		},
-		{
-		    "path" : "pages/cms/couponxuan/couponxuan",
-		    "style" : {
-			}
-		},
-		{
-		    "path" : "pages/cms/couponlist/couponlist",
-		    "style" : {
-				"enablePullDownRefresh": true
-			}
-		},
-		{
-		    "path" : "pages/cms/tag_manage/tag_manage",
-		    "style" : {
-				"enablePullDownRefresh": true
-			}
-		}
-		,{
-		    "path" : "pages/cms/coupon_VIP/coupon_VIP",
-		    "style" : {}
-		},
-		{
-		    "path" : "pages/cms/edit/product/product",
-		    "style" : {}
-		}
-		,{
-		    "path" : "pages/cms/edit/shop/shop",
-		    "style" : {}
-		}
-		,{
-		    "path" : "pages/cms/edit/shop_login/shop_login",
-		    "style" : {}
-		}
-		,{
-		    "path" : "pages/cms/user/user",
-		    "style" : {}
-		}
-		,{
-		    "path" : "pages/cms/user/agent/agent",
-		    "style" : {
-				"enablePullDownRefresh": true
-			}
-		}
-		,{
-		    "path" : "pages/cms/user/fenxiao/fenxiao",
-		    "style" : {
-				"enablePullDownRefresh": true
-			}
-		}
-		,{
-		    "path" : "pages/cms/user/tongji/tongji",
-		    "style" : {
-				"enablePullDownRefresh": true
-			}
-		}
-		,{
-		    "path" : "pages/cms/user/mingxi/mingxi",
-		    "style" : {
-				"enablePullDownRefresh": true
-			}
-		}
-		,{
-		    "path" : "pages/cms/kucun/kucun",
-		    "style" : {
-				"enablePullDownRefresh": true
-			}
-		}
-		,{
-		    "path" : "pages/cms/user/fenxiao/tixian/tixian",
-		    "style" : {
-				"enablePullDownRefresh": true
-			}
-		}
-		,{
-		    "path" : "pages/cms/edit/yanzheng/yanzheng",
-		    "style" : {}
-		}
-		,{
-		    "path" : "pages/cms/order/order",
-		    "style" : {
-				"enablePullDownRefresh": true
-			}
-		},{
-		    "path" : "pages/cms/order/yz_order",
-		    "style" : {
-				
-			}
-		},{
-		    "path" : "pages/cms/order/detail",
-		    "style" : {
-				"enablePullDownRefresh": true
-			}
-		}
-		,{
-		    "path" : "pages/cms/user/fenxiao/success/success",
-		    "style" : {
-				"enablePullDownRefresh": true
-			}
-		}
-		,{
-		    "path" : "pages/cms/user/fenxiao/bankcard/bankcard",
-		    "style" : {
-				"enablePullDownRefresh": true
-			}
-		}
-		,{
-		    "path" : "pages/cms/user/fenxiao/addcard/addcard",
-		    "style" : {
-			}
-		}
-		,{
-		    "path" : "pages/cms/edit/product/addgroup/addgroup",
-		    "style" : {
-				"enablePullDownRefresh": true
-			}
-		}
-		,
-		{
-		    "path" : "pages/cms/edit/pro_manage/pro_manage",
-		    "style" : {
-				"enablePullDownRefresh": true
-			}
-		}
-		,{
-		    "path" : "pages/cms/order/detail/detail",
-		    "style" : {
-				"enablePullDownRefresh": true
-			}
-		}
-		,{
-		    "path" : "pages/cms/edit/yunfei/yunfei",
-		    "style" : {}
-		}
-		,{
-		    "path" : "pages/cms/edit/yfmoban/yfmoban",
-		    "style" : {
-			}
-		}
-		,{
-		    "path" : "pages/cms/edit/yfset/yfset",
-		    "style" : {
-			}
-		}
-        ,{
-            "path" : "pages/user/member/member",
-            "style" : {
-				"enablePullDownRefresh": true
-			}
-        }
-        ,{
-            "path" : "pages/article/article",
-            "style" : {
-				"enablePullDownRefresh": true
-			}
-        }
-        ,{
-            "path" : "pages/cartnone/cartnone",
-            "style" : {}
-        }
-        ,{
-            "path" : "pages/list/list",
-            "style" : {}
-        }
-        ,{
-            "path" : "pages/xieyi/xieyi",
-            "style" : {}
-        }
-        ,{
-            "path" : "pages/login/login",
-            "style" : {}
-        }
-        ,{
-            "path" : "pages/invoices/invoices",
+            "path" : "pages/order/pay",
             "style" : {}
         }
     ],
+	"subPackages": [{
+		"root": "means",
+		"pages": [
+			{
+			"path": "play/watering/watering",
+			"style": {
+				"navigationBarTitleText": "种树"
+			}
+		},{
+			"path": "play/activity/draw",
+			"style": {
+				"navigationBarTitleText": "大转盘"
+			}
+		},
+		{
+			"path": "play/sherpa-jiugongge/sherpa-jiugongge",
+			"style": {
+				"navigationBarTitleText": "9宫格"
+			}
+		},
+		{
+			"path": "notice/notice",
+			"style": {
+				"navigationBarTitleText": "通知",
+				"enablePullDownRefresh": true,
+				"navigationBarBackgroundColor": "#F7F7F7"
+			}
+		} , 
+		{
+			"path": "discount/discount", 
+			"style": {
+				"enablePullDownRefresh": true,
+				"navigationBarBackgroundColor": "#f7f7f7"
+			}
+		}, 
+		{
+			"path": "pin/pin", 
+			"style": {
+				"enablePullDownRefresh": true
+			}
+		}, 
+		{
+			"path": "coupon/coupon", 
+			"style": {
+				"enablePullDownRefresh": true
+			}
+		}, 
+		{
+			"path": "onebuy/onebuy",
+			"style": {
+				"enablePullDownRefresh": true
+			}
+		}
+		,
+		{
+			"path": "qiandao/qiandao",
+			"style": {
+				"navigationBarTitleText": "签到",
+				"enablePullDownRefresh": true,
+				"navigationBarBackgroundColor": "#FE461D"
+			}
+		}
+		]
+	}],
+
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
-		
+		"navigationBarTitleText": "如花商城",
 		"navigationBarBackgroundColor": "#F8F8F8",
 		"backgroundColor": "#F8F8F8"
 	},
@@ -543,5 +585,5 @@
 			}
 		]
 	}
-	
+
 }

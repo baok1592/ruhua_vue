@@ -7,7 +7,7 @@
 			<view class="card_02" v-if="data.total">¥ {{data.total[0].all_money_total}}</view>
 			<view class="card_03">
 				<view class="card_03_1">
-					订单数<br/><span>{{data.total[0].all_num_total}}</span>
+					<!-- 订单数<br/><span>{{data.total[0].all_num_total}}</span> -->
 				</view>
 				<view class="card_03_1">
 					消费人数<br/><span>{{data.total[0].all_num_total}}</span>
@@ -42,7 +42,7 @@
 	export default {
 		data() {
 			return {
-				data:[]
+				data:{}
 			};
 		},
 		onLoad() {
@@ -50,10 +50,10 @@
 		},
 		methods:{
 			_load(){
-				// this.$api.http.post('shop/count_order').then(res=>{
-				// 	this.data=res
-				// })
-				this.data=this.$api.json_cms.count_order
+				this.$api.http.get('shop/count_order').then(res=>{
+					this.data=res
+				})
+				// this.data=this.$api.json_cms.count_order
 			}
 		},
 		onPullDownRefresh() {

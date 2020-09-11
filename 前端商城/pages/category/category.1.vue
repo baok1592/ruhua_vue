@@ -43,6 +43,8 @@
 </template>
 
 <script>
+	import categoryModel from '@/model/category.js'
+	
 	export default {
 		data() {
 			return {
@@ -71,13 +73,15 @@
 		},
 		methods: {
 			async _load() {
-				this.tabbar = await this.$api.http.get('category/get_category?id=1').then(res => {
+				// this.tabbar = await this.$api.http.get('category/get_category?id=1').then(res => {
+				this.tabbar = await categoryModel.getCategoryOne().then( res => {
 					return res.data
 				})
 				if(this.tabbar && this.tabbar[0]){
 					console.log('aa')
 					const cid=this.tabbar[0].category_id
-					this.$api.http.get('category/category_cid',{id:cid}).then(res => {
+					// this.$api.http.get('category/category_cid',{id:cid}).then(res => {
+					categoryModel.getCategoryCid(cid).then( res =>{
 						this.cateList = res.data.category
 						console.log(this.cateList) 
 					})
@@ -86,7 +90,8 @@
 			},
 			swichNav1(id) {
 				// this.cid = id
-				this.$api.http.get('category/category_cid',{id:id}).then(res => {
+				// this.$api.http.get('category/category_cid',{id:id}).then(res => {
+				categoryModel.getCategoryCid(id).then( res =>{
 					this.cateList = res.data.category
 					console.log(this.cateList) 
 				})
@@ -132,7 +137,7 @@
 		},
 		onShareAppMessage(res) { 
 			return {
-				title: '如花',
+				title: '商城',
 			}
 		},
 		onPullDownRefresh() {

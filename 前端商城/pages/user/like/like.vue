@@ -36,6 +36,7 @@
 <script>
 	import uniSegmentedControl from "@/components/uni/uni-segmented-control/uni-segmented-control.vue"
 	import None from "@/components/qy/none.vue"
+	import {common} from '../../../common/mixin.js'
 	export default {
 		data() {
 			return {
@@ -47,12 +48,13 @@
 				current: 0
 			}
 		},
+		mixins:[common],
 		components: {
 			None,
 			uniSegmentedControl
 		},
 		onLoad(option) {
-			this._load()
+			this.check_login()
 			this.id = option.id
 		},
 		onShow(option) {

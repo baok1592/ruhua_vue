@@ -48,7 +48,7 @@
 			3、订单完成后可开具发票。<br/>
 			<span v-if="fapiao==3">4、请确保抬头和纳税人识别号或统一社会信用代码准确，开票成功后无法更改。</span>
 		</view>
-		<view class="btn">确定</view>
+		<view class="btn" @click="msg">确定</view>
 	</view>
 </template>
 
@@ -62,6 +62,9 @@
 			};
 		},
 		methods:{
+			msg(){
+				this.$api.msg('开发中...')
+			},
 			bindPickerChange: function(e) {
 				console.log('picker发送选择改变，携带值为', e.target.value)
 				this.index = e.target.value

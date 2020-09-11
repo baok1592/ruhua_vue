@@ -38,9 +38,8 @@
 			<view class="shuju_01 no">
 				<view>昨日订单/金额</view>
 				<view class="shuju_01_s" v-if="order_data">{{order_data.yesterday_order}} /
-					{{order_data.yesterday_money}}</view>
+					{{order_data.yesterday_money}}</view> 
 			</view>
-
 			<view class="shuju_01">
 				<view>总订单数</view>
 				<view class="shuju_01_s" v-if="order_data">{{order_data.all_order}}</view>
@@ -153,15 +152,29 @@
 			},
 			//扫码
 			shao() {
+				const that = this
 				uni.scanCode({
-					onlyFromCamera: true,
+					onlyFromCamera: false,
 					success: function(res) {
-						uni.navigateTo({
-							url: 'pages/edit/yanzheng/yanzheng?code=' + res.result
-						})
+						console.log(res)
+						that.jump_yz(res.result)
 					}
-				});
-			}
+				})
+			},
+			jump_yz(code){
+				this.$api.http.post('order/mcms/hexiao', {
+					number:code
+				}).then(res => {
+					if (res.status == 200) {
+						this.$api.msg(res.msg);
+						this.code = ''
+					}
+					if(res.status == 400){
+						this.$api.msg(res.msg);
+						this.code = ''
+					}
+				})
+			},
 		},
 		onPullDownRefresh() {
 			this._load()

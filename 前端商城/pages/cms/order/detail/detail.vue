@@ -1,12 +1,12 @@
 <template>
 	<view class="r_detail">
-		<view class="head">
+		<!-- <view class="head">
 			<view class="head_l">
 				<view class="head_l_01">配送中...</view>
 				<view class="head_l_02">服务专员正在为您配送中</view>
 			</view>
 			<view class="head_r"><img src="@/imgs/detail.jpg"></img></view>
-		</view>
+		</view> -->
 		<view class="address">
 			<view class="address_l"><img src="@/imgs/location.png"></img></view>
 			<view class="address_r">
@@ -46,7 +46,7 @@
 		</view>
 		<view class="KB" style="height: 80px;"></view>
 		<view class="foot" >
-			<button class="cu-btn round bg-red" @click="send(oid)">去发货</button>
+			<button v-if="order_state.length == 0" class="cu-btn round bg-red" @click="send(oid)">去发货</button>
 			
 		</view>
 		
@@ -62,10 +62,14 @@
 				order_pro:'',
 				oid:'',
 				total_price:'',
+				order_state:'',
 			};
 		},
 		onLoad(options) {  
 			this.oid = options.id
+			this._load()
+		},
+		onShow() {
 			this._load()
 		},
 		
@@ -78,6 +82,7 @@
 			_load(){
 				this.$api.http.post('order/mcms/get_order_one',{id:this.oid}).then(res=>{
 					this.order_detail = res.data.order
+					this.order_state = res.data.log
 					let price = 0
 					for (var i = 0; i < res.data.order.ordergoods.length; i++) {
 						price = price + res.data.order.ordergoods[i].price * res.data.order.ordergoods[i].num

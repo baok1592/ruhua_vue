@@ -15,19 +15,20 @@
 					<None v-if="list_empty"></None>
 					<!-- 订单列表 -->
 					<view v-else>
-						<view v-for="(item,index) in order_list" :key="index" class="order-item" v-if="tabCurrentIndex==0 || (item.payment_state==now_pay && item.shipment_state==now_drive && item.state<=now_pinjia) ">
+						<view v-for="(item,index) in order_list" :key="index" class="order-item" v-if="tabCurrentIndex==0 || (item.payment_state==now_pay && item.shipment_state==now_drive && item.state==now_state) ">
 							<view class="i-top b-b">
 								<text class="time">{{item.order_num}}</text>
-								<!-- <text class="state" :style="{color: item.stateTipColor}">{{item.stateTip}}</text> -->
+								<text class="state" :style="{color: item.stateTipColor}" style="margin-right: 20px;">{{item.stateTip}}</text>
 								<text class="state">{{item.create_time}}</text>
 								<text v-if="item.payment_state == 0" class="del-btn yticon icon-iconfontshanchu1" @click="deleteOrder(item.order_id)"></text>
-							</view> 
+							</view>
 							<scroll-view v-if="item.order_goods.length > 1" class="goods-box" scroll-x>
-								<view v-for="(goodsItem, goodsIndex) in item.order_goods" :key="goodsIndex" class="goods-item"  @click="jumo_tomyorder(item.order_id)">
+								<view v-for="(goodsItem, goodsIndex) in item.order_goods" :key="goodsIndex" class="goods-item" @click="jumo_tomyorder(item.order_id)">
 									<image class="goods-img" :src="getimg+goodsItem.imgs.url" mode="aspectFill"></image>
 								</view>
 							</scroll-view>
-							<view v-if="item.order_goods.length === 1" class="goods-box-single" v-for="(goodsItem, goodsIndex) in item.order_goods" :key="goodsIndex">
+							<view v-if="item.order_goods.length === 1" class="goods-box-single" v-for="(goodsItem, goodsIndex) in item.order_goods"
+							 :key="goodsIndex">
 								<image class="goods-img" :src="getimg+goodsItem.imgs.url" mode="aspectFill" @click="jumo_tomyorder(item.order_id)"></image>
 								<view class="right" @click="jumo_tomyorder(item.order_id)">
 									<text class="title clamp">{{goodsItem.goods_name}}</text>
@@ -35,20 +36,20 @@
 									<text class="price">{{item.order_money}}</text>
 								</view>
 							</view>
-						
+
 							<view class="price-box">
 								共
 								<text class="num">{{item.order_goods.length}}</text>
 								件商品 实付款
 								<text class="price">{{item.order_money}}</text>
 							</view>
-							<view class="action-box b-t" v-if="item.payment_state == 0">
+							<view class="action-box b-t" v-if="item.payment_state == 0 && item.state != -3">
 								<button class="action-btn" @click="deleteOrder(item.order_id)">取消订单</button>
 								<button class="action-btn recom" @click="pay_again(item.order_id)" v-if="item.payment_state == 0">立即支付</button>
 							</view>
 						</view>
 					</view>
-					
+
 
 					<!-- <uni-load-more :status="tabItem.loadingType"></uni-load-more> -->
 
@@ -61,7 +62,8 @@
 <script>
 	import None from "@/components/qy/none.vue"
 	import uniLoadMore from '@/components/uni/uni-load-more/uni-load-more.vue';
-	import empty from "@/components/empty"; 
+	import empty from "@/components/empty";
+	import orderModel from "@/model/order.js"
 	export default {
 		components: {
 			uniLoadMore,
@@ -71,10 +73,10 @@
 		data() {
 			return {
 				list_empty: false,
-				now_pay:0,
-				now_drive:0,	
-				now_pinjia:0,
-				getimg:this.$getimg,
+				now_pay: 0,
+				now_drive: 0,
+				now_state: '',
+				getimg: this.$getimg,
 				tabCurrentIndex: 0,
 				order_list: '',
 				navList: [{
@@ -91,19 +93,19 @@
 					},
 					{
 						state: 2,
-						text: '待收货',
+						text: '待发货',
 						loadingType: 'more',
 						orderList: []
 					},
 					{
 						state: 3,
-						text: '待评价',
+						text: '待收货',
 						loadingType: 'more',
 						orderList: []
 					},
 					{
 						state: 4,
-						text: '售后',
+						text: '已完成',
 						loadingType: 'more',
 						orderList: []
 					}
@@ -136,46 +138,120 @@
 				})
 			},
 			get_order() {
-				const that = this
-				this.$api.http.post('order/user/all_order').then(res => {
-					if (res.data=='') {
+				let obj = {
+					stateTip: '',
+					stateTipColor: ''
+				}
+				const that = this 
+				orderModel.postOrderAll().then(res=>{
+					if (res.data == '') {
 						this.list_empty = true
 					} else {
-						this.order_list = res.data	
+						for (let k in res.data) {
+							let v = res.data[k]
+							if (v.payment_state == 0) {
+								obj = that.orderStateExp(1)
+							}
+							if (v.payment_state == 1 && v.shipment_state == 0) {
+								obj = that.orderStateExp(2)
+							}
+							if (v.payment_state == 1 && v.shipment_state == 1) {
+								obj = that.orderStateExp(3)
+							}
+							if (v.state == -3) {
+								obj = that.orderStateExp(9)
+							}
+							if (v.payment_state == 1 && v.shipment_state == 2 && v.state == 1) {
+								obj = that.orderStateExp(4)
+							}
+							v.stateTip = obj.stateTip
+							v.stateTipColor = obj.stateTipColor
+						}
+						this.order_list = res.data
 					}
-									 
-					console.log(this.tabCurrentIndex)	
 				})
 			},
 			//支付
-			async pay_again(id){
-				const pay_data=await this.$api.http.post('order/pay/pre_order', {
-					id: id
-				}).then(res => {
-					console.log('pay:', res)
-					return res
-				})				
-				await this.onpay(pay_data)  
+			async pay_again(id) { 
+				
+				//#ifdef MP-WEIXIN 
+					 const pay_data=await orderModel.postOrderWxPay(id).then(res=>{
+						return res
+					});
+					await this.pay(pay_data);
+				//#endif
+				
+				//#ifdef APP-PLUS  
+					const app_data=await orderModel.postOrderAppPay(id).then(res=>{
+						return res
+					});
+					await this.app_pay(app_data);
+				//#endif
+				
+				
+				//#ifdef H5 
+					const wx_data=await orderModel.postOrderH5Pay(id).then(res=>{
+						return res
+					});					
+					this.wxPay(wx_data);
+				//#endif
 			},
 			//支付
-			onpay(data) {  
-				const that=this
-			    uni.requestPayment({
-			    	provider:"wxpay", 
-			    	timeStamp: data.timeStamp,
-			    	nonceStr: data.nonceStr,
-			    	package: data.package,
-			    	signType: data.signType,
-			    	paySign: data.paySign,
-			    	success: function (res) {  
-			    		console.log('success:' + JSON.stringify(res)); 
-			    		that.get_order()
-			    	},
-			    	fail: function (err) { 						
-			    		console.log('fail:' + JSON.stringify(err)); 
-			    	}
-			    });
-			},			
+			onpay(data) {
+				const that = this
+				uni.requestPayment({
+					provider: "wxpay",
+					timeStamp: data.timeStamp,
+					nonceStr: data.nonceStr,
+					package: data.package,
+					signType: data.signType,
+					paySign: data.paySign,
+					success: function(res) {
+						console.log('success:' + JSON.stringify(res));
+						that.get_order()
+					},
+					fail: function(err) {
+						console.log('fail:' + JSON.stringify(err));
+					}
+				});
+			},
+			//公众号支付
+			wxPay(json) {
+				if (typeof WeixinJSBridge == "undefined") {
+					if (document.addEventListener) {
+						document.addEventListener("WeixinJSBridgeReady", jsApiCall, false);
+					} else if (document.attachEvent) {
+						document.attachEvent("WeixinJSBridgeReady", jsApiCall);
+						document.attachEvent("onWeixinJSBridgeReady", jsApiCall);
+					}
+				} else {
+					this.jsApiCall(json);
+				}
+			},
+			jsApiCall(json) {
+				const that = this;
+				WeixinJSBridge.invoke("getBrandWCPayRequest", json, function(res) {
+					WeixinJSBridge.log('a:', res.err_msg);
+					if (res.err_msg == "get_brand_wcpay_request:ok") {
+						that.$api.msg("支付成功!"); 
+					} else if (res.err_msg == "get_brand_wcpay_request:cancel") {
+						that.$api.msg("取消支付");
+					} else {
+						that.$api.msg("支付失败");
+					}
+					if (this.is_kai == 1) {
+						uni.navigateTo({
+							url: '../invite/invite?id=' + that.pid
+						}) 
+						return
+					}
+					setTimeout(() => {
+						uni.redirectTo({
+							url: '/pages/order/order'
+						});
+					}, 1000);
+				});
+			},
 			
 			//获取订单列表
 			loadData(source) {},
@@ -188,48 +264,48 @@
 			tabClick(index) {
 				console.log(index)
 				this.tabCurrentIndex = index;
-				if(index==1){
-					this.now_pay=0
-					this.now_drive=0		
-					this.now_pinjia=0 
+				if (index == 1) {
+					this.now_pay = 0
+					this.now_drive = 0
+					// this.now_state=0 
 				}
-				if(index==2){
-					this.now_pay=1	
-					this.now_drive=0		
-					this.now_pinjia=0 
+				if (index == 2) {
+					this.now_pay = 1
+					this.now_drive = 0
+					this.now_state = 0
 				}
-				if(index==3){		
-					this.now_pay=1				
-					this.now_drive=1		
-					this.now_pinjia=0 
-				} 
-				if(index==4){
-					this.now_pay=1				
-					this.now_drive=0			
-					this.now_pinjia=-1 
-				} 
+				if (index == 3) {
+					this.now_pay = 1
+					this.now_drive = 1
+					this.now_state = 0
+				}
+				if (index == 4) {
+					this.now_pay = 1
+					this.now_drive = 2
+					this.now_state = 1
+				}
 			},
 			//删除订单
 			deleteOrder(id) {
 				const that = this
 				uni.showModal({
-				    title: '提示',
-				    content: '确定删除订单？',
-				    success: function (res) {
-				        if (res.confirm) {
-				            console.log('用户点击确定');
-							that.$api.http.put('order/user/del_order?id='+id).then(res=>{
+					title: '提示',
+					content: '确定删除订单？',
+					success: function(res) {
+						if (res.confirm) {
+							console.log('用户点击确定');
+							orderModel.putOrderdel(id).then(res=>{
 								uni.showToast({
-								    title: '删除成功',
-								    duration: 2000
+									title: '删除成功',
+									duration: 2000
 								});
 								that.get_order()
 							})
-				        } else if (res.cancel) {
-				            console.log('用户点击取消');
-				        }
-				    }
-				});	 
+						} else if (res.cancel) {
+							console.log('用户点击取消');
+						}
+					}
+				});
 			},
 
 			//订单状态文字和颜色
@@ -243,8 +319,14 @@
 					case 2:
 						stateTip = '待发货';
 						break;
+					case 3:
+						stateTip = '待收货';
+						break;
+					case 4:
+						stateTip = '已完成';
+						break;
 					case 9:
-						stateTip = '订单已关闭';
+						stateTip = '已关闭';
 						stateTipColor = '#909399';
 						break;
 

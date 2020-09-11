@@ -1,1 +1,0 @@
-<view><block wx:if="{{list_empty}}"><none vue-id="1" bind:__l="__l"></none></block><block wx:else><block wx:for="{{list}}" wx:for-item="item" wx:for-index="__i0__"><view><view data-event-opts="{{[['tap',[['jump',['$0'],[[['list','',__i0__,'id']]]]]]]}}" class="list" bindtap="__e">{{''+item.title+''}}</view></view></block></block></view>

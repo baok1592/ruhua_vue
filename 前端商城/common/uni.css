@@ -145,7 +145,7 @@
 	padding: 15upx 25upx;
 	line-height:50upx; */
 	text-indent:20upx;
-	font-size:28upx;
+	/* font-size:28upx; */
 	background:#FCFAED;
 	flex: 1;
 } 

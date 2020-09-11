@@ -5,7 +5,7 @@
 		</div>
 		<view class="t_con">
 			<view class="t_c_tit">《服务协议和隐私政策》</view>
-			<view class="t_c_con"> 欢迎您访问如花商城！为了更好地为您提供服务与保障您的消费者权益，请使用前务必仔细阅读以下协议内容。如您选择同意，则视为您已充分阅读并理解本服务协议的内容，自愿接受本协议所约定的权利义务约束。</view> 
+			<view class="t_c_con"> 欢迎您访问商城！为了更好地为您提供服务与保障您的消费者权益，请使用前务必仔细阅读以下协议内容。如您选择同意，则视为您已充分阅读并理解本服务协议的内容，自愿接受本协议所约定的权利义务约束。</view> 
 			<view class="t_c_more" >
 				<span @click="jump_xieyi(1)">《服务协议》</span> 和
 				<span @click="jump_xieyi(2)">《隐私政策》</span>

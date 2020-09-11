@@ -10,6 +10,7 @@
 				</el-header>
 				<el-main style="background-color: #F3F3F3;">
 					<div class="article">
+						<el-button  @click="jumpback">返回</el-button> &emsp;
 						<el-button type="primary" @click="add">新建运费模板</el-button>
 						<div style="height:20px;">&nbsp;</div>
 						<template>
@@ -22,8 +23,7 @@
 								<el-table-column prop="full" label="续费（元）"></el-table-column>
 								<el-table-column prop="operation" label="操作" width="300px">
 									<template slot-scope="scope">
-										<el-button @click="edit(scope.row)"
-										 type="success" size="small">修改</el-button>
+										<el-button @click="edit(scope.row)" type="success" size="small">修改</el-button>
 										<el-button style="margin-left: 10px" type="danger" size="small" slot="reference" @click="del(scope.row.id)">删除</el-button>
 									</template>
 								</el-table-column><strong></strong>
@@ -43,11 +43,11 @@
 	import NavTo from '@/components/navTo.vue'
 	import Header from "@/components/header.vue";
 	export default {
-		data(){
-			return{
+		data() {
+			return {
 				size: 10,
-				total: '',
-				list:'',
+				total: 0,
+				list: [],
 			}
 		},
 		components: {
@@ -57,7 +57,13 @@
 		mounted() {
 			this.get_template();
 		},
-		methods:{
+		methods: {
+			//返回
+			jumpback() {
+				this.$router.push({
+					path: '/extend/application'
+				})
+			},
 			jump_page(e) {
 				const that = this;
 				let start = (e - 1) * that.size;
@@ -67,7 +73,7 @@
 			},
 			//获取
 			get_template() {
-				this.http.get_show('delivery/admin/get_delivery').then(res => {
+				this.http.get('delivery/admin/get_delivery').then(res => {
 					this.list = res.data
 				})
 			},
@@ -81,14 +87,14 @@
 				}).then(() => {
 					this.http.put_show('delivery/admin/del_delivery', {
 						id: id
-					}).then(res=> {
-						if(res.status==200){
+					}).then(res => {
+						if (res.status == 200) {
 							that.$message({
 								showClose: true,
 								message: '删除成功',
 								type: 'success'
 							});
-						}else{
+						} else {
 							that.$message({
 								showClose: true,
 								message: res.msg,
@@ -100,25 +106,29 @@
 					});
 				})
 			},
-			add(){
+			add() {
 				this.$router.push({
 					path: './addtemplate'
 				})
 			},
 			edit(item) {
-				localStorage.setItem("edit_data",JSON.stringify(item))
-				this.$router.push({path: './edittemplate', query:{key:2}});
+				localStorage.setItem("edit_data", JSON.stringify(item))
+				this.$router.push({
+					path: './addtemplate',
+					query: {
+						type:'edit'
+					}
+				});
 			},
 		}
 	}
-	
 </script>
 
 <style>
-.article {
-			line-height: 30px;
-			background-color: #fff;
-			padding: 15px;
-			text-align: left;
-		}
+	.article {
+		line-height: 30px;
+		background-color: #fff;
+		padding: 15px;
+		text-align: left;
+	}
 </style>

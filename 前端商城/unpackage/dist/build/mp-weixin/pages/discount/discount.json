@@ -1,7 +1,0 @@
-{
-  "enablePullDownRefresh": true,
-  "navigationBarBackgroundColor": "#f7f7f7",
-  "usingComponents": {
-    "none": "/components/qy/none"
-  }
-}
