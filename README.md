@@ -6,7 +6,7 @@
 微信小程序端，微信公众号端，APP端。
 匆匆上线，还有很多不完善，疯狂迭代中...
 
-##### 官网： http://www.ruhuashop.com
+##### 官网： https://mall.telidy.cn/
 ##### QQ群： 728615087
 
 
@@ -15,12 +15,11 @@
 2.  后台cms安装：npm install 
 3.  后台cms运行：npm run serve
 
-#### 扫码演示
-![image](https://github.com/baok1592/ruhua/raw/master/xcx.jpg)
-![image](https://github.com/baok1592/ruhua/raw/master/h5.png)
+#### 扫码演示 
+请到官网查看：https://mall.telidy.cn/
 
 #### 后台
-演示: http://api.demo.ruhuashop.com/cms/	账号：admin	密码123456
+演示: http://demo.telidy.cn/one_cms/#/login
 仓库：https://github.com/baok1592/ruhua
 
 #### 开源版使用须知
